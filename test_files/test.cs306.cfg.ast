@@ -1,0 +1,7 @@
+Program:
+   Procedure: main
+      Basic_Block 2
+         Asgn:
+            LHS (Name : b)
+            RHS (Name : a)
+         Return <NOTHING>
