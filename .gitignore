@@ -2,8 +2,11 @@
 *.slo
 *.lo
 *.o
+*tags
+*.out
 
 # Compiled Dynamic libraries
+
 *.so
 *.dylib
 
@@ -11,3 +14,6 @@
 *.lai
 *.la
 *.a
+
+# temp files
+scannerbase.h parserbase.h scanner.cc parser.cc parser.yy.output
