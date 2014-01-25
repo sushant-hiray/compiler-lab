@@ -52,7 +52,7 @@
 program:
 	declaration_statement_list procedure_name
 	procedure_body
-|
+	|
 	procedure_name
 	procedure_body
 ;
@@ -70,7 +70,7 @@ procedure_body:
 
 declaration_statement_list:
 	declaration_statement
-|
+	|
 	declaration_statement_list declaration_statement
 ;
 
@@ -80,7 +80,7 @@ declaration_statement:
 
 basic_block_list:
 	basic_block_list basic_block
-|
+	|
 	basic_block	
 ;
 
@@ -90,18 +90,18 @@ basic_block:
 
 executable_statement_list:
 	assignment_statement_list
-|
+	|
 	assignment_statement_list RETURN ';'
 ;
 
 assignment_statement_list:
-|
+	|
 	assignment_statement_list assignment_statement
 ;
 
 assignment_statement:
 	variable '=' variable ';'
-|
+	|
 	variable '=' constant ';'
 ;
 
