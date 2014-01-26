@@ -48,7 +48,7 @@
 %token <string_value> NAME
 %token <float_value> FLOAT_NUMBER
 %token <char_value> CHAR_LETTER
-%token RETURN INTEGER FLOAT CHAR
+%token RETURN INTEGER FLOAT CHAR IF ELSE GOTO
 
 /* start symbol is named "program" */
 %start program
@@ -100,6 +100,11 @@ executable_statement_list:
 	assignment_statement_list
 	|
 	assignment_statement_list RETURN ';'
+    |
+    assignment_statement_list if_control_block
+    |
+    assignment_statement_list goto_statement
+
 ;
 
 assignment_statement_list:
@@ -113,6 +118,50 @@ assignment_statement:
 	variable '=' constant ';'
 ;
 
+expression:
+    logical_expression
+    |
+    atomic_expression
+;
+
+logical_expression:
+    expression '=' '=' expression
+    |
+    expression '!' '=' expression
+    |
+    expression '>' expression 
+    |
+    expression '<' expression 
+    |
+    expression '>' '=' expression 
+    |
+    expression '<' '=' expression 
+;
+
+atomic_expression:
+    variable
+    |
+    constant
+    |
+    '(' expression ')'
+;
+
+not_expression:
+    '!' not_expression
+    |
+    variable
+    |
+    constant
+;
+
+if_control_block:
+    IF '(' logical_expression ')' goto_statement ELSE goto_statement
+;
+
+goto_statement:
+    GOTO '<' NAME INTEGER_NUMBER '>' ';' 
+
+;
 variable:
 	NAME
 ;
