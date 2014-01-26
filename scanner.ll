@@ -27,19 +27,10 @@
 %%
 
 int     {
-        store_token_name("INT");
+        store_token_name("INTEGER");
         return Parser::INTEGER;
         }
-
-float   {
-            store_token_name("FLOAT");
-            return Parser::FLOAT;
-        }
-
-char    {
-            store_token_name("CHAR");
-            return Parser::CHAR;
-        }      
+      
 return		{ 
 			store_token_name("RETURN");
 			return Parser::RETURN; 

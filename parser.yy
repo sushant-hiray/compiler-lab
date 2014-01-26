@@ -46,9 +46,9 @@
 
 %token <integer_value> INTEGER_NUMBER
 %token <string_value> NAME
+%token RETURN INTEGER IF ELSE GOTO FLOAT CHAR
 %token <float_value> FLOAT_NUMBER
 %token <char_value> CHAR_LETTER
-%token RETURN INTEGER FLOAT CHAR IF ELSE GOTO
 
 /* start symbol is named "program" */
 %start program
