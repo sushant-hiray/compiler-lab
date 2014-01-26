@@ -33,19 +33,19 @@ int     {
 
 float   {
             store_token_name("FLOAT");
-            return Parser::INTEGER;
+            return Parser::FLOAT;
         }
 
 char    {
             store_token_name("CHAR");
-            return Parser::CHAR_LETTER;
+            return Parser::CHAR;
         }      
 return		{ 
 			store_token_name("RETURN");
 			return Parser::RETURN; 
 		}
 
-[<>:{}();=]	{
+[<>:{}();=!]	{
 			store_token_name("META CHAR");
 			return matched()[0];
 		}
@@ -58,6 +58,7 @@ return		{
 
 				return Parser::INTEGER_NUMBER; 
 			}
+
 
 [-]?[[:digit:]]+[.][[:digit:]]+   {
                 store_token_name("NUM_FLOAT");
