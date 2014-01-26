@@ -1,6 +1,9 @@
 int a;
-main()
+int main()
 {
-	int b;
+    int b,c;
+    if(a==b){
+        b=c;
+    }
 	b = a;
 }

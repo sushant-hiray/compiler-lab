@@ -10,6 +10,9 @@
            Khedker    (http://www.cse.iitb.ac.in/~uday)  for the courses
            cs302+cs306: Language  Processors  (theory and  lab)  at  IIT
            Bombay.
+           
+           Currently being updated by Sushant and Sanchit as a part of l
+           ab course on Implementation of Programming Languages.
 
            Release  date  Jan  15, 2013.  Copyrights  reserved  by  Uday
            Khedker. This  implemenation  has been made  available purely
@@ -37,11 +40,15 @@
 	Basic_Block * basic_block;
 	list<Basic_Block *> * basic_block_list;
 	Procedure * procedure;
+    float float_value;
+    char char_value;
 };
 
 %token <integer_value> INTEGER_NUMBER
 %token <string_value> NAME
-%token RETURN INTEGER 
+%token <float_value> FLOAT_NUMBER
+%token <char_value> CHAR_LETTER
+%token RETURN INTEGER FLOAT CHAR
 
 /* start symbol is named "program" */
 %start program
@@ -75,7 +82,8 @@ declaration_statement_list:
 ;
 
 declaration_statement:
-	INTEGER NAME ';'
+	type_specifier
+    NAME ';'
 ;
 
 basic_block_list:
@@ -110,5 +118,13 @@ variable:
 ;
 
 constant:
-	INTEGER_NUMBER
+	INTEGER_NUMBER | FLOAT_NUMBER | CHAR_LETTER
+;
+
+type_specifier:
+    INTEGER
+    |
+    FLOAT
+    |
+    CHAR
 ;

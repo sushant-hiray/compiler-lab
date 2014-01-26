@@ -26,11 +26,20 @@
 
 %%
 
-int		{
-			store_token_name("INTEGER");
-			return Parser::INTEGER; 
-		}
+int     {
+        store_token_name("INT");
+        return Parser::INTEGER;
+        }
 
+float   {
+            store_token_name("FLOAT");
+            return Parser::INTEGER;
+        }
+
+char    {
+            store_token_name("CHAR");
+            return Parser::CHAR_LETTER;
+        }      
 return		{ 
 			store_token_name("RETURN");
 			return Parser::RETURN; 
@@ -49,6 +58,14 @@ return		{
 
 				return Parser::INTEGER_NUMBER; 
 			}
+
+[-]?[[:digit:]]+[.][[:digit:]]+   {
+                store_token_name("NUM_FLOAT");
+                ParserBase::STYPE__ * val = getSval();
+                val->integer_value = atoi(matched().c_str());
+
+                return Parser::FLOAT_NUMBER;
+            }
 
 [[:alpha:]_][[:alpha:][:digit:]_]* {
 					store_token_name("NAME");
