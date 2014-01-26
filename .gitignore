@@ -17,3 +17,6 @@
 
 # temp files
 scannerbase.h parserbase.h scanner.cc parser.cc parser.yy.output
+*.output 
+*.cfg
+cfglp
