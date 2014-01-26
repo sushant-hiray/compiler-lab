@@ -20,3 +20,5 @@ scannerbase.h parserbase.h scanner.cc parser.cc parser.yy.output
 *.output 
 *.cfg
 cfglp
+
+test_files/
