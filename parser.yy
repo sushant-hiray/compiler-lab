@@ -116,6 +116,8 @@ assignment_statement:
 	variable '=' variable ';'
 	|
 	variable '=' constant ';'
+    |
+    variable '=' expression ';'
 ;
 
 expression:
