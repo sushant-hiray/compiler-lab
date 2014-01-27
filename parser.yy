@@ -148,13 +148,6 @@ atomic_expression:
     '(' expression ')'
 ;
 
-not_expression:
-    '!' not_expression
-    |
-    variable
-    |
-    constant
-;
 
 if_control_block:
     IF '(' logical_expression ')' goto_statement ELSE goto_statement
