@@ -46,9 +46,7 @@
 
 %token <integer_value> INTEGER_NUMBER
 %token <string_value> NAME
-%token RETURN INTEGER IF ELSE GOTO FLOAT CHAR
-%token <float_value> FLOAT_NUMBER
-%token <char_value> CHAR_LETTER
+%token RETURN INTEGER IF ELSE GOTO 
 
 /* start symbol is named "program" */
 %start program
@@ -59,104 +57,142 @@
 program:
 	declaration_statement_list procedure_name
 	procedure_body
+    {}
 	|
 	procedure_name
 	procedure_body
+    {}
 ;
 
 procedure_name:
 	NAME '(' ')'
+    {}
 ;
 
 procedure_body:
 	'{' declaration_statement_list
 	basic_block_list '}'
-	|
+	{}
+    |
 	'{' basic_block_list '}'
+    {}
 ;
 
 declaration_statement_list:
 	declaration_statement
+    {}
 	|
 	declaration_statement_list declaration_statement
+    {}
 ;
 
 declaration_statement:
 	type_specifier
     NAME ';'
+    {}
 ;
 
 basic_block_list:
 	basic_block_list basic_block
+    {}
 	|
 	basic_block	
+    {}
 ;
 
 basic_block:
 	'<' NAME INTEGER_NUMBER '>' ':' executable_statement_list
+    {}
 ;
 
 executable_statement_list:
 	assignment_statement_list
-	|
+	{}
+    |
 	assignment_statement_list RETURN ';'
+    {}
     |
     assignment_statement_list if_control_block
+    {}
     |
     assignment_statement_list goto_statement
-
+    {}
 ;
 
 assignment_statement_list:
 	|
 	assignment_statement_list assignment_statement
+    {}
 ;
 
 assignment_statement:
     variable '=' expression ';'
+    {}
 ;
 
 expression:
     logical_expression
+    {}
 ;
 
 boolean_op:
-    '=' '=' | '!' '=' | '>' | '<' | '>' '=' | '<' '=' 
+    '=' '=' 
+    {}
+    | 
+    '!' '='
+    {}
+    |
+    '>' 
+    {}
+    |
+    '<' 
+    {}
+    |
+    '>' '='
+    {}
+    |
+    '<' '='
+    {}
 ;
 
 logical_expression:
     expression boolean_op atomic_expression
+    {}
     |
     atomic_expression
+    {}
 ;
 
 atomic_expression:
     variable
+    {}
     |
     constant
+    {}
 ;
 
 
 if_control_block:
     IF '(' logical_expression ')' goto_statement ELSE goto_statement
+    {}
 ;
 
 goto_statement:
     GOTO '<' NAME INTEGER_NUMBER '>' ';' 
+    {}
 
 ;
 variable:
 	NAME
+    {}
 ;
 
 constant:
-	INTEGER_NUMBER | FLOAT_NUMBER | CHAR_LETTER
+	INTEGER_NUMBER 
+    {}
 ;
 
 type_specifier:
     INTEGER
-    |
-    FLOAT
-    |
-    CHAR
+    {}
 ;
