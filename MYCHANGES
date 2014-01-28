@@ -1,0 +1,29 @@
+Sushant Hiray: 110050009
+Sanchit Garg : 110050035
+
+The following changes were made for Lab3 Submission
+For this submission, we changed mainly 2 files, namely: scanner.ll and parser.yy
+
+Changes in scanner.ll:
+    -> regex expression corresponding to if else goto tokens were added.
+    -> A new regex matching comments was added alongwith the earlier existing ignore lexeme part.
+    -> `!` was added in the list of meta characters.
+
+Changes in parser.yy
+    -> Modified the executable_statement_list:
+        ->Added if_control_block
+        ->Added goto_statement
+
+
+    ->Modified assignment_statement.
+        Added variable '=' expression ';'
+
+
+    ->Added if_control_block
+    ->Added goto_statement
+
+    ->Added grammar corresponding to expression:
+        ->Added grammar corresponding to logical_expression
+        ->Added grammar corresponding to atomic_expression
+        
+
