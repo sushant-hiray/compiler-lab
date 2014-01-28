@@ -113,39 +113,27 @@ assignment_statement_list:
 ;
 
 assignment_statement:
-	variable '=' variable ';'
-	|
-	variable '=' constant ';'
-    |
     variable '=' expression ';'
 ;
 
 expression:
     logical_expression
-    |
-    atomic_expression
+;
+
+boolean_op:
+    '=' '=' | '!' '=' | '>' | '<' | '>' '=' | '<' '=' 
 ;
 
 logical_expression:
-    expression '=' '=' expression
+    expression boolean_op atomic_expression
     |
-    expression '!' '=' expression
-    |
-    expression '>' expression 
-    |
-    expression '<' expression 
-    |
-    expression '>' '=' expression 
-    |
-    expression '<' '=' expression 
+    atomic_expression
 ;
 
 atomic_expression:
     variable
     |
     constant
-    |
-    '(' expression ')'
 ;
 
 
