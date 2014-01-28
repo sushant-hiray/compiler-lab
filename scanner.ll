@@ -65,13 +65,6 @@ goto    {
 			}
 
 
-[-]?[[:digit:]]+[.][[:digit:]]+   {
-                store_token_name("NUM_FLOAT");
-                ParserBase::STYPE__ * val = getSval();
-                val->integer_value = atoi(matched().c_str());
-
-                return Parser::FLOAT_NUMBER;
-            }
 
 [[:alpha:]_][[:alpha:][:digit:]_]* {
 					store_token_name("NAME");
