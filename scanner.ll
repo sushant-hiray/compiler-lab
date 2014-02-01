@@ -75,6 +75,10 @@ goto    {
 					return Parser::NAME; 
 				}
 
+[<][b][b][ \t]*[:digit:][ \t]*[>] {
+                store_token_name("BASIC BLOCK");
+                return Parser:basic_block;
+                }
 \n		{ 
 			if (command_options.is_show_tokens_selected())
 				ignore_token();

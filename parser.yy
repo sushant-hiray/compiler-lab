@@ -46,7 +46,7 @@
 
 %token <integer_value> INTEGER_NUMBER
 %token <string_value> NAME
-%token RETURN INTEGER IF ELSE GOTO 
+%token basic_block RETURN INTEGER IF ELSE GOTO 
 
 /* start symbol is named "program" */
 %start program
@@ -96,14 +96,12 @@ basic_block_list:
 	basic_block_list basic_block
     {}
 	|
-	basic_block	
+    basic_block
     {}
 ;
 
-basic_block:
-	'<' NAME INTEGER_NUMBER '>' ':' executable_statement_list
-    {}
-;
+
+
 
 executable_statement_list:
 	assignment_statement_list
@@ -178,7 +176,7 @@ if_control_block:
 ;
 
 goto_statement:
-    GOTO '<' NAME INTEGER_NUMBER '>' ';' 
+    GOTO basic_block
     {}
 
 ;
