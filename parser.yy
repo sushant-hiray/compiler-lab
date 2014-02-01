@@ -45,8 +45,9 @@
 };
 
 %token <integer_value> INTEGER_NUMBER
+%token BASICBLOCK
 %token <string_value> NAME
-%token BASICBLOCK RETURN INTEGER IF ELSE GOTO 
+%token RETURN INTEGER IF ELSE GOTO ASSIGN_OP NE EQ LT LE GT GE    
 
 /* start symbol is named "program" */
 %start program
@@ -126,7 +127,7 @@ assignment_statement_list:
 ;
 
 assignment_statement:
-    variable '=' expression ';'
+    variable ASSIGN_OP expression ';'
     {}
 ;
 
@@ -136,22 +137,22 @@ expression:
 ;
 
 boolean_op:
-    '=' '=' 
+    EQ
     {}
     | 
-    '!' '='
+    NE
     {}
     |
-    '>' 
+    GT
     {}
     |
-    '<' 
+    LT
     {}
     |
-    '>' '='
+    GE
     {}
     |
-    '<' '='
+    LE
     {}
 ;
 
