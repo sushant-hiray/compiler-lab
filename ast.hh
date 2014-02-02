@@ -143,6 +143,32 @@ class Conditional_Ast:public Ast
         ~Conditional_Ast();
         void print_ast(ostream &file_buffer);
         Eval_Result & evaluate(Local_Environment & eval_env, ostream & file_buffer);
+};
+
+
+
+
+
+
+
+
+class Goto_Ast:public Ast
+{
+    private:
+        int block_no;
+    public:
+        Goto_Ast(int bb_no);
+        ~Goto_Ast();
+        void print_ast(ostream &file_buffer);
+        Eval_Result & evaluate(Local_Environment & eval_env, ostream & file    _buffer);
+
+};
+
+
+
+
+
+
 
 template <class T>
 class Number_Ast:public Ast
