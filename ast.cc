@@ -210,7 +210,105 @@ Eval_Result & Name_Ast::evaluate(Local_Environment & eval_env, ostream & file_bu
 	return get_value_of_evaluation(eval_env);
 }
 
+//////////////////////////////////////////////////////////////////////////
+
+Expression_Ast::Expression_Ast(Ast * lhs , Ast *  rhs , BooleanOp op){
+	lhs_exp = lhs;
+	rhs_exp = rhs;
+	op  = op;
+}
+
+Expression_Ast::~Expression_Ast(){
+	delete(lhs_exp);
+	delete(rhs_exp);
+}
+void Expression_Ast :: print_ast(ostream & file_buffer){
+
+	file_buffer << "\n"<< AST_SPACE <<" Expression:\n";
+	file_buffer << AST_NODE_SPACE << "LHS (";
+	lhs_exp->print_ast(file_buffer);
+	file_buffer << ")\n";
+	file_buffer << "\t"  << AST_NODE_SPACE << "Boolean_op : " <<op << "\n"; 
+	file_buffer << AST_NODE_SPACE << "RHS (";
+	rhs->print_ast(file_buffer);
+	file_buffer << ")\n";
+}
+
+
+Eval_Result & Expression_Ast:: evaluate(Local_Environment & eval_env, ostream & file_buffer){
+		Eval_Result & result = *new Eval_Result_Value_Int();
+        return result;
+}
+
 ///////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////
+
+Conditional_Ast::Conditional_Ast(Ast* _condition, Ast*  ifGoto, Ast* elseGoto){
+	condition = _condition;
+	if_goto = ifGoto;
+	else_goto = elseGoto;
+}
+
+Condtional_Ast::~Conditional_Ast(){
+	delete(condition);
+	delete(if_goto);
+	delete(else_goto);
+	
+}
+
+void Conditional_Ast ::  print_ast(ostream & file_buffer){
+	
+	file_buffer << AST_SPACE << "IF	" << "\n" ;
+	file_buffer << AST_NODE_SPACE  << "Condition";
+	condition->print_ast(file_buffer);
+	file_buffer<<"\n";
+	if_goto->print_ast(file_buffer);
+	file_buffer << "\n" << AST_SPACE << " ELSE  " <<"\n";
+	else_goto->print_ast(file_buffer); 
+	file_buffer << "\n";
+}
+
+Eval_Result & Conditional_Ast:: evaluate(Local_Environment & eval_env, ostream & file_buffer){
+		Eval_Result & result = *new Eval_Result_Value_Int();
+        return result;
+}
+
+/////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////
+
+
+
+Goto_Ast::Goto_Ast(int bb){
+	block_no=bb;
+}
+
+
+Goto_Ast::~Goto_Ast(){
+	//nothing to delete
+}
+
+
+Eval_Result & Goto_Ast:: evaluate(Local_Environment & eval_env, ostream & file_buffer){
+		Eval_Result & result = *new Eval_Result_Value_Int();
+        return result;
+}
+
+
+
+void Goto_Ast::print_ast(ostream & file_buffer){
+	file_buffer << AST_NODE_SPACE << "GOTO : <bb "<< bb_no << " > \n";
+};
+
+
+
+
+
+/////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////
+
+
+
 
 template <class DATA_TYPE>
 Number_Ast<DATA_TYPE>::Number_Ast(DATA_TYPE number, Data_Type constant_data_type)
