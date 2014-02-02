@@ -131,7 +131,18 @@ class Expression_Ast:public Ast
 
 
 
+class Conditional_Ast:public Ast
+{
+    private:
+        Ast* condition;
+        Ast* if_goto;
+        Ast* else_goto;
 
+    public:
+        Conditional_Ast(Ast* condition, Ast* if_goto, Ast* else_goto);
+        ~Conditional_Ast();
+        void print_ast(ostream &file_buffer);
+        Eval_Result & evaluate(Local_Environment & eval_env, ostream & file_buffer);
 
 template <class T>
 class Number_Ast:public Ast
