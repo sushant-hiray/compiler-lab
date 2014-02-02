@@ -52,6 +52,11 @@ public:
 	virtual Eval_Result & evaluate(Local_Environment & eval_env, ostream & file_buffer) = 0;
 };
 
+
+
+
+
+
 class Assignment_Ast:public Ast
 {
 	Ast * lhs;
@@ -68,6 +73,12 @@ public:
 
 	Eval_Result & evaluate(Local_Environment & eval_env, ostream & file_buffer);
 };
+
+
+
+
+
+
 
 class Name_Ast:public Ast
 {
@@ -87,6 +98,40 @@ public:
 	void set_value_of_evaluation(Local_Environment & eval_env, Eval_Result & result);
 	Eval_Result & evaluate(Local_Environment & eval_env, ostream & file_buffer);
 };
+
+
+
+
+class Expression_Ast:public Ast
+{
+    public:
+        enum BooleanOp{
+            GT,
+            GE,
+            LT,
+            LE,
+            EQ,
+            NE
+        };
+        
+    private:
+        Ast* lhs_exp;
+        Ast* rhs_exp;
+        BooleanOp op;
+
+    public:
+        Expression_Ast(Ast * lhs_exp , Ast * rhs_exp , BooleanOp op);
+        ~Expression_Ast();
+        void print_ast(ostream & file_buffer);
+
+        Eval_Result & evaluate(Local_Environment & eval_env, ostream & file_buffer);
+
+};
+
+
+
+
+
 
 template <class T>
 class Number_Ast:public Ast
