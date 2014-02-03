@@ -36,6 +36,8 @@
 	list<Ast *> * ast_list;
 	Ast * ast;
     Expression_Ast * e_Ast;
+    Goto_Ast * goto_ast;
+    Conditional_Ast * cond_ast;
 	Symbol_Table * symbol_table;
 	Symbol_Table_Entry * symbol_entry;
 	Basic_Block * basic_block;
@@ -60,8 +62,8 @@
 %type <ast> assignment_statement
 %type <ast> variable
 %type <ast> constant
-%type <ast> if_control_block
-%type <ast> goto_statement
+%type <cond_ast> if_control_block
+%type <goto_ast> goto_statement
 %type <op> boolean_op
 %type <ast> expression
 %type <ast> logical_expression

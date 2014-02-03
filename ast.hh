@@ -132,22 +132,6 @@ class Expression_Ast:public Ast
 
 
 
-class Conditional_Ast:public Ast
-{
-    private:
-        Expression_Ast* condition;
-        Ast* true_goto;
-        Ast* false_goto;
-
-    public:
-        Conditional_Ast(Expression_Ast* condition, Ast* trueGoto, Ast* falseGoto);
-        ~Conditional_Ast();
-        void print_ast(ostream &file_buffer);
-        Eval_Result & evaluate(Local_Environment & eval_env, ostream & file_buffer);
-};
-
-
-
 
 
 
@@ -161,9 +145,37 @@ class Goto_Ast:public Ast
         Goto_Ast(int bb_no);
         ~Goto_Ast();
         void print_ast(ostream &file_buffer);
+        int getBlockNo();
         Eval_Result & evaluate(Local_Environment & eval_env, ostream & file_buffer);
 
 };
+
+
+
+
+
+
+
+
+class Conditional_Ast:public Ast
+{
+    private:
+        Ast* condition;
+        Goto_Ast* true_goto;
+        Goto_Ast* false_goto;
+
+    public:
+        Conditional_Ast(Ast* condition,Goto_Ast* trueGoto, Goto_Ast* falseGoto);
+        ~Conditional_Ast();
+        void print_ast(ostream &file_buffer);
+        Eval_Result & evaluate(Local_Environment & eval_env, ostream & file_buffer);
+};
+
+
+
+
+
+
 
 
 

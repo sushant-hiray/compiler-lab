@@ -224,11 +224,11 @@ Expression_Ast::~Expression_Ast(){
 }
 void Expression_Ast :: print_ast(ostream & file_buffer){
 
-	file_buffer << "\n"<< AST_SPACE <<opNames[op];
-	file_buffer << AST_NODE_SPACE << "LHS (";
+	file_buffer << "\n"<<AST_NODE_SPACE <<"Condition: "<<opNames[op]<<"\n";
+	file_buffer << AST_NODE_SPACE << "\tLHS (";
 	lhs_exp->print_ast(file_buffer);
 	file_buffer << ")\n";
-	file_buffer << AST_NODE_SPACE << "RHS (";
+	file_buffer  << AST_NODE_SPACE << "\tRHS (";
 	rhs_exp->print_ast(file_buffer);
 	file_buffer << ")\n";
 }
@@ -242,7 +242,7 @@ Eval_Result & Expression_Ast:: evaluate(Local_Environment & eval_env, ostream & 
 ///////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////
 
-Conditional_Ast::Conditional_Ast(Expression_Ast* _condition, Ast*  trueGoto, Ast* falseGoto){
+Conditional_Ast::Conditional_Ast(Ast* _condition, Goto_Ast*  trueGoto, Goto_Ast* falseGoto){
 	condition = _condition;
 	true_goto = trueGoto;
 	false_goto = falseGoto;
@@ -257,12 +257,10 @@ Conditional_Ast::~Conditional_Ast(){
 
 void Conditional_Ast ::  print_ast(ostream & file_buffer){
 	
-	file_buffer << AST_SPACE << "If_Else statement:" << "\n" ;
-	file_buffer << AST_NODE_SPACE  << "Condition: "<<opNames[condition->op];
-	true_goto->print_ast(file_buffer);
-	file_buffer << "\n" << AST_SPACE << " ELSE  " <<"\n";
-	false_goto->print_ast(file_buffer); 
-	file_buffer << "\n";
+	file_buffer << AST_SPACE << "If_Else statement:";
+    condition->print_ast(file_buffer);
+	file_buffer << AST_NODE_SPACE <<"True Successor: "<<true_goto->getBlockNo()<<"\n"; 
+	file_buffer << AST_NODE_SPACE << "False Successor: "<<false_goto->getBlockNo()<<"\n";
 }
 
 Eval_Result & Conditional_Ast:: evaluate(Local_Environment & eval_env, ostream & file_buffer){
@@ -284,6 +282,9 @@ Goto_Ast::~Goto_Ast(){
 	//nothing to delete
 }
 
+int Goto_Ast::getBlockNo(){
+    return block_no;
+}
 
 Eval_Result & Goto_Ast:: evaluate(Local_Environment & eval_env, ostream & file_buffer){
 		Eval_Result & result = *new Eval_Result_Value_Int();
