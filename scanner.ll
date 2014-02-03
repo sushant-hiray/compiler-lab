@@ -113,6 +113,9 @@ goto    {
 
 [<][b][b][ \t]*[[:digit:]]+[ \t]*[>] {
                 store_token_name("BASIC BLOCK");
+                ParserBase::STYPE__ * val = getSval();
+                string matchs = matched();
+                val->integer_value = atoi((matchs.substr(4,matchs.length() -5)).c_str());
                 return Parser::BASICBLOCK;
                 }
 \n		{ 

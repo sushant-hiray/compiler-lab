@@ -31,6 +31,8 @@
 
 using namespace std;
 
+
+static const char* opNames[] = {"EQ","NE","GT","LT","GE","LE" };    
 class Ast;
 
 class Ast
@@ -101,19 +103,18 @@ public:
 
 
 
-
 class Expression_Ast:public Ast
 {
     public:
         enum BooleanOp{
-            GT,
-            GE,
-            LT,
-            LE,
             EQ,
-            NE
+            NE,
+            GT,
+            LT,
+            GE,
+            LE
         };
-        
+
     private:
         Ast* lhs_exp;
         Ast* rhs_exp;
@@ -134,12 +135,12 @@ class Expression_Ast:public Ast
 class Conditional_Ast:public Ast
 {
     private:
-        Ast* condition;
-        Ast* if_goto;
-        Ast* else_goto;
+        Expression_Ast* condition;
+        Ast* true_goto;
+        Ast* false_goto;
 
     public:
-        Conditional_Ast(Ast* condition, Ast* if_goto, Ast* else_goto);
+        Conditional_Ast(Expression_Ast* condition, Ast* trueGoto, Ast* falseGoto);
         ~Conditional_Ast();
         void print_ast(ostream &file_buffer);
         Eval_Result & evaluate(Local_Environment & eval_env, ostream & file_buffer);
@@ -160,7 +161,7 @@ class Goto_Ast:public Ast
         Goto_Ast(int bb_no);
         ~Goto_Ast();
         void print_ast(ostream &file_buffer);
-        Eval_Result & evaluate(Local_Environment & eval_env, ostream & file    _buffer);
+        Eval_Result & evaluate(Local_Environment & eval_env, ostream & file_buffer);
 
 };
 

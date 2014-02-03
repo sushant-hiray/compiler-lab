@@ -224,13 +224,12 @@ Expression_Ast::~Expression_Ast(){
 }
 void Expression_Ast :: print_ast(ostream & file_buffer){
 
-	file_buffer << "\n"<< AST_SPACE <<" Expression:\n";
+	file_buffer << "\n"<< AST_SPACE <<opNames[op];
 	file_buffer << AST_NODE_SPACE << "LHS (";
 	lhs_exp->print_ast(file_buffer);
 	file_buffer << ")\n";
-	file_buffer << "\t"  << AST_NODE_SPACE << "Boolean_op : " <<op << "\n"; 
 	file_buffer << AST_NODE_SPACE << "RHS (";
-	rhs->print_ast(file_buffer);
+	rhs_exp->print_ast(file_buffer);
 	file_buffer << ")\n";
 }
 
@@ -243,28 +242,26 @@ Eval_Result & Expression_Ast:: evaluate(Local_Environment & eval_env, ostream & 
 ///////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////
 
-Conditional_Ast::Conditional_Ast(Ast* _condition, Ast*  ifGoto, Ast* elseGoto){
+Conditional_Ast::Conditional_Ast(Expression_Ast* _condition, Ast*  trueGoto, Ast* falseGoto){
 	condition = _condition;
-	if_goto = ifGoto;
-	else_goto = elseGoto;
+	true_goto = trueGoto;
+	false_goto = falseGoto;
 }
 
-Condtional_Ast::~Conditional_Ast(){
+Conditional_Ast::~Conditional_Ast(){
 	delete(condition);
-	delete(if_goto);
-	delete(else_goto);
+	delete(true_goto);
+	delete(false_goto);
 	
 }
 
 void Conditional_Ast ::  print_ast(ostream & file_buffer){
 	
-	file_buffer << AST_SPACE << "IF	" << "\n" ;
-	file_buffer << AST_NODE_SPACE  << "Condition";
-	condition->print_ast(file_buffer);
-	file_buffer<<"\n";
-	if_goto->print_ast(file_buffer);
+	file_buffer << AST_SPACE << "If_Else statement:" << "\n" ;
+	file_buffer << AST_NODE_SPACE  << "Condition: "<<opNames[condition->op];
+	true_goto->print_ast(file_buffer);
 	file_buffer << "\n" << AST_SPACE << " ELSE  " <<"\n";
-	else_goto->print_ast(file_buffer); 
+	false_goto->print_ast(file_buffer); 
 	file_buffer << "\n";
 }
 
@@ -296,7 +293,7 @@ Eval_Result & Goto_Ast:: evaluate(Local_Environment & eval_env, ostream & file_b
 
 
 void Goto_Ast::print_ast(ostream & file_buffer){
-	file_buffer << AST_NODE_SPACE << "GOTO : <bb "<< bb_no << " > \n";
+	file_buffer<<AST_SPACE<< "Goto statement:\n "<<AST_NODE_SPACE <<"Successor: "<< block_no << " \n";
 };
 
 
