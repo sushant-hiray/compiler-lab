@@ -96,7 +96,7 @@ bool Assignment_Ast::check_ast(int line)
 
 void Assignment_Ast::print_ast(ostream & file_buffer)
 {
-	file_buffer << AST_SPACE << "Asgn:\n";
+	file_buffer <<"\n" << AST_SPACE << "Asgn:\n";
 
 	file_buffer << AST_NODE_SPACE"LHS (";
 	lhs->print_ast(file_buffer);
@@ -104,7 +104,7 @@ void Assignment_Ast::print_ast(ostream & file_buffer)
 
 	file_buffer << AST_NODE_SPACE << "RHS (";
 	rhs->print_ast(file_buffer);
-	file_buffer << ")\n";
+	file_buffer << ")";
 }
 
 Eval_Result & Assignment_Ast::evaluate(Local_Environment & eval_env, ostream & file_buffer)
@@ -231,7 +231,7 @@ void Expression_Ast :: print_ast(ostream & file_buffer){
 	file_buffer << ")\n";
 	file_buffer  << AST_NODE_SPACE << "\tRHS (";
 	rhs_exp->print_ast(file_buffer);
-	file_buffer << ")\n";
+	file_buffer << ")";
 }
 
 Data_Type Expression_Ast::get_data_type()
@@ -419,7 +419,7 @@ Return_Ast::~Return_Ast()
 
 void Return_Ast::print_ast(ostream & file_buffer)
 {
-	file_buffer << AST_SPACE << "Return <NOTHING>\n";
+	file_buffer << "\n" << AST_SPACE << "Return <NOTHING>\n";
 }
 
 Eval_Result & Return_Ast::evaluate(Local_Environment & eval_env, ostream & file_buffer)
