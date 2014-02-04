@@ -216,6 +216,7 @@ Expression_Ast::Expression_Ast(Ast * lhs , Ast *  rhs , BooleanOp op){
 	lhs_exp = lhs;
 	rhs_exp = rhs;
 	op  = op;
+	node_data_type = int_data_type;
 }
 
 Expression_Ast::~Expression_Ast(){
@@ -233,9 +234,52 @@ void Expression_Ast :: print_ast(ostream & file_buffer){
 	file_buffer << ")\n";
 }
 
+Data_Type Expression_Ast::get_data_type()
+{
+	return node_data_type;
+}
 
 Eval_Result & Expression_Ast:: evaluate(Local_Environment & eval_env, ostream & file_buffer){
+		Eval_Result & l_res = lhs_exp->evaluate(eval_env, file_buffer);
+		if (l_res.is_variable_defined() == false){
+			report_error("Variable should be defined to be on lhs of condition", NOLINE);
+		}
+		Eval_Result & r_res = rhs_exp->evaluate(eval_env, file_buffer);
+		if (r_res.is_variable_defined() == false){
+			report_error("Variable should be defined to be on rhs of condition", NOLINE);
+		}
 		Eval_Result & result = *new Eval_Result_Value_Int();
+		int l = l_res.get_value();
+		int r = r_res.get_value();
+		int temp = 0;
+		switch (op) {
+			case EQ :
+				if(l==r){
+					temp=1;
+				}
+			case NE :
+				if(l!=r){
+					temp=1;
+				}
+			case GT :
+				if(l>r){
+					temp=1;
+				}
+			case LT :
+				if(l<r){
+					temp=1;
+				}
+			case GE :
+				if(l>=r){
+					temp=1;
+				}
+			case LE :
+				if(l<=r){
+					temp=1;
+				}
+		}
+		result.set_value(temp);
+		result.set_result_enum(int_result);
         return result;
 }
 

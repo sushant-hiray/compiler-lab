@@ -314,7 +314,7 @@ assignment_statement:
 	$$ = new Assignment_Ast($1, $3);
 
 	int line = get_line_number();
-	$$->check_ast(line);
+	
     }
 ;
 

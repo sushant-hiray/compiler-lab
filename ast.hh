@@ -123,8 +123,8 @@ class Expression_Ast:public Ast
     public:
         Expression_Ast(Ast * lhs_exp , Ast * rhs_exp , BooleanOp op);
         ~Expression_Ast();
+        Data_Type get_data_type();
         void print_ast(ostream & file_buffer);
-
         Eval_Result & evaluate(Local_Environment & eval_env, ostream & file_buffer);
 
 };
