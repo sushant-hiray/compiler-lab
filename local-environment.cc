@@ -95,6 +95,87 @@ Result_Enum Eval_Result_Value_Int::get_result_enum()
 
 ///////////////////////////////////////////////////////////////////////////////////
 
+
+
+Eval_Result_Value_Goto::Eval_Result_Value_Goto()
+{
+	value = 0;
+	defined = false;
+	result_type = goto_result;
+}
+
+Eval_Result_Value_Goto::~Eval_Result_Value_Goto()
+{ }
+
+void Eval_Result_Value_Goto::set_value(int number)
+{
+	value = number;
+	defined = true;
+}
+
+int Eval_Result_Value_Goto::get_value()
+{
+	return value;
+}
+
+void Eval_Result_Value_Goto::set_variable_status(bool def)
+{
+	defined = def;
+}
+
+bool Eval_Result_Value_Goto::is_variable_defined()
+{
+	return defined;
+}
+
+void Eval_Result_Value_Goto::set_result_enum(Result_Enum res)
+{
+	result_type = res;
+}
+
+Result_Enum Eval_Result_Value_Goto::get_result_enum()
+{
+	return result_type;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+/////////////////////////////////////////////////////////////////
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 Local_Environment::Local_Environment()
 {}
 

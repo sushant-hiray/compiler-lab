@@ -212,10 +212,10 @@ Eval_Result & Name_Ast::evaluate(Local_Environment & eval_env, ostream & file_bu
 
 //////////////////////////////////////////////////////////////////////////
 
-Expression_Ast::Expression_Ast(Ast * lhs , Ast *  rhs , BooleanOp op){
+Expression_Ast::Expression_Ast(Ast * lhs , Ast *  rhs , BooleanOp _op){
 	lhs_exp = lhs;
 	rhs_exp = rhs;
-	op  = op;
+	op  = _op;
 	node_data_type = int_data_type;
 }
 
@@ -257,26 +257,32 @@ Eval_Result & Expression_Ast:: evaluate(Local_Environment & eval_env, ostream & 
 				if(l==r){
 					temp=1;
 				}
+				break;
 			case NE :
 				if(l!=r){
 					temp=1;
 				}
+				break;
 			case GT :
 				if(l>r){
 					temp=1;
 				}
+				break;
 			case LT :
 				if(l<r){
 					temp=1;
 				}
+				break;
 			case GE :
 				if(l>=r){
 					temp=1;
 				}
+				break;
 			case LE :
 				if(l<=r){
 					temp=1;
 				}
+				break;
 		}
 		result.set_value(temp);
 		result.set_result_enum(int_result);
@@ -308,8 +314,13 @@ void Conditional_Ast ::  print_ast(ostream & file_buffer){
 }
 
 Eval_Result & Conditional_Ast:: evaluate(Local_Environment & eval_env, ostream & file_buffer){
-		Eval_Result & result = *new Eval_Result_Value_Int();
-        return result;
+		Eval_Result & cond_result = condition->evaluate(eval_env,file_buffer);
+		if(cond_result.get_value()==1){
+			return true_goto->evaluate(eval_env,file_buffer);
+		}
+        else{
+        	return false_goto->evaluate(eval_env,file_buffer);
+        }
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -330,8 +341,10 @@ int Goto_Ast::getBlockNo(){
     return block_no;
 }
 
-Eval_Result & Goto_Ast:: evaluate(Local_Environment & eval_env, ostream & file_buffer){
-		Eval_Result & result = *new Eval_Result_Value_Int();
+Eval_Result & Goto_Ast::evaluate(Local_Environment & eval_env, ostream & file_buffer){
+		
+		Eval_Result & result = *new Eval_Result_Value_Goto();
+		result.set_value(block_no);
         return result;
 }
 

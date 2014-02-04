@@ -107,7 +107,7 @@ class Expression_Ast:public Ast
 {
     public:
         enum BooleanOp{
-            EQ,
+            EQ = 0,
             NE,
             GT,
             LT,
