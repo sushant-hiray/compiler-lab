@@ -260,12 +260,12 @@ executable_statement_list:
             return_statement_used_flag = true; // Current procedure has an occurrence of return statement
 
             if ($1 != NULL)
-            $$ = $1;
+                $$ = $1;
 
             else
                  $$ = new list<Ast *>;
-
-
+    
+            $$->push_back(ret);
     }
     |
     assignment_statement_list if_control_block
