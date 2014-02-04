@@ -150,7 +150,7 @@ void Name_Ast::print_value(Local_Environment & eval_env, ostream & file_buffer)
 	Eval_Result_Value * loc_var_val = eval_env.get_variable_value(variable_name);
 	Eval_Result_Value * glob_var_val = interpreter_global_table.get_variable_value(variable_name);
 
-	file_buffer << "\n" << AST_SPACE << variable_name << " : ";
+	file_buffer << AST_SPACE << variable_name << " : ";
 
 	if (!eval_env.is_variable_defined(variable_name) && !interpreter_global_table.is_variable_defined(variable_name))
 		file_buffer << "undefined";
@@ -175,7 +175,7 @@ void Name_Ast::print_value(Local_Environment & eval_env, ostream & file_buffer)
 		else
 			report_internal_error("Result type can only be int and float");
 	}
-	file_buffer << "\n";
+	file_buffer << "\n\n";
 }
 
 Eval_Result & Name_Ast::get_value_of_evaluation(Local_Environment & eval_env)
@@ -314,11 +314,20 @@ void Conditional_Ast ::  print_ast(ostream & file_buffer){
 }
 
 Eval_Result & Conditional_Ast:: evaluate(Local_Environment & eval_env, ostream & file_buffer){
+
+        
+	file_buffer << AST_SPACE << "If_Else statement:";
+    condition->print_ast(file_buffer);
+	file_buffer << AST_NODE_SPACE <<"True Successor: "<<true_goto->getBlockNo()<<"\n"; 
+	file_buffer << AST_NODE_SPACE << "False Successor: "<<false_goto->getBlockNo()<<"\n";
 		Eval_Result & cond_result = condition->evaluate(eval_env,file_buffer);
 		if(cond_result.get_value()==1){
+            file_buffer <<AST_SPACE<< "Condition True : Goto (BB " << true_goto->getBlockNo()<<")\n";
 			return true_goto->evaluate(eval_env,file_buffer);
 		}
         else{
+
+            file_buffer <<AST_SPACE<< "Condition False : Goto (BB " << false_goto->getBlockNo()<<")\n";
         	return false_goto->evaluate(eval_env,file_buffer);
         }
 }
@@ -415,7 +424,9 @@ void Return_Ast::print_ast(ostream & file_buffer)
 
 Eval_Result & Return_Ast::evaluate(Local_Environment & eval_env, ostream & file_buffer)
 {
-	Eval_Result & result = *new Eval_Result_Value_Int();
+	
+	file_buffer << AST_SPACE << "Return <NOTHING>\n";
+    Eval_Result & result = *new Eval_Result_Value_Int();
 	return result;
 }
 
