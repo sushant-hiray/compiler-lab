@@ -46,12 +46,14 @@
     float float_value;
     char char_value;
     Expression_Ast::BooleanOp op;
+    Return_Ast * return_ast;
 };
 
 %token <integer_value> INTEGER_NUMBER
 %token <integer_value> BASICBLOCK
 %token <string_value> NAME
-%token RETURN INTEGER IF ELSE GOTO ASSIGN_OP NE EQ LT LE GT GE    
+%token <return_ast> RETURN
+%token INTEGER IF ELSE GOTO ASSIGN_OP NE EQ LT LE GT GE    
 
 %type <symbol_table> declaration_statement_list
 %type <symbol_entry> declaration_statement
@@ -240,7 +242,6 @@ basic_block:
     {
         list<Ast *> * ast_list = new list<Ast *>;
         $$ = new Basic_Block($1, *ast_list);
-        cout<<"lajfdlkajdfljalsdf"<<endl;
 
         }
     }
@@ -262,7 +263,7 @@ executable_statement_list:
             $$ = $1;
 
             else
-            $$ = new list<Ast *>;
+                 $$ = new list<Ast *>;
 
 
     }
