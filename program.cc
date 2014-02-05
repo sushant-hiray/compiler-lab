@@ -96,7 +96,6 @@ void Program::print_ast()
 	command_options.create_ast_buffer();
 	ostream & ast_buffer = command_options.get_ast_buffer();
 
-	ast_buffer << "Program:\n";
 
 	Procedure * main = get_main_procedure(ast_buffer);
 	if (main == NULL)
@@ -104,6 +103,7 @@ void Program::print_ast()
 
 	else
 	{
+	    ast_buffer << "Program:\n";
 		main->print_ast(ast_buffer);
 	}
 }
