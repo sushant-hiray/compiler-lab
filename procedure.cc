@@ -144,6 +144,9 @@ Eval_Result & Procedure::evaluate(ostream & file_buffer)
 	while (current_bb)
 	{
 		result = &(current_bb->evaluate(eval_env, file_buffer));
+		if(result==NULL){
+			report_error("Basic Block is empty",-1);
+		}
 		if(result->get_result_enum()==goto_result){
 			current_bb = get_bb(result->get_value());
 		}

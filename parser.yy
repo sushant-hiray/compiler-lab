@@ -120,7 +120,7 @@ procedure_body:
             if (return_statement_used_flag == false)
             {
               int line = get_line_number();
-             // report_error("Atleast 1 basic block should have a return statement", line);
+              report_error("Atleast 1 basic block should have a return statement", line);
             }
             int a = current_procedure->check_valid_goto();
             if(a!=0){
@@ -255,7 +255,13 @@ basic_block_list:
 basic_block:
 	BASICBLOCK ':' executable_statement_list
     {
+    if($1 < 2){
+        int line = get_line_number();
+        report_error("Illegal basic block lable",line);
+    }
+
     current_procedure->add_basic_block_no($1);
+    
     if ($3 != NULL)
          $$ = new Basic_Block($1, *$3);
     else
