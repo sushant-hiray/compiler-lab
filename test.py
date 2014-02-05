@@ -37,9 +37,9 @@ for f in files:
 
 for f in error_files:
     print("Testing file  " + f ); 
-    command = "./cfg-test -ast  " + f + " > expected " 
+    command = "./cfg-test -ast  " + f + " 2> expected " 
     os.system(command) 
-    command = "./cfglp -ast " + f + " > generated " 
+    command = "./cfglp -ast " + f + " 2> generated " 
     os.system(command)
     os.system("diff -bB expected generated");
 

@@ -119,7 +119,7 @@ procedure_body:
             if (return_statement_used_flag == false)
             {
               int line = get_line_number();
-             report_error("Atleast 1 basic block should have a return statement", line);
+             // report_error("Atleast 1 basic block should have a return statement", line);
             }
 
             current_procedure->set_basic_block_list(*$4);
@@ -132,7 +132,7 @@ procedure_body:
             if (return_statement_used_flag == false)
             {
                 int line = get_line_number();
-                report_error("Atleast 1 basic block should have a return statement", line);
+                //report_error("Atleast 1 basic block should have a return statement", line);
             }
 
             current_procedure->set_basic_block_list(*$2);
