@@ -11,7 +11,7 @@ for f in files:
         correct_files.append(f)
 
 
-which="ast"
+#which="ast"
 cfgFiles=[]
 for f in correct_files:
     command = "make -f Makefile.cfg FILE=" + f+ " >/dev/null";

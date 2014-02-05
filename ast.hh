@@ -28,6 +28,7 @@
 
 #define AST_SPACE "         "
 #define AST_NODE_SPACE "            "
+#define COND_NODE_SPACE "               "
 
 using namespace std;
 
