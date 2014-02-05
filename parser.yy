@@ -42,6 +42,8 @@
 	Symbol_Table_Entry * symbol_entry;
 	Basic_Block * basic_block;
 	list<Basic_Block *> * basic_block_list;
+    list<int> *basic_block_no;
+    list<int> *goto_no;
 	Procedure * procedure;
     float float_value;
     char char_value;
@@ -67,7 +69,6 @@
 %type <ast> constant
 %type <cond_ast> if_control_block
 %type <goto_ast> goto_statement
-%type <op> boolean_op
 %type <ast> expression
 %type <ast> logical_expression
 %type <ast> atomic_expression
@@ -121,9 +122,17 @@ procedure_body:
               int line = get_line_number();
              // report_error("Atleast 1 basic block should have a return statement", line);
             }
-
+            int a = current_procedure->check_valid_goto();
+            if(a!=0){
+                string error_message = "bb ";
+                char intStr[100];
+                sprintf(intStr,"%d",a);
+                string str = string(intStr);
+                error_message.append(str);
+                error_message.append(" doesn't exist");
+                report_error(error_message,get_line_number());
+            }
             current_procedure->set_basic_block_list(*$4);
-
             delete $4;
     }
     |
@@ -135,6 +144,16 @@ procedure_body:
                 //report_error("Atleast 1 basic block should have a return statement", line);
             }
 
+            int a = current_procedure->check_valid_goto();
+            if(a!=0){
+                string error_message = "bb ";
+                char intStr[100];
+                sprintf(intStr,"%d",a);
+                string str = string(intStr);
+                error_message.append(str);
+                error_message.append(" doesn't exist");
+                report_error(error_message,get_line_number());
+            }
             current_procedure->set_basic_block_list(*$2);
 
             delete $2;
@@ -236,7 +255,7 @@ basic_block_list:
 basic_block:
 	BASICBLOCK ':' executable_statement_list
     {
-            
+    current_procedure->add_basic_block_no($1);
     if ($3 != NULL)
          $$ = new Basic_Block($1, *$3);
     else
@@ -388,6 +407,7 @@ goto_statement:
     GOTO BASICBLOCK ';' 
     {
         $$ =  new Goto_Ast($2); 
+        current_procedure->add_goto_no($2);
     }
 
 ;

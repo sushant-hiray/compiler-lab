@@ -30,7 +30,7 @@
 #include<iostream>
 #include<string>
 #include<fstream>
-
+#include<cstdio>
 using namespace std;
 
 #include"local-environment.hh"

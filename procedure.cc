@@ -159,3 +159,45 @@ Eval_Result & Procedure::evaluate(ostream & file_buffer)
 	return *result;
 }
 
+
+void Procedure::add_basic_block_no(int n){
+    basic_block_no.push_back(n);
+}
+
+void Procedure::add_goto_no(int n){
+    goto_no.push_back(n);
+}
+
+
+int Procedure::check_valid_goto(){
+
+    for (std::list<int>::iterator git=goto_no.begin(); git != goto_no.end(); ++git){
+        bool flag=false;
+        for (std::list<int>::iterator it=basic_block_no.begin(); it != basic_block_no.end(); ++it){
+            if(*it==*git){
+                flag=true;
+            }
+        }
+        if(!flag){
+            return *git;
+        }
+    }
+    return 0;
+}
+
+
+void Procedure::print_nos(){
+cout<<"Block Nos ";
+        for (std::list<int>::iterator it=basic_block_no.begin(); it != basic_block_no.end(); ++it){
+    cout<<(*it)<<" ";
+        }
+        cout<<endl;
+
+
+cout<<"Goto Nos ";
+        for (std::list<int>::iterator it=goto_no.begin(); it != goto_no.end(); ++it){
+    cout<<(*it)<<" ";
+        }
+        cout<<endl;
+        return;
+}
