@@ -310,7 +310,7 @@ void Conditional_Ast ::  print_ast(ostream & file_buffer){
 	file_buffer << "\n" << AST_SPACE << "If_Else statement:";
     condition->print_ast(file_buffer);
 	file_buffer << "\n" << AST_NODE_SPACE <<"True Successor: "<<true_goto->getBlockNo()<<"\n"; 
-	file_buffer << AST_NODE_SPACE << "False Successor: "<<false_goto->getBlockNo()<<"\n";
+	file_buffer << AST_NODE_SPACE << "False Successor: "<<false_goto->getBlockNo();
 }
 
 Eval_Result & Conditional_Ast:: evaluate(Local_Environment & eval_env, ostream & file_buffer){
@@ -360,7 +360,7 @@ Eval_Result & Goto_Ast::evaluate(Local_Environment & eval_env, ostream & file_bu
 
 
 void Goto_Ast::print_ast(ostream & file_buffer){
-	file_buffer<<"\n"<<AST_SPACE<< "Goto statement:\n "<<AST_NODE_SPACE <<"Successor: "<< block_no << " \n";
+	file_buffer<<"\n"<<AST_SPACE<< "Goto statement:\n "<<AST_NODE_SPACE <<"Successor: "<< block_no;
 };
 
 

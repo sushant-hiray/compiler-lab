@@ -53,8 +53,9 @@
 %token <integer_value> BASICBLOCK
 %token <string_value> NAME
 %token <return_ast> RETURN
-%token INTEGER IF ELSE GOTO ASSIGN_OP NE EQ LT LE GT GE    
-
+%token INTEGER IF ELSE GOTO ASSIGN_OP    
+%left NE EQ 
+%left LT LE GT GE
 %type <symbol_table> declaration_statement_list
 %type <symbol_entry> declaration_statement
 %type <basic_block_list> basic_block_list
@@ -325,42 +326,36 @@ expression:
     }
 ;
 
-boolean_op:
-    EQ
-    {
-        $$ = Expression_Ast::BooleanOp::EQ;  
-    }
-    | 
-    NE
-    {
-        $$ = Expression_Ast::BooleanOp::NE;
-    }
-    |
-    GT
-    {
-        $$ = Expression_Ast::BooleanOp::GT;
-    }
-    |
-    LT
-    {
-        $$ = Expression_Ast::BooleanOp::LT;        
-    }
-    |
-    GE
-    {
-        $$ = Expression_Ast::BooleanOp::GE;        
-    }
-    |
-    LE
-    {
-        $$ = Expression_Ast::BooleanOp::LE;
-    }
-;
 
 logical_expression:
-    expression boolean_op atomic_expression
+    expression EQ expression
     {
-        $$ = new Expression_Ast($1,$3,$2);
+        $$ = new Expression_Ast($1,$3,Expression_Ast::BooleanOp::EQ);
+    }
+    |
+    expression NE expression
+    {
+        $$ = new Expression_Ast($1,$3,Expression_Ast::BooleanOp::NE);
+    }
+    |
+    expression GT expression
+    {
+        $$ = new Expression_Ast($1,$3,Expression_Ast::BooleanOp::GT);
+    }
+    |
+    expression GE expression
+    {
+        $$ = new Expression_Ast($1,$3,Expression_Ast::BooleanOp::GE);
+    }
+    |
+    expression LT expression
+    {
+        $$ = new Expression_Ast($1,$3,Expression_Ast::BooleanOp::LT);
+    }
+    |
+    expression LE expression
+    {
+        $$ = new Expression_Ast($1,$3,Expression_Ast::BooleanOp::LE);
     }
     |
     atomic_expression
