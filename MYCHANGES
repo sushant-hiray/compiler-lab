@@ -1,29 +1,51 @@
 Sushant Hiray: 110050009
 Sanchit Garg : 110050035
 
-The following changes were made for Lab3 Submission
-For this submission, we changed mainly 2 files, namely: scanner.ll and parser.yy
+The following changes were made for Lab3 and Assignment 2b. Submission:
 
-Changes in scanner.ll:
-    -> regex expression corresponding to if else goto tokens were added.
-    -> A new regex matching comments was added alongwith the earlier existing ignore lexeme part.
-    -> `!` was added in the list of meta characters.
+Changes in ast.cc and ast.hh
+    
+    Added 3 Classes derived from Ast namely:
+    Expression_Ast  ->  Handles Relation Expression
+    Conditional_Ast ->  Handles Conditional Statements e.g. "if else"
+    Goto_Ast        ->  Handles goto statements
+
+    Added static char array for referring operators(defined as enum in Expression_Ast).
+---------------------------------------------------------------------------------------
+
+Changes in basic-block.cc
+    
+    Modified a print statement
+---------------------------------------------------------------------------------------
+
+Changes in local-environment.hh and local-environment.cc
+    
+    Added a Class Eval_Result_Value_Goto derived from Eval_Result_Value.
+    Added a new type goto_result in enum: Result_Enum .
+---------------------------------------------------------------------------------------
 
 Changes in parser.yy
-    -> Modified the executable_statement_list:
-        ->Added if_control_block
-        ->Added goto_statement
 
+    Added precedence order and associativity to the operators.
+    Defined various types to refer other classes.
+    Added Actions Rules corresponding to all the production statements.
+    Added error handling in the action rules.
+---------------------------------------------------------------------------------------
 
-    ->Modified assignment_statement.
-        Added variable '=' expression ';'
+Changes in procedure.cc and procedure.hh
+    
+    Added list of Basic-Block No.s and Goto-Block No.s to its private variables.
+    Added 5 functions:
+        void add_basic_block_no(int n)  ->  Appends block number to the list of basic-block-no.
+        void add_goto_no(int n)  ->  Appends goto number to the list of goto-block-no.
+        int check_valid_goto()  ->  Checks if goto blocks are referenced are in the basic-block-no list.
+        Basic_Block * get_bb(int block_no) ->  returns Basic_Block* corresponding to block_no.
+        void print_nos();   ->  prints the value in list (Added for debugging).
+ ---------------------------------------------------------------------------------------
 
+Changes in scanner.ll
 
-    ->Added if_control_block
-    ->Added goto_statement
+    Updated token names corresponding to operators.
+    Added regex to recognize the basic block structure.
 
-    ->Added grammar corresponding to expression:
-        ->Added grammar corresponding to logical_expression
-        ->Added grammar corresponding to atomic_expression
-        
 Also we have made sure that there are no shift reduce conflicts by assigning appropriate associative rules!
