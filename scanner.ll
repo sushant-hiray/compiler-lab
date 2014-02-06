@@ -116,6 +116,9 @@ goto    {
                 ParserBase::STYPE__ * val = getSval();
                 string matchs = matched();
                 val->integer_value = atoi((matchs.substr(4,matchs.length() -5)).c_str());
+                if(val->integer_value < 2){
+                   report_error("Illegal basic block lable",lineNr());
+                }
                 return Parser::BASICBLOCK;
                 }
 \n		{ 
@@ -123,7 +126,7 @@ goto    {
 				ignore_token();
 		}    
 
-";;".*  	|
+[ \t]*";;".*  	|
 [ \t]*[/][/].* |
 [ \t]		{
 			if (command_options.is_show_tokens_selected())

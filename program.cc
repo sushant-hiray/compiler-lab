@@ -98,13 +98,14 @@ void Program::print_ast()
 
 
 	Procedure * main = get_main_procedure(ast_buffer);
-	if (main == NULL)
-		//report_error("No main function found in the program", NOLINE);
+	ast_buffer << "Program:\n";
+	if (main == NULL){
+		report_error("No main function found in the program", NOLINE);
         return;
+    }
 
 	else
 	{
-	    ast_buffer << "Program:\n";
 		main->print_ast(ast_buffer);
 	}
 }

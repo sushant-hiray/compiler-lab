@@ -323,12 +323,16 @@ Eval_Result & Conditional_Ast:: evaluate(Local_Environment & eval_env, ostream &
 	file_buffer << AST_NODE_SPACE << "False Successor: "<<false_goto->getBlockNo()<<"\n";
 		if(cond_result.get_value()==1){
             file_buffer <<AST_SPACE<< "Condition True : Goto (BB " << true_goto->getBlockNo()<<")\n";
-			return true_goto->evaluate(eval_env,file_buffer);
+            Eval_Result & result = *new Eval_Result_Value_Goto();
+            result.set_value(true_goto->getBlockNo());
+			return result;
 		}
         else{
 
             file_buffer <<AST_SPACE<< "Condition False : Goto (BB " << false_goto->getBlockNo()<<")\n";
-        	return false_goto->evaluate(eval_env,file_buffer);
+            Eval_Result & result = *new Eval_Result_Value_Goto();
+            result.set_value(false_goto->getBlockNo());
+			return result;
         }
 }
 
@@ -351,7 +355,8 @@ int Goto_Ast::getBlockNo(){
 }
 
 Eval_Result & Goto_Ast::evaluate(Local_Environment & eval_env, ostream & file_buffer){
-		
+        file_buffer<<"\n"<<AST_SPACE<< "Goto statement:\n"<<AST_NODE_SPACE <<"Successor: "<< block_no;
+        file_buffer<< "\n" <<AST_SPACE<< "GOTO (BB "<< block_no <<")\n";
 		Eval_Result & result = *new Eval_Result_Value_Goto();
 		result.set_value(block_no);
         return result;
