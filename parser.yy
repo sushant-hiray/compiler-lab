@@ -78,6 +78,7 @@
 %type <ast> atomic_expression
 %type <ast> arithmetic_expression
 %type <ast> unary_expression
+%type <ast> type_expression
 /* start symbol is named "program" */
 %start program
 
@@ -341,7 +342,7 @@ assignment_statement_list:
 ;
 
 assignment_statement:
-    variable ASSIGN_OP expression ';'
+    variable ASSIGN_OP type_expression ';'
     {
 	$$ = new Assignment_Ast($1, $3);
 
@@ -349,6 +350,25 @@ assignment_statement:
 	
     }
 ;
+
+type_expression:
+    expression
+    {
+        $$=$1;
+    }
+    |
+    '(' type_specifier ')' '(' expression ')'
+    {
+        $$=$5;
+    }
+    |
+    '(' type_specifier ')' atomic_expression
+    {
+        $$=$4;
+    
+    }
+;
+
 
 expression:
     logical_expression
@@ -369,57 +389,57 @@ expression:
 
 
 logical_expression:
-    expression EQ expression
+    type_expression EQ type_expression
     {
         $$ = new Expression_Ast($1,$3,Expression_Ast::BooleanOp::EQ);
     }
     |
-    expression NE expression
+    type_expression NE type_expression
     {
         $$ = new Expression_Ast($1,$3,Expression_Ast::BooleanOp::NE);
     }
     |
-    expression GT expression
+    type_expression GT type_expression
     {
         $$ = new Expression_Ast($1,$3,Expression_Ast::BooleanOp::GT);
     }
     |
-    expression GE expression
+    type_expression GE type_expression
     {
         $$ = new Expression_Ast($1,$3,Expression_Ast::BooleanOp::GE);
     }
     |
-    expression LT expression
+    type_expression LT type_expression
     {
         $$ = new Expression_Ast($1,$3,Expression_Ast::BooleanOp::LT);
     }
     |
-    expression LE expression
+    type_expression LE type_expression
     {
         $$ = new Expression_Ast($1,$3,Expression_Ast::BooleanOp::LE);
     }
 ;
 
 arithmetic_expression:
-    expression '-' expression
+    type_expression '-' type_expression
     {
     
         $$ = new Arithmetic_Ast($1,$3,Arithmetic_Ast::ArithOp::MINUS);
     }
     |
-    expression '+' expression
+    type_expression '+' type_expression
     {
     
         $$ = new Arithmetic_Ast($1,$3,Arithmetic_Ast::ArithOp::PLUS);
     }
     |
-    expression '*' expression
+    type_expression '*' type_expression
     {
     
         $$ = new Arithmetic_Ast($1,$3,Arithmetic_Ast::ArithOp::DIVIDE);
     }
     |
-    expression '/' expression
+    type_expression '/' type_expression
     {
     
         $$ = new Arithmetic_Ast($1,$3,Arithmetic_Ast::ArithOp::MULTIPLY);
@@ -436,9 +456,6 @@ atomic_expression:
     {
          $$ = $1;
     }
-    |
-    '(' type_specifier ')' '(' expression ')'
-    {}
 
 ;
 
@@ -447,9 +464,6 @@ unary_expression:
     {
         $$ = $2;
     }
-    |
-    '(' type_specifier ')' atomic_expression
-    {}
     |
     atomic_expression
     {
