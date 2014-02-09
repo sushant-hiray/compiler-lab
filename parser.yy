@@ -36,6 +36,7 @@
 	list<Ast *> * ast_list;
 	Ast * ast;
     Expression_Ast * e_Ast;
+    Arithmetic_Ast* a_Ast;
     Goto_Ast * goto_ast;
     Conditional_Ast * cond_ast;
 	Symbol_Table * symbol_table;
@@ -53,11 +54,14 @@
 
 %token <integer_value> INTEGER_NUMBER
 %token <integer_value> BASICBLOCK
+%token <float_value> FLOAT_NUMBER
 %token <string_value> NAME
 %token <return_ast> RETURN
-%token INTEGER IF ELSE GOTO ASSIGN_OP    
+%token INTEGER FLOAT DOUBLE IF ELSE GOTO ASSIGN_OP
 %left NE EQ 
 %left LT LE GT GE
+%left '+' '-'
+%left '*' '/'
 %type <symbol_table> declaration_statement_list
 %type <symbol_entry> declaration_statement
 %type <basic_block_list> basic_block_list
@@ -72,6 +76,8 @@
 %type <ast> expression
 %type <ast> logical_expression
 %type <ast> atomic_expression
+%type <ast> arithmetic_expression
+%type <ast> unary_expression
 /* start symbol is named "program" */
 %start program
 
@@ -349,6 +355,16 @@ expression:
     {
         $$=$1;
     }
+    |
+    arithmetic_expression
+    {
+        $$=$1;
+    }
+    |
+    unary_expression
+    {
+        $$ = $1;
+    }
 ;
 
 
@@ -382,10 +398,31 @@ logical_expression:
     {
         $$ = new Expression_Ast($1,$3,Expression_Ast::BooleanOp::LE);
     }
-    |
-    atomic_expression
+;
+
+arithmetic_expression:
+    expression '-' expression
     {
-         $$ = $1;
+    
+        $$ = new Arithmetic_Ast($1,$3,Arithmetic_Ast::ArithOp::MINUS);
+    }
+    |
+    expression '+' expression
+    {
+    
+        $$ = new Arithmetic_Ast($1,$3,Arithmetic_Ast::ArithOp::PLUS);
+    }
+    |
+    expression '*' expression
+    {
+    
+        $$ = new Arithmetic_Ast($1,$3,Arithmetic_Ast::ArithOp::DIVIDE);
+    }
+    |
+    expression '/' expression
+    {
+    
+        $$ = new Arithmetic_Ast($1,$3,Arithmetic_Ast::ArithOp::MULTIPLY);
     }
 ;
 
@@ -399,8 +436,26 @@ atomic_expression:
     {
          $$ = $1;
     }
+    |
+    '(' type_specifier ')' '(' expression ')'
+    {}
+
 ;
 
+unary_expression:
+    '-' unary_expression
+    {
+        $$ = $2;
+    }
+    |
+    '(' type_specifier ')' atomic_expression
+    {}
+    |
+    atomic_expression
+    {
+        $$ = $1;
+    }
+;
 
 if_control_block:
     IF '(' logical_expression ')' goto_statement ELSE goto_statement
@@ -445,11 +500,23 @@ constant:
 	INTEGER_NUMBER 
     {
 	$$ = new Number_Ast<int>($1, int_data_type);
-     }
+    }
+    |
+    FLOAT_NUMBER
+    {
+	$$ = new Number_Ast<int>($1, int_data_type);
+    }
+
 ;
 
 type_specifier:
     INTEGER
+    {} 
+    |
+    FLOAT
+    {}
+    |
+    DOUBLE
     {}
 ;
 

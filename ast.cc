@@ -291,6 +291,53 @@ Eval_Result & Expression_Ast:: evaluate(Local_Environment & eval_env, ostream & 
 
 ///////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////
+Arithmetic_Ast::Arithmetic_Ast(Ast* _lhs, Ast* _rhs, ArithOp _op){
+    lhs_exp = _lhs;
+    rhs_exp = _rhs;
+    op = _op;
+}
+
+Arithmetic_Ast::~Arithmetic_Ast(){
+    delete(lhs_exp);
+    delete(rhs_exp);
+}
+
+Data_Type Arithmetic_Ast::get_data_type()
+{
+	return node_data_type;
+}
+
+
+void Arithmetic_Ast :: print_ast(ostream & file_buffer){
+
+	file_buffer << "\n"<<AST_NODE_SPACE <<"Condition: "<<opNames[op]<<"\n";
+	file_buffer << COND_NODE_SPACE << "LHS (";
+	lhs_exp->print_ast(file_buffer);
+	file_buffer << ")\n";
+	file_buffer  << COND_NODE_SPACE << "RHS (";
+	rhs_exp->print_ast(file_buffer);
+	file_buffer << ")";
+}
+
+
+Eval_Result & Arithmetic_Ast:: evaluate(Local_Environment & eval_env, ostream & file_buffer){
+        Eval_Result & result = *new Eval_Result_Value_Int();
+        return result;
+}
+
+
+
+
+
+
+
+
+/////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////
+
+
+
 
 Conditional_Ast::Conditional_Ast(Ast* _condition, Goto_Ast*  trueGoto, Goto_Ast* falseGoto){
 	condition = _condition;

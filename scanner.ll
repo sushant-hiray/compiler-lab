@@ -31,6 +31,17 @@ int     {
         return Parser::INTEGER;
         }
       
+float  {
+        store_token_name("META CHAR");
+        return Parser::FLOAT;
+       }
+
+
+double  {
+        store_token_name("META CHAR");
+        return Parser::DOUBLE;
+       }
+
 return		{ 
 			store_token_name("RETURN");
 			return Parser::RETURN; 
@@ -91,6 +102,13 @@ goto    {
 			return matched()[0];
 		}
 
+[-]?[[:digit:]]+[.][[:digit:]]+ {
+            store_token_name("FNUM");
+            ParserBase::STYPE__ * val = getSval();
+            val->float_value = atof(matched().c_str());
+            return Parser::FLOAT_NUMBER;
+        }
+
 [-]?[[:digit:]]+ 	{ 
 				store_token_name("NUM");
 
@@ -101,8 +119,13 @@ goto    {
 			}
 
 
+[-*/+] {
+       
+        store_token_name("ARITHOP");
+        return matched()[0];
+       }
 
-[[:alpha:]_][[:alpha:][:digit:]_]* {
+[[:alpha:]][[:alpha:][:digit:]_]* {
 					store_token_name("NAME");
 
 					ParserBase::STYPE__ * val = getSval();

@@ -133,9 +133,28 @@ class Expression_Ast:public Ast
 
 
 
+class Arithmetic_Ast:public Ast
+{
+    public:
+        enum ArithOp{
+            MINUS,
+            PLUS,
+            MULTIPLY,
+            DIVIDE
+        };
 
+    private:
+        Ast* lhs_exp;
+        Ast* rhs_exp;
+        ArithOp op;
 
-
+    public:
+        Arithmetic_Ast(Ast* lhs_exp , Ast* rhs_exp , ArithOp op);
+        ~Arithmetic_Ast();
+        Data_Type get_data_type();
+        void print_ast(ostream & file_buffer);
+        Eval_Result & evaluate(Local_Environment & eval_enc , ostream & file_buffer);
+};
 
 
 class Goto_Ast:public Ast
