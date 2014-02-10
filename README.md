@@ -43,3 +43,21 @@ the following:
 
 ------------------------------------------------------------------------ 
 
+
+Details of Level 1 Interpretation:
+
+This level extends level 0 by supporting intraprocedural control flow statements and evaluation of conditions in the following ways:
+
+- Conditional expression e1?e2:e3, while, do-while, for, if, and if-else statements may exists in the C source program.
+switch and goto statements are not present in the C program.
+- The boolean conditions controlling the control flow consist of the six comparison operators (<, <=, >, >=, ==, and !=) and three logical operators  (&&, ||, and !).
+- The values used for comparison are only integer values.
+- The comparison expressions can also appear on the right hand sides of assignment statements.
+
+
+------------------------------------------------------------------------
+Details of Level 2 Interpretation:
+
+- Apart from integers, single precision floating point types (introduced by the type specifier float) are supported.
+- Expressions appearing in the right hand side of an assignment or in comparisons may contain the following arithmetic operators:  +, -, *, /, and unary minus. Note that the expressions do not have any side effects.
+
