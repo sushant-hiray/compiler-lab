@@ -28,7 +28,6 @@
 %scanner-token-function d_scanner.lex()
 %filenames parser
 %parsefun-source parser.cc
-
 %union 
 {
 	int integer_value;
@@ -357,11 +356,6 @@ type_expression:
         $$=$1;
     }
     |
-    '(' type_specifier ')' '(' expression ')'
-    {
-        $$=$5;
-    }
-    |
     '(' type_specifier ')' atomic_expression
     {
         $$=$4;
@@ -456,7 +450,11 @@ atomic_expression:
     {
          $$ = $1;
     }
-
+    |
+    '(' type_expression ')'
+    {
+        $$ = $2;
+    }
 ;
 
 unary_expression:
