@@ -34,7 +34,7 @@
 	std::string * string_value;
 	list<Ast *> * ast_list;
 	Ast * ast;
-    Expression_Ast * e_Ast;
+    Boolean_Ast * e_Ast;
     Arithmetic_Ast* a_Ast;
     Goto_Ast * goto_ast;
     Conditional_Ast * cond_ast;
@@ -47,8 +47,9 @@
 	Procedure * procedure;
     float float_value;
     char char_value;
-    Expression_Ast::BooleanOp op;
+    Boolean_Ast::BooleanOp op;
     Return_Ast * return_ast;
+    Data_Type dt;
 };
 
 %token <integer_value> INTEGER_NUMBER
@@ -78,6 +79,8 @@
 %type <ast> arithmetic_expression
 %type <ast> unary_expression
 %type <ast> type_expression
+%type <dt> type_specifier
+
 /* start symbol is named "program" */
 %start program
 
@@ -221,7 +224,7 @@ declaration_statement:
 	type_specifier
     NAME ';'
     {
-            $$ = new Symbol_Table_Entry(*$2, int_data_type);
+            $$ = new Symbol_Table_Entry(*$2, $1);
 
             delete $2;
     
@@ -353,12 +356,13 @@ assignment_statement:
 type_expression:
     expression
     {
-        $$=$1;
+        $$= new Type_Expression_Ast($1);
     }
     |
     '(' type_specifier ')' atomic_expression
     {
         $$=$4;
+        $$= new Type_Expression_Ast($4,$2);
     
     }
 ;
@@ -385,32 +389,32 @@ expression:
 logical_expression:
     type_expression EQ type_expression
     {
-        $$ = new Expression_Ast($1,$3,Expression_Ast::BooleanOp::EQ);
+        $$ = new Boolean_Ast($1,$3,Boolean_Ast::BooleanOp::EQ);
     }
     |
     type_expression NE type_expression
     {
-        $$ = new Expression_Ast($1,$3,Expression_Ast::BooleanOp::NE);
+        $$ = new Boolean_Ast($1,$3,Boolean_Ast::BooleanOp::NE);
     }
     |
     type_expression GT type_expression
     {
-        $$ = new Expression_Ast($1,$3,Expression_Ast::BooleanOp::GT);
+        $$ = new Boolean_Ast($1,$3,Boolean_Ast::BooleanOp::GT);
     }
     |
     type_expression GE type_expression
     {
-        $$ = new Expression_Ast($1,$3,Expression_Ast::BooleanOp::GE);
+        $$ = new Boolean_Ast($1,$3,Boolean_Ast::BooleanOp::GE);
     }
     |
     type_expression LT type_expression
     {
-        $$ = new Expression_Ast($1,$3,Expression_Ast::BooleanOp::LT);
+        $$ = new Boolean_Ast($1,$3,Boolean_Ast::BooleanOp::LT);
     }
     |
     type_expression LE type_expression
     {
-        $$ = new Expression_Ast($1,$3,Expression_Ast::BooleanOp::LE);
+        $$ = new Boolean_Ast($1,$3,Boolean_Ast::BooleanOp::LE);
     }
 ;
 
@@ -427,13 +431,13 @@ arithmetic_expression:
         $$ = new Arithmetic_Ast($1,$3,Arithmetic_Ast::ArithOp::PLUS);
     }
     |
-    type_expression '*' type_expression
+    type_expression '/' type_expression
     {
     
         $$ = new Arithmetic_Ast($1,$3,Arithmetic_Ast::ArithOp::DIVIDE);
     }
     |
-    type_expression '/' type_expression
+    type_expression '*' type_expression
     {
     
         $$ = new Arithmetic_Ast($1,$3,Arithmetic_Ast::ArithOp::MULTIPLY);
@@ -516,19 +520,25 @@ constant:
     |
     FLOAT_NUMBER
     {
-	$$ = new Number_Ast<int>($1, int_data_type);
+	$$ = new Number_Ast<float>($1, float_data_type);
     }
 
 ;
 
 type_specifier:
     INTEGER
-    {} 
+    {
+        $$=Data_Type::int_data_type;
+    } 
     |
     FLOAT
-    {}
+    {
+        $$=Data_Type::float_data_type;
+    }
     |
     DOUBLE
-    {}
+    {
+        $$=Data_Type::double_data_type;
+    }
 ;
 

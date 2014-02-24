@@ -33,7 +33,8 @@
 using namespace std;
 
 
-static const char* opNames[] = {"EQ","NE","GT","LT","GE","LE" };    
+static const char* boolOp[] = {"EQ","NE","GT","LT","GE","LE" };    
+static const char* arithOp[] = {"MINUS","PLUS","MULT","DIV"};  
 class Ast;
 
 class Ast
@@ -102,9 +103,20 @@ public:
 	Eval_Result & evaluate(Local_Environment & eval_env, ostream & file_buffer);
 };
 
+class Type_Expression_Ast:public Ast{
+    private:
+        Ast* type_exp;
 
+    public:
+        Type_Expression_Ast(Ast*, Data_Type);
+        Type_Expression_Ast(Ast*);
+        ~Type_Expression_Ast();
+        Data_Type get_data_type();
+        void print_ast(ostream & file_buffer);
+        Eval_Result & evaluate(Local_Environment & eval_env, ostream & file_buffer);
+};
 
-class Expression_Ast:public Ast
+class Boolean_Ast:public Ast
 {
     public:
         enum BooleanOp{
@@ -122,8 +134,8 @@ class Expression_Ast:public Ast
         BooleanOp op;
 
     public:
-        Expression_Ast(Ast * lhs_exp , Ast * rhs_exp , BooleanOp op);
-        ~Expression_Ast();
+        Boolean_Ast(Ast * lhs_exp , Ast * rhs_exp , BooleanOp op);
+        ~Boolean_Ast();
         Data_Type get_data_type();
         void print_ast(ostream & file_buffer);
         Eval_Result & evaluate(Local_Environment & eval_env, ostream & file_buffer);

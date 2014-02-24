@@ -23,7 +23,7 @@
 
 #include<iostream>
 #include<fstream>
-
+#include <iomanip> 
 using namespace std;
 
 #include"user-options.hh"
@@ -212,20 +212,53 @@ Eval_Result & Name_Ast::evaluate(Local_Environment & eval_env, ostream & file_bu
 
 //////////////////////////////////////////////////////////////////////////
 
-Expression_Ast::Expression_Ast(Ast * lhs , Ast *  rhs , BooleanOp _op){
+Type_Expression_Ast::Type_Expression_Ast(Ast* e, Data_Type d){
+	type_exp = e;
+	node_data_type = d;
+}
+
+Type_Expression_Ast::Type_Expression_Ast(Ast* e){
+	type_exp = e;
+	node_data_type = e->get_data_type();
+}
+
+
+Type_Expression_Ast::~Type_Expression_Ast(){
+	delete(type_exp);
+}
+
+void Type_Expression_Ast::print_ast(ostream & file_buffer){
+	type_exp->print_ast(file_buffer);
+}
+
+Data_Type Type_Expression_Ast::get_data_type(){
+	return node_data_type;
+}
+
+Eval_Result & Type_Expression_Ast::evaluate(Local_Environment & eval_env, ostream & file_buffer){
+	Eval_Result & res = type_exp->evaluate(eval_env, file_buffer);
+	res.set_result_enum(int_result);
+	return res;
+}
+
+
+///////////////////////////////////////////////////////////////////////////
+
+Boolean_Ast::Boolean_Ast(Ast * lhs , Ast *  rhs , BooleanOp _op){
 	lhs_exp = lhs;
 	rhs_exp = rhs;
 	op  = _op;
 	node_data_type = int_data_type;
 }
 
-Expression_Ast::~Expression_Ast(){
+Boolean_Ast::~Boolean_Ast(){
 	delete(lhs_exp);
 	delete(rhs_exp);
 }
-void Expression_Ast :: print_ast(ostream & file_buffer){
 
-	file_buffer << "\n"<<AST_NODE_SPACE <<"Condition: "<<opNames[op]<<"\n";
+void Boolean_Ast::print_ast(ostream & file_buffer){
+
+	file_buffer << "\n"<<AST_NODE_SPACE <<"Condition: "<<boolOp[op]<<"\n";
 	file_buffer << COND_NODE_SPACE << "LHS (";
 	lhs_exp->print_ast(file_buffer);
 	file_buffer << ")\n";
@@ -234,12 +267,12 @@ void Expression_Ast :: print_ast(ostream & file_buffer){
 	file_buffer << ")";
 }
 
-Data_Type Expression_Ast::get_data_type()
+Data_Type Boolean_Ast::get_data_type()
 {
 	return node_data_type;
 }
 
-Eval_Result & Expression_Ast:: evaluate(Local_Environment & eval_env, ostream & file_buffer){
+Eval_Result & Boolean_Ast:: evaluate(Local_Environment & eval_env, ostream & file_buffer){
 		Eval_Result & l_res = lhs_exp->evaluate(eval_env, file_buffer);
 		if (l_res.is_variable_defined() == false){
 			report_error("Variable should be defined to be on lhs of condition", NOLINE);
@@ -310,7 +343,7 @@ Data_Type Arithmetic_Ast::get_data_type()
 
 void Arithmetic_Ast :: print_ast(ostream & file_buffer){
 
-	file_buffer << "\n"<<AST_NODE_SPACE <<"Condition: "<<opNames[op]<<"\n";
+	file_buffer << "\n"<<AST_NODE_SPACE <<"Arith: "<<arithOp[op]<<"\n";
 	file_buffer << COND_NODE_SPACE << "LHS (";
 	lhs_exp->print_ast(file_buffer);
 	file_buffer << ")\n";
@@ -446,7 +479,7 @@ Data_Type Number_Ast<DATA_TYPE>::get_data_type()
 template <class DATA_TYPE>
 void Number_Ast<DATA_TYPE>::print_ast(ostream & file_buffer)
 {
-	file_buffer << "Num : " << constant;
+	file_buffer << "Num : " << std::fixed << std::setprecision(2) << constant;
 }
 
 template <class DATA_TYPE>
@@ -483,3 +516,4 @@ Eval_Result & Return_Ast::evaluate(Local_Environment & eval_env, ostream & file_
 }
 
 template class Number_Ast<int>;
+template class Number_Ast<float>;

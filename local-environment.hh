@@ -34,6 +34,8 @@ using namespace std;
 typedef enum
 {
 	int_result,
+	float_result,
+	double_result,
 	void_result,
 	goto_result
 } Result_Enum;
