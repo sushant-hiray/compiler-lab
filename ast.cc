@@ -246,7 +246,20 @@ Data_Type Type_Expression_Ast::get_data_type(){
 
 Eval_Result & Type_Expression_Ast::evaluate(Local_Environment & eval_env, ostream & file_buffer){
 	Eval_Result & res = type_exp->evaluate(eval_env, file_buffer);
-	res.set_result_enum(int_result);
+	
+	switch(node_data_type){
+		case int_data_type:
+			res.set_result_enum(int_result);
+			break;
+
+		case float_data_type:
+			res.set_result_enum(float_result);
+			break;
+		
+		case doble_data_type:
+			res.set_result_enum(double_result);
+			break;
+	}
 	return res;
 }
 
@@ -293,7 +306,7 @@ Data_Type Boolean_Ast::get_data_type()
 	return node_data_type;
 }
 
-Eval_Result & Boolean_Ast:: evaluate(Local_Environment & eval_env, ostream & file_buffer){
+Eval_Result & Boolean_Ast::evaluate(Local_Environment & eval_env, ostream & file_buffer){
 		Eval_Result & l_res = lhs_exp->evaluate(eval_env, file_buffer);
 		if (l_res.is_variable_defined() == false){
 			report_error("Variable should be defined to be on lhs of condition", NOLINE);
@@ -303,37 +316,35 @@ Eval_Result & Boolean_Ast:: evaluate(Local_Environment & eval_env, ostream & fil
 			report_error("Variable should be defined to be on rhs of condition", NOLINE);
 		}
 		Eval_Result & result = *new Eval_Result_Value_Int();
-		int l = l_res.get_value();
-		int r = r_res.get_value();
 		int temp = 0;
 		switch (op) {
 			case EQ :
-				if(l==r){
+				if(l_res.get_value()==r_res.get_value()){
 					temp=1;
 				}
 				break;
 			case NE :
-				if(l!=r){
+				if(l_res.get_value()!=r_res.get_value()){
 					temp=1;
 				}
 				break;
 			case GT :
-				if(l>r){
+				if(l_res.get_value()>r_res.get_value()){
 					temp=1;
 				}
 				break;
 			case LT :
-				if(l<r){
+				if(l_res.get_value()<r_res.get_value()){
 					temp=1;
 				}
 				break;
 			case GE :
-				if(l>=r){
+				if(l_res.get_value()>=r_res.get_value()){
 					temp=1;
 				}
 				break;
 			case LE :
-				if(l<=r){
+				if(l_res.get_value()<=r_res.get_value()){
 					temp=1;
 				}
 				break;
@@ -375,7 +386,7 @@ Data_Type Arithmetic_Ast::get_data_type()
 }
 
 
-void Arithmetic_Ast :: print_ast(ostream & file_buffer){
+void Arithmetic_Ast::print_ast(ostream & file_buffer){
 
 	file_buffer << "\n"<<AST_NODE_SPACE <<"Arith: "<<arithOp[op]<<"\n";
 	file_buffer << COND_NODE_SPACE << "LHS (";
@@ -387,8 +398,43 @@ void Arithmetic_Ast :: print_ast(ostream & file_buffer){
 }
 
 
-Eval_Result & Arithmetic_Ast:: evaluate(Local_Environment & eval_env, ostream & file_buffer){
-        Eval_Result & result = *new Eval_Result_Value_Int();
+Eval_Result & Arithmetic_Ast::evaluate(Local_Environment & eval_env, ostream & file_buffer){
+       
+        Eval_Result & l_res = lhs_exp->evaluate(eval_env, file_buffer);
+		if (l_res.is_variable_defined() == false){
+			report_error("Variable should be defined to be on lhs of condition", NOLINE);
+		}
+		Eval_Result & r_res = rhs_exp->evaluate(eval_env, file_buffer);
+		if (r_res.is_variable_defined() == false){
+			report_error("Variable should be defined to be on rhs of condition", NOLINE);
+		}
+		Eval_Result & result = *new Eval_Result();
+		result.set_result_enum(l_res.get_result_enum());
+		if()
+
+		switch (op) {
+			case MINUS :
+				resullt.set_value(l_res.get_value() - r_res.get_value());
+				break;
+			case PLUS :
+				resullt.set_value(l_res.get_value() + r_res.get_value());
+				break;
+			case DIVIDE :
+				resullt.set_value(l_res.get_value() * r_res.get_value());
+				// if(l_res.get_data_type()==float_data_type){
+				// 	resullt.set_value(l_res.get_value() / (float)r_res.get_value());
+				// }
+				// else if(l_res.get_data_type()==double_data_type){
+				// 	resullt.set_value(l_res.get_value() / (double)r_res.get_value());
+				// }
+				// else if(l_res.get_data_type()==itn_data_type){
+				// 	resullt.set_value(l_res.get_value() / r_res.get_value());
+				// }
+				break;
+			case MULTIPLY :
+				resullt.set_value(l_res.get_value() * r_res.get_value());
+				break;
+		}
         return result;
 }
 
@@ -426,7 +472,10 @@ void Unary_Ast::print_ast(ostream & file_buffer){
 
 
 Eval_Result & Unary_Ast:: evaluate(Local_Environment & eval_env, ostream & file_buffer){
-        Eval_Result & result = *new Eval_Result_Value_Int();
+        Eval_Result & result = atomic_exp->evaluate();
+        if(minus){
+        	result.set_value(-1*result.get_value());
+        }
         return result;
 }
 
@@ -560,6 +609,20 @@ Eval_Result & Number_Ast<DATA_TYPE>::evaluate(Local_Environment & eval_env, ostr
 
 		return result;
 	}
+	else if (node_data_type == float_data_type)
+	{
+		Eval_Result & result = *new Eval_Result_Value_Float();
+		result.set_value(constant);
+
+		return result;
+	}
+	else if (node_data_type == double_data_type)
+	{
+		Eval_Result & result = *new Eval_Result_Value_Double();
+		result.set_value(constant);
+
+		return result;
+	}
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -585,3 +648,4 @@ Eval_Result & Return_Ast::evaluate(Local_Environment & eval_env, ostream & file_
 
 template class Number_Ast<int>;
 template class Number_Ast<float>;
+template class Number_Ast<double>;

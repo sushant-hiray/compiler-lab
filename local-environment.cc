@@ -93,6 +93,97 @@ Result_Enum Eval_Result_Value_Int::get_result_enum()
 	return result_type;
 }
 
+
+
+
+///////////////////////////////////////////////////////////////////////////////
+
+Eval_Result_Value_Float::Eval_Result_Value_Float()
+{
+	value = 0;
+	defined = false;
+	result_type = float_result;
+}
+
+Eval_Result_Value_Float::~Eval_Result_Value_Float()
+{ }
+
+void Eval_Result_Value_Float::set_value(float number)
+{
+	value = number;
+	defined = true;
+}
+
+float Eval_Result_Value_Float::get_value()
+{
+	return value;
+}
+
+void Eval_Result_Value_Float::set_variable_status(bool def)
+{
+	defined = def;
+}
+
+bool Eval_Result_Value_Float::is_variable_defined()
+{
+	return defined;
+}
+
+void Eval_Result_Value_Float::set_result_enum(Result_Enum res)
+{
+	result_type = res;
+}
+
+Result_Enum Eval_Result_Value_Float::get_result_enum()
+{
+	return result_type;
+}
+
+///////////////////////////////////////////////////////////////////////////////////
+
+
+Eval_Result_Value_Double::Eval_Result_Value_Double()
+{
+	value = 0;
+	defined = false;
+	result_type = double_result;
+}
+
+Eval_Result_Value_Double::~Eval_Result_Value_Double()
+{ }
+
+void Eval_Result_Value_Double::set_value(double number)
+{
+	value = number;
+	defined = true;
+}
+
+double Eval_Result_Value_Double::get_value()
+{
+	return value;
+}
+
+void Eval_Result_Value_Double::set_variable_status(bool def)
+{
+	defined = def;
+}
+
+bool Eval_Result_Value_Double::is_variable_defined()
+{
+	return defined;
+}
+
+void Eval_Result_Value_Double::set_result_enum(Result_Enum res)
+{
+	result_type = res;
+}
+
+Result_Enum Eval_Result_Value_Double::get_result_enum()
+{
+	return result_type;
+}
+
+
 ///////////////////////////////////////////////////////////////////////////////////
 
 
