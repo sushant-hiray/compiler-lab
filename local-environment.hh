@@ -37,8 +37,14 @@ typedef enum
 	float_result,
 	double_result,
 	void_result,
-	goto_result
+	goto_result,
+	return_result
 } Result_Enum;
+
+struct Result{
+	int no;			// 1 for int, 2 for float, 3 for double, 4 for goto, 5 for return
+	double res;
+};
 
 class Eval_Result;
 class Local_Environment;
@@ -49,21 +55,21 @@ protected:
 	Result_Enum result_type;
 
 public:
-	virtual int get_value();
-	virtual void set_value(int value);
+	virtual Result get_value();
+	virtual void set_value(Result);
 
 	virtual bool is_variable_defined();
 	virtual void set_variable_status(bool def);
 
-	virtual void set_result_enum(Result_Enum res) = 0;
-	virtual Result_Enum get_result_enum() = 0;
+	virtual void set_result_enum(Result_Enum res);
+	virtual Result_Enum get_result_enum();
 };
 
 class Eval_Result_Value:public Eval_Result
 {
 public:
-	virtual void set_value(int number) = 0;
-	virtual int get_value() = 0;
+	virtual void set_value(Result) = 0;
+	virtual Result get_value() = 0;
 
 	virtual bool is_variable_defined() = 0;
 	virtual void set_variable_status(bool def) = 0;
@@ -74,14 +80,15 @@ public:
 
 class Eval_Result_Value_Int:public Eval_Result_Value
 {
+	Result r;
 	int value;
 	bool defined;
 public:
 	Eval_Result_Value_Int();
 	~Eval_Result_Value_Int();
 
-	void set_value(int number);
-	int get_value();
+	void set_value(Result);
+	Result get_value();
 
 	void set_variable_status(bool def);
 	bool is_variable_defined();
@@ -95,13 +102,14 @@ public:
 class Eval_Result_Value_Float:public Eval_Result_Value
 {
 	float value;
+	Result r;
 	bool defined;
 public:
 	Eval_Result_Value_Float();
 	~Eval_Result_Value_Float();
 
-	void set_value(float number);
-	float get_value();
+	void set_value(Result);
+	Result get_value();
 
 	void set_variable_status(bool def);
 	bool is_variable_defined();
@@ -116,13 +124,14 @@ public:
 class Eval_Result_Value_Double:public Eval_Result_Value
 {
 	double value;
+	Result r;
 	bool defined;
 public:
 	Eval_Result_Value_Double();
 	~Eval_Result_Value_Double();
 
-	void set_value(double number);
-	double get_value();
+	void set_value(Result);
+	Result get_value();
 
 	void set_variable_status(bool def);
 	bool is_variable_defined();
@@ -136,13 +145,14 @@ public:
 class Eval_Result_Value_Goto:public Eval_Result_Value
 {
 	int value;
+	Result r;
 	bool defined;
 public:
 	Eval_Result_Value_Goto();
 	~Eval_Result_Value_Goto();
 
-	void set_value(int number);
-	int get_value();
+	void set_value(Result);
+	Result get_value();
 
 	void set_variable_status(bool def);
 	bool is_variable_defined();
