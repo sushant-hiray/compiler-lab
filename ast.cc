@@ -358,9 +358,42 @@ Eval_Result & Arithmetic_Ast:: evaluate(Local_Environment & eval_env, ostream & 
         return result;
 }
 
+/////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////
+
+Unary_Ast::Unary_Ast(Ast* ast,bool m){
+    atomic_exp = ast;
+    minus = m;
+}
+
+Unary_Ast::~Unary_Ast(){
+    delete(atomic_exp);
+}
+
+Data_Type Unary_Ast::get_data_type()
+{
+	return node_data_type;
+}
 
 
+void Unary_Ast::print_ast(ostream & file_buffer){
+	if(minus){
+		file_buffer << "\n"<<AST_NODE_SPACE <<"Arith: UMINUS"<<"\n";
+		file_buffer << COND_NODE_SPACE << "LHS (";
+		atomic_exp->print_ast(file_buffer);
+		file_buffer << ")";
+	}
+	else{
+		atomic_exp->print_ast(file_buffer);
+	}
+}
 
+
+Eval_Result & Unary_Ast:: evaluate(Local_Environment & eval_env, ostream & file_buffer){
+        Eval_Result & result = *new Eval_Result_Value_Int();
+        return result;
+}
 
 
 

@@ -168,6 +168,18 @@ class Arithmetic_Ast:public Ast
         Eval_Result & evaluate(Local_Environment & eval_enc , ostream & file_buffer);
 };
 
+class Unary_Ast:public Ast{
+    private:
+        Ast* atomic_exp;
+        bool minus;
+
+    public:
+        Unary_Ast(Ast*, bool);
+        ~Unary_Ast();
+        Data_Type get_data_type();
+        void print_ast(ostream & file_buffer);
+        Eval_Result & evaluate(Local_Environment & eval_enc , ostream & file_buffer);
+};
 
 class Goto_Ast:public Ast
 {

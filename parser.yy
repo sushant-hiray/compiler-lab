@@ -464,12 +464,12 @@ atomic_expression:
 unary_expression:
     '-' unary_expression
     {
-        $$ = $2;
+        $$ = new Unary_Ast($2,1);
     }
     |
     atomic_expression
     {
-        $$ = $1;
+        $$ = new Unary_Ast($1,0);
     }
 ;
 
