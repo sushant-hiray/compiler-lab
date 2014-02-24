@@ -83,10 +83,19 @@ Data_Type Assignment_Ast::get_data_type()
 	return node_data_type;
 }
 
-bool Assignment_Ast::check_ast(int line)
-{
-	if (lhs->get_data_type() == rhs->get_data_type())
-	{
+bool Assignment_Ast::check_ast(int line){
+	Data_Type l = lhs->get_data_type();
+	Data_Type r = rhs->get_data_type();
+
+	if(l == float_data_type || l == double_data_type){
+		if(r == int_data_type || r == float_data_type || r == double_data_type){
+			
+			node_data_type = lhs->get_data_type();
+			return true;
+		} 
+	}
+
+	else if(l==int_data_type and r==int_data_type){
 		node_data_type = lhs->get_data_type();
 		return true;
 	}
@@ -256,6 +265,18 @@ Boolean_Ast::~Boolean_Ast(){
 	delete(rhs_exp);
 }
 
+bool Boolean_Ast::check_ast(int line){
+	Data_Type l = lhs_exp->get_data_type();
+	Data_Type r = rhs_exp->get_data_type();
+
+	if(l==r){
+		node_data_type = l;
+		return true;
+	}
+
+	report_error("Assignment statement data type not compatible", line);
+}
+
 void Boolean_Ast::print_ast(ostream & file_buffer){
 
 	file_buffer << "\n"<<AST_NODE_SPACE <<"Condition: "<<boolOp[op]<<"\n";
@@ -335,6 +356,19 @@ Arithmetic_Ast::~Arithmetic_Ast(){
     delete(rhs_exp);
 }
 
+bool Arithmetic_Ast::check_ast(int line){
+	Data_Type l = lhs_exp->get_data_type();
+	Data_Type r = rhs_exp->get_data_type();
+
+	if(l==r){
+		node_data_type = l;
+		return true;
+	}
+
+	report_error("Assignment statement data type not compatible", line);
+}
+
+
 Data_Type Arithmetic_Ast::get_data_type()
 {
 	return node_data_type;
@@ -364,6 +398,7 @@ Eval_Result & Arithmetic_Ast:: evaluate(Local_Environment & eval_env, ostream & 
 
 Unary_Ast::Unary_Ast(Ast* ast,bool m){
     atomic_exp = ast;
+    node_data_type = ast->get_data_type();
     minus = m;
 }
 

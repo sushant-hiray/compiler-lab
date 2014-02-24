@@ -138,6 +138,7 @@ class Boolean_Ast:public Ast
         ~Boolean_Ast();
         Data_Type get_data_type();
         void print_ast(ostream & file_buffer);
+        bool check_ast(int line);
         Eval_Result & evaluate(Local_Environment & eval_env, ostream & file_buffer);
 
 };
@@ -165,6 +166,7 @@ class Arithmetic_Ast:public Ast
         ~Arithmetic_Ast();
         Data_Type get_data_type();
         void print_ast(ostream & file_buffer);
+        bool check_ast(int line);
         Eval_Result & evaluate(Local_Environment & eval_enc , ostream & file_buffer);
 };
 

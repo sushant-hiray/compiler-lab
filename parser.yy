@@ -349,7 +349,7 @@ assignment_statement:
 	$$ = new Assignment_Ast($1, $3);
 
 	int line = get_line_number();
-	
+	$$->check_ast(line);
     }
 ;
 
@@ -390,31 +390,43 @@ logical_expression:
     type_expression EQ type_expression
     {
         $$ = new Boolean_Ast($1,$3,Boolean_Ast::BooleanOp::EQ);
+        int line = get_line_number();
+        $$->check_ast(line); 
     }
     |
     type_expression NE type_expression
     {
         $$ = new Boolean_Ast($1,$3,Boolean_Ast::BooleanOp::NE);
+        int line = get_line_number();
+        $$->check_ast(line); 
     }
     |
     type_expression GT type_expression
     {
         $$ = new Boolean_Ast($1,$3,Boolean_Ast::BooleanOp::GT);
+        int line = get_line_number();
+        $$->check_ast(line); 
     }
     |
     type_expression GE type_expression
     {
         $$ = new Boolean_Ast($1,$3,Boolean_Ast::BooleanOp::GE);
+        int line = get_line_number();
+        $$->check_ast(line); 
     }
     |
     type_expression LT type_expression
     {
         $$ = new Boolean_Ast($1,$3,Boolean_Ast::BooleanOp::LT);
+        int line = get_line_number();
+        $$->check_ast(line); 
     }
     |
     type_expression LE type_expression
     {
         $$ = new Boolean_Ast($1,$3,Boolean_Ast::BooleanOp::LE);
+        int line = get_line_number();
+        $$->check_ast(line); 
     }
 ;
 
@@ -423,24 +435,32 @@ arithmetic_expression:
     {
     
         $$ = new Arithmetic_Ast($1,$3,Arithmetic_Ast::ArithOp::MINUS);
+        int line = get_line_number();
+        $$->check_ast(line); 
     }
     |
     type_expression '+' type_expression
     {
     
         $$ = new Arithmetic_Ast($1,$3,Arithmetic_Ast::ArithOp::PLUS);
+        int line = get_line_number();
+        $$->check_ast(line); 
     }
     |
     type_expression '/' type_expression
     {
     
         $$ = new Arithmetic_Ast($1,$3,Arithmetic_Ast::ArithOp::DIVIDE);
+        int line = get_line_number();
+        $$->check_ast(line); 
     }
     |
     type_expression '*' type_expression
     {
     
         $$ = new Arithmetic_Ast($1,$3,Arithmetic_Ast::ArithOp::MULTIPLY);
+        int line = get_line_number();
+        $$->check_ast(line); 
     }
 ;
 
