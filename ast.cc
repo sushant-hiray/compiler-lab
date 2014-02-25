@@ -514,6 +514,9 @@ Eval_Result & Arithmetic_Ast::evaluate(Local_Environment & eval_env, ostream & f
 				r.res = l_res.get_value().res + r_res.get_value().res;
 				break;
 			case DIVIDE :
+				if(r_res.get_value().res == 0){
+					report_error("Divide by 0",NOLINE);
+				}
 				r.res = l_res.get_value().res / r_res.get_value().res;
 				// if(l_res.get_data_type()==float_data_type){
 				// 	resullt.set_value(l_res.get_value() / (float)r_res.get_value());
