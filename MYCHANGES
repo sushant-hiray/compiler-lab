@@ -5,24 +5,75 @@ The following changes were made for Lab3 and Assignment 2b. Submission:
 
 Changes in ast.cc and ast.hh
     
-    Added basic prototype of Arithmetic class derived from Ast namely:
-    Arithmetic_Ast  ->  Handles Arithmetic Expression
+    Definition changes in ast.hh
+	    Added an arithOp array to print enum ArithOp
+	    Renamed opNames array to boolOp
+
+	    Added a new class: Type_Expression_Ast
+	    Added a new class: Unary_Ast
+
+	    Renamed class Expression_Ast to Boolean_Ast
+	    
+	    Added check_ast for Boolean_Ast and Arithmetic_Ast
+
+	 Changes in ast.cc
+	 	Added a new library iomanip for precision printing of floating point and double values
+	 	Added all function definitions corresponding to new classes added
+	 	Added function body corresponding to check_ast for class Boolean_Ast and Arithmetic_Ast
     
 ---------------------------------------------------------------------------------------
 
 Changes in parser.yy
+    Renamed Expression_Ast to Boolean_Ast
     
-    added type_expression rule for typecasting
-    added arithmetic_expression rule for arithmetic expreesions
-    added UNARY expression
-    added float 'n' double as datatypes.
+    Added actions to all the production rules
+    For the above part: 
+    	Data_Type dt;
+    	%type <dt> type_specifier was added
+    	All other types were defined in previous version itself
+    	Action rules corrsponding to arithmetic_expression were added
+    	Action rules corresponding to type_specifier were added
+
+    Changed a grammar rule:
+	    	'(' type_specifier ')' atomic_expression
+	    	{
+	    	    $$=$4;
+	    	    $$= new Type_Expression_Ast($4,$2);
+	    	
+	    	}
+	    This rule was shifted from type_expression to atomic_expression
+	    Doing this makes sure -(type_specifier) atomic_expression are recognised
+
 
 ---------------------------------------------------------------------------------------
 
-Changes in scanner.ll
+Changes in local-environment.hh local-environment.cc
+	Changes in local-environment.hh
+	    Updated Result_Enum by adding float_result , double_result and return_result
+	    Added a new struct Result for returning result.
+	    Changed return type of get_value() from int to the struct Result
+	    Changed parameter of set_value() to Result
+	    Added classes Eval_Result_Value_Float and Eval_Result_Value_Double.
 
-    Added float and double rules
+	 Changes in local-environment.cc
+	 	Changed print method of Local_Environment to print the value of the variable 
+	 	according to its type
+	 	Added method definitions corresponding to the new classes added.
+	 	Defined all the virtual functions
+	 	Changed return type of get_value() to the struct Result which comprises of a double value 
+	 	and an integer specifying its type.
 
 ---------------------------------------------------------------------------------------
+
+Changes in symbol-table.hh and symbol-table.cc
+	Changes in symbol-table.hh
+		Added new values in the enum Data_Type: float_data_type, double_data_type, return_data_type
+	Changes in symbol-table.cc
+		Updated the parameter of set_value wherever required
+
+
+---------------------------------------------------------------------------------------
+Changes in procedure.cc
+	Added a new condition to break evaluation of the procedure if a return statement is found.
 
 Also we have made sure that there are no shift-reduce or reduce-reduce conflicts by assigning appropriate associative rules!
