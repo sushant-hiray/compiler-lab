@@ -358,13 +358,7 @@ type_expression:
     {
         $$= new Type_Expression_Ast($1);
     }
-    |
-    '(' type_specifier ')' atomic_expression
-    {
-        $$=$4;
-        $$= new Type_Expression_Ast($4,$2);
     
-    }
 ;
 
 
@@ -478,6 +472,13 @@ atomic_expression:
     '(' type_expression ')'
     {
         $$ = $2;
+    }
+    |
+    '(' type_specifier ')' atomic_expression
+    {
+        $$=$4;
+        $$= new Type_Expression_Ast($4,$2);
+    
     }
 ;
 
