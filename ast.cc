@@ -88,7 +88,7 @@ bool Assignment_Ast::check_ast(int line){
 	Data_Type r = rhs->get_data_type();
 
 	if(l == float_data_type || l == double_data_type){
-		if(r == int_data_type || r == float_data_type || r == double_data_type){
+		if(r == float_data_type || r == double_data_type){
 			
 			node_data_type = lhs->get_data_type();
 			return true;
