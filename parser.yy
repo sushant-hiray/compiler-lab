@@ -69,6 +69,7 @@
 %type <ast_list> executable_statement_list
 %type <ast_list> assignment_statement_list
 %type <ast> assignment_statement
+%type <ast> function_call
 %type <ast> variable
 %type <ast> constant
 %type <cond_ast> if_control_block
@@ -81,6 +82,7 @@
 %type <ast> type_expression
 %type <dt> type_specifier
 %type <dt> return_type_specifier
+%type <dt> VOID
 
 /* start symbol is named "program" */
 %start program
@@ -234,13 +236,25 @@ declaration_statement:
     
     }
     |
-    return_type_specifier
-    NAME '(' parameter_list ')' ';'
+    type_specifier NAME '(' parameter_list ')' ';'
     {
     
             $$ = new Symbol_Table_Entry(*$2, $1);
 
             delete $2;
+    }
+    |
+    VOID NAME '(' parameter_list ')' ';'
+    {
+            $$ = new Symbol_Table_Entry(*$2, $1);
+
+            delete $2;
+    }
+;
+
+function_call:
+    NAME '(' parameter_list ')' ';'
+    {
     }
 ;
 
@@ -346,6 +360,18 @@ assignment_statement_list:
 	|
 	assignment_statement_list assignment_statement
     {
+        if ($1 == NULL)
+                    $$ = new list<Ast *>;
+
+        else
+                    $$ = $1;
+
+        $$->push_back($2);
+    }
+    |
+    assignment_statement_list function_call
+    {
+    
         if ($1 == NULL)
                     $$ = new list<Ast *>;
 
@@ -581,6 +607,6 @@ return_type_specifier:
     |
     VOID
     {
-        $$=Data_Type::void_data_type;
+        $$=Data_Type::int_data_type;
     }
 ;
