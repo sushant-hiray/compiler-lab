@@ -57,7 +57,7 @@
 %token <float_value> FLOAT_NUMBER
 %token <string_value> NAME
 %token <return_ast> RETURN
-%token INTEGER FLOAT DOUBLE IF ELSE GOTO ASSIGN_OP
+%token INTEGER FLOAT DOUBLE VOID IF ELSE GOTO ASSIGN_OP
 %left NE EQ 
 %left LT LE GT GE
 %left '+' '-'
@@ -80,6 +80,7 @@
 %type <ast> unary_expression
 %type <ast> type_expression
 %type <dt> type_specifier
+%type <dt> return_type_specifier
 
 /* start symbol is named "program" */
 %start program
@@ -87,32 +88,30 @@
 %%	//separates the 2 sections Bison Directives and Grammar Rules										
 /*** Grammar Rules ***/
 
+
 program:
-	declaration_statement_list procedure_name
-    {       
+    declaration_statement_list procedure_list 
+    {
             program_object.set_global_table(*$1);
             return_statement_used_flag = false; 
-    }   
-	procedure_body
-    {
-            program_object.set_procedure_map(*current_procedure);
-            if ($1)
-            $1->global_list_in_proc_map_check(get_line_number());
-            delete $1;
-    }
-	|
-	procedure_name
-	{
-        return_statement_used_flag = false; 
-    }
-    procedure_body
-    {
-        program_object.set_procedure_map(*current_procedure);
     }
 ;
 
+procedure_list:
+    procedure_defn
+    |
+    procedure_defn procedure_list
+;
+
+procedure_defn:
+    procedure_name procedure_body
+    {
+        program_object.set_procedure_map(*current_procedure);
+    
+    }
+;
 procedure_name:
-	NAME '(' ')'
+	NAME '(' parameter_list ')'
     {
         current_procedure = new Procedure(void_data_type, *$1);
     }
@@ -220,6 +219,11 @@ declaration_statement_list:
     }
 ;
 
+parameter_list:
+    |
+    parameter_list ',' type_specifier NAME
+;
+
 declaration_statement:
 	type_specifier
     NAME ';'
@@ -228,6 +232,15 @@ declaration_statement:
 
             delete $2;
     
+    }
+    |
+    return_type_specifier
+    NAME '(' parameter_list ')' ';'
+    {
+    
+            $$ = new Symbol_Table_Entry(*$2, $1);
+
+            delete $2;
     }
 ;
 
@@ -563,3 +576,11 @@ type_specifier:
     }
 ;
 
+return_type_specifier:
+    type_specifier
+    |
+    VOID
+    {
+        $$=Data_Type::void_data_type;
+    }
+;
