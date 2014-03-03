@@ -97,6 +97,11 @@ program:
             program_object.set_global_table(*$1);
             return_statement_used_flag = false; 
     }
+    |
+    procedure_list
+    {
+    return_statement_used_flag = false; 
+    }
 ;
 
 procedure_list:
@@ -605,14 +610,5 @@ type_specifier:
     DOUBLE
     {
         $$=Data_Type::double_data_type;
-    }
-;
-
-return_type_specifier:
-    type_specifier
-    |
-    VOID
-    {
-        $$=Data_Type::int_data_type;
     }
 ;
