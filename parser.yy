@@ -221,9 +221,15 @@ declaration_statement_list:
     }
 ;
 
+para_list:
+    type_specifier NAME
+    |
+    para_list ',' type_specifier NAME
+;
+
 parameter_list:
     |
-    parameter_list ',' type_specifier NAME
+    para_list
 ;
 
 declaration_statement:
