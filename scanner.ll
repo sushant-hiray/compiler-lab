@@ -101,7 +101,7 @@ goto    {
             return Parser::LE;
         }
 
-[:{}();]	{
+[:{}();,]	{
 			store_token_name("META CHAR");
 			return matched()[0];
 		}
