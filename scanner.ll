@@ -71,6 +71,17 @@ goto    {
         }
 
 
+("<bb "([0-9]+)">") {
+                store_token_name("BASIC BLOCK");
+                ParserBase::STYPE__ * val = getSval();
+                string matchs = matched();
+                val->integer_value = atoi((matchs.substr(4,matchs.length() -5)).c_str());
+                if(val->integer_value < 2){
+                   report_error("Illegal basic block lable",lineNr());
+                }
+                return Parser::BASICBLOCK;
+                }
+                
 [=][=]      {
         store_token_name("EQ");
         return Parser::EQ;
@@ -101,33 +112,36 @@ goto    {
             return Parser::LE;
         }
 
-[:{}();,]	{
-			store_token_name("META CHAR");
-			return matched()[0];
-		}
-
-[-]?[[:digit:]]+[.][[:digit:]]+ {
-            store_token_name("FNUM");
-            ParserBase::STYPE__ * val = getSval();
-            val->float_value = atof(matched().c_str());
-            return Parser::FLOAT_NUMBER;
-        }
-
-[-]?[[:digit:]]+ 	{ 
-				store_token_name("NUM");
-
-				ParserBase::STYPE__ * val = getSval();
-				val->integer_value = atoi(matched().c_str());
-
-				return Parser::INTEGER_NUMBER; 
-			}
-
 
 [-*/+] {
        
         store_token_name("ARITHOP");
         return matched()[0];
        }
+       
+
+
+[:{}();,]	{
+			store_token_name("META CHAR");
+			return matched()[0];
+		}
+
+[-]?[0-9]+[.][0-9]+ {
+            store_token_name("FNUM");
+            ParserBase::STYPE__ * val = getSval();
+            val->float_value = atof(matched().c_str());
+            return Parser::FLOAT_NUMBER;
+        }
+
+[-]?[[:digit:]]+  	{ 
+				store_token_name("NUM");
+
+				ParserBase::STYPE__ * val = getSval();
+				val->integer_value = atoi(matched().c_str());
+				cout<<"val is" <<val->integer_value<<" "<<matched().c_str()<<endl;
+				return Parser::INTEGER_NUMBER; 
+			}
+
 
 [[:alpha:]_][[:alpha:][:digit:]_]* {
 					store_token_name("NAME");
@@ -138,27 +152,19 @@ goto    {
 					return Parser::NAME; 
 				}
 
-[<][b][b][ \t]*[[:digit:]]+[ \t]*[>] {
-                store_token_name("BASIC BLOCK");
-                ParserBase::STYPE__ * val = getSval();
-                string matchs = matched();
-                val->integer_value = atoi((matchs.substr(4,matchs.length() -5)).c_str());
-                if(val->integer_value < 2){
-                   report_error("Illegal basic block lable",lineNr());
-                }
-                return Parser::BASICBLOCK;
-                }
+
 \n		{ 
 			if (command_options.is_show_tokens_selected())
 				ignore_token();
 		}    
 
-[ \t]*";;".*  	|
-[ \t]*[/][/].* |
+(";;".*)  	|
+([ \t]*"//".*) |
 [ \t]		{
 			if (command_options.is_show_tokens_selected())
 				ignore_token();
 		}
+
 
 .		{ 
 			string error_message;
