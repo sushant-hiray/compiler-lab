@@ -138,7 +138,6 @@ goto    {
 
 				ParserBase::STYPE__ * val = getSval();
 				val->integer_value = atoi(matched().c_str());
-				cout<<"val is" <<val->integer_value<<" "<<matched().c_str()<<endl;
 				return Parser::INTEGER_NUMBER; 
 			}
 
