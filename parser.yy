@@ -68,6 +68,8 @@
 %type <basic_block> basic_block
 %type <ast_list> executable_statement_list
 %type <ast_list> assignment_statement_list
+%type <ast_list> call_para_list
+%type <ast_list> call_parameter_list
 %type <ast> assignment_statement
 %type <ast> function_call
 %type <ast> variable
@@ -276,7 +278,7 @@ call_para_list:
     type_expression
     {
         $$ = new list<Ast*>();
-        $$->push_symbol($1);
+        $$->push_back($1);
     }
     |
     call_para_list ',' type_expression
@@ -290,7 +292,7 @@ call_para_list:
         else
             $$ = new list<Ast*>();
 
-        $$->push_symbol($3);   
+        $$->push_back($3);   
     }
 ;
 
