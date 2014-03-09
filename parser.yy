@@ -88,8 +88,6 @@
 %start program
 
 %%	//separates the 2 sections Bison Directives and Grammar Rules										
- /** Grammar Rules ***/
-
 
 program:
     declaration_statement_list procedure_list 
@@ -119,6 +117,7 @@ procedure_defn:
     
     }
 ;
+
 procedure_name:
 	NAME '(' parameter_list ')'
     {
@@ -131,8 +130,9 @@ procedure_body:
     { 
             current_procedure->set_local_list(*$2);
             delete $2;
-     }
-	basic_block_list '}'
+    }
+	
+    basic_block_list '}'
 	{ 
             if (return_statement_used_flag == false)
             {
@@ -152,6 +152,7 @@ procedure_body:
             current_procedure->set_basic_block_list(*$4);
             delete $4;
      }
+    
     |
 	'{' basic_block_list '}'
     { 
@@ -180,7 +181,7 @@ procedure_body:
 declaration_statement_list:
 	declaration_statement
     {
-         int line = get_line_number();
+        int line = get_line_number();
         program_object.variable_in_proc_map_check($1->get_variable_name(), line);
 
         string var_name = $1->get_variable_name();
@@ -197,8 +198,9 @@ declaration_statement_list:
 	declaration_statement_list declaration_statement
     {
      
-          if declaration is local then no need to check in global list
-          if declaration is global then this list is global list
+        /*  if declaration is local then no need to check in global list
+            if declaration is global then this list is global list
+        */
 
     int line = get_line_number();
     program_object.variable_in_proc_map_check($2->get_variable_name(), line);
@@ -376,7 +378,7 @@ executable_statement_list:
     { 
             Ast * ret = new Return_Ast();
 
-            return_statement_used_flag = true;   Current procedure has an occurrence of return statement
+            return_statement_used_flag = true;   //Current procedure has an occurrence of return statement
 
             if ($1 != NULL)
                 $$ = $1;
