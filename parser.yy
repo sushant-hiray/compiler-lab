@@ -274,24 +274,42 @@ declaration_statement:
 
 call_para_list:
     type_expression
-    {}
+    {
+        $$ = new list<Ast*>();
+        $$->push_symbol($1);
+    }
     |
     call_para_list ',' type_expression
-    {}
+    {
+        if ($1 != NULL)
+        {
+
+            $$ = $1;
+        }
+
+        else
+            $$ = new list<Ast*>();
+
+        $$->push_symbol($3);   
+    }
 ;
 
 call_parameter_list:
-    {}
+    {
+        $$ = NULL;
+    }
     |
     call_para_list
-    {}
+    {
+        $$ = $1;
+    }
 ;
 
 function_call:
     NAME '(' call_parameter_list ')'
     { 
-        Data_Type dt = program_object.get_return_type($1);
-        $$ = new Call_Ast($1,$3);
+        Data_Type dt = program_object.get_return_type(*$1);
+        $$ = new Call_Ast(*$1,*$3, dt);
      }
 ;
 
