@@ -353,6 +353,64 @@ Eval_Result & Type_Expression_Ast::evaluate(Local_Environment & eval_env, ostrea
 
 ///////////////////////////////////////////////////////////////////////////
 
+
+
+
+
+
+//////////////////////////////////////////////////////////////////////////
+
+Call_Ast::Call_Ast(string & name,list<Ast*> _parlist,Data_Type _return_type){
+	fn_name = name;
+	par_list = _parlist;
+	node_data_type = _return_type;
+}
+
+Call_Ast::~Call_Ast(){
+	delete(par_list);
+}
+
+void Call_Ast::print_ast(ostream & file_buffer){
+	//type_exp->print_ast(file_buffer);
+}
+
+Data_Type Call_Ast::get_data_type(){
+	return node_data_type;
+}
+
+Eval_Result & Call_Ast::evaluate(Local_Environment & eval_env, ostream & file_buffer){
+	// Eval_Result & res = type_exp->evaluate(eval_env, file_buffer);
+	// Result r;
+	if(node_data_type == int_data_type){
+		// r.no=1;
+		// r.res = (int) res.get_value().res;
+		Eval_Result & result = *new Eval_Result_Value_Int();
+		// result.set_value(r);
+		// result.set_result_enum(int_result);
+		return result;
+	}
+	else if(node_data_type == float_data_type){
+		// r.no=2;
+		// r.res = (float) res.get_value().res;
+		Eval_Result & result = *new Eval_Result_Value_Float();
+		// result.set_value(r);
+		// result.set_result_enum(float_result);
+		return result;
+	}
+		
+	else if(node_data_type == double_data_type){
+		// r.no=3;
+		// r.res = (double) res.get_value().res;
+		Eval_Result & result = *new Eval_Result_Value_Double();
+		// result.set_value(r);
+		// result.set_result_enum(double_result);
+		return result;
+	}
+}
+
+
+///////////////////////////////////////////////////////////////////////////
+
 Boolean_Ast::Boolean_Ast(Ast * lhs , Ast *  rhs , BooleanOp _op){
 	lhs_exp = lhs;
 	rhs_exp = rhs;

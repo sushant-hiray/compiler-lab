@@ -116,6 +116,22 @@ class Type_Expression_Ast:public Ast{
         Eval_Result & evaluate(Local_Environment & eval_env, ostream & file_buffer);
 };
 
+
+
+class Call_Ast:public Ast{
+    private:
+        string fn_name;
+        list<Ast*> par_list;
+
+    public:
+        Call_Ast(string & name,list<Ast*> _parlist,Data_Type _return_type);
+        ~Call_Ast();
+        Data_Type get_data_type();
+        void print_ast(ostream & file_buffer);
+        Eval_Result & evaluate(Local_Environment & eval_env, ostream & file_buffer);
+};
+
+
 class Boolean_Ast:public Ast
 {
     public:
