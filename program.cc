@@ -110,6 +110,12 @@ void Program::print_ast()
 	}
 }
 
+Data_Type Program::get_return_type(string variable){
+	if(procedure_map[variable]!= NULL){
+		return (procedure_map[variable])->get_return_type();
+	}
+}
+
 Eval_Result & Program::evaluate()
 {
 	Procedure * main = get_main_procedure(command_options.get_output_buffer());

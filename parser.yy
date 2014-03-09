@@ -290,23 +290,8 @@ call_parameter_list:
 function_call:
     NAME '(' call_parameter_list ')'
     { 
-        Symbol_Table_Entry var_table_entry;
-
-        if (current_procedure->variable_in_symbol_list_check(*$1))
-             var_table_entry = current_procedure->get_symbol_table_entry(*$1);
-
-        else if (program_object.variable_in_symbol_list_check(*$1))
-            var_table_entry = program_object.get_symbol_table_entry(*$1);
-
-        else
-        {
-            int line = get_line_number();
-            report_error("Variable has not been declared", line);
-        }
-
-        $$ = new Name_Ast(*$1, var_table_entry);
-
-        delete $1;
+        Data_Type dt = program_object.get_return_type($1);
+        $$ = new Call_Ast($1,$3);
      }
 ;
 

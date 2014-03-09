@@ -59,6 +59,8 @@ public:
 
 	bool variable_in_symbol_list_check(string variable);
 	void variable_in_proc_map_check(string symbol, int line);
+
+	Data_Type get_return_type(string variable);
 };
 
 #endif
