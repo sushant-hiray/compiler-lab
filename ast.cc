@@ -367,7 +367,6 @@ Call_Ast::Call_Ast(string & name,list<Ast*> _parlist,Data_Type _return_type){
 }
 
 Call_Ast::~Call_Ast(){
-	delete(par_list);
 }
 
 void Call_Ast::print_ast(ostream & file_buffer){
