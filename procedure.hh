@@ -43,6 +43,9 @@ class Procedure
 	list<Basic_Block *> basic_block_list;
   list<int> basic_block_no;
   list<int> goto_no;
+  int parameter_length;
+  bool defined;
+
 
 
 public:
@@ -52,7 +55,7 @@ public:
 	string get_proc_name();
 	void set_basic_block_list(list<Basic_Block *> bb_list);
 	void set_local_list(Symbol_Table & new_list);
-  void append_local_list(Symbol_Table & new_list);
+  void append_local_list(Symbol_Table & new_list,int line);
 	Data_Type get_return_type();
 	Symbol_Table_Entry & get_symbol_table_entry(string variable_name);
   void add_basic_block_no(int n);
@@ -66,6 +69,12 @@ public:
 	Eval_Result & evaluate(ostream & file_buffer);
 	bool variable_in_symbol_list_check(string variable);
   void check_parameter_list(Symbol_Table* new_list, int);
+  Symbol_Table get_local_symbol_table();
+  void set_parameter_length(int _a);
+  int get_parameter_length();
+  void set_defined(bool _val);
+  bool is_defined();
+  void set_return_type(Data_Type);
 };
 
 #endif

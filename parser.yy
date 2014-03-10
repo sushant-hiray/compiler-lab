@@ -17,7 +17,7 @@
            Release  date  Jan  15, 2013.  Copyrights  reserved  by  Uday
            Khedker. This  implemenation  has been made  available purely
            for academic purposes without any warranty of any kind.
-
+Variable has
            Documentation (functionality, manual, and design) and related
            tools are  available at http://www.cse.iitb.ac.in/~uday/cfglp
 
@@ -96,24 +96,28 @@
 %%	//separates the 2 sections Bison Directives and Grammar Rules										
 
 program:
-    declaration_statement_list procedure_declaration_list procedure_list 
+    declaration_statement_list 
     {
          program_object.set_global_table(*$1);
          return_statement_used_flag = false; 
     }
+    procedure_list 
     |
-    procedure_declaration_list procedure_list
+    declaration_statement_list
+    procedure_declaration_list 
     {
-        return_statement_used_flag = false; 
+         program_object.set_global_table(*$1);
+         return_statement_used_flag = false; 
     }
-    |
-    declaration_statement_list procedure_list
-    {
-
-    }
-    |
     procedure_list
+    |
+    procedure_declaration_list 
+    {
+    }
+    procedure_list
+    |
     {}
+    procedure_list
 ;
 
 procedure_list:
@@ -129,6 +133,10 @@ procedure_defn:
     {
         //cout<<" int procedure_defn\n";
         //program_object.set_procedure_map(*current_procedure);
+        current_procedure->set_defined(true);
+        if(return_statement_used_flag == false){
+            cout<<"no return statement"<<endl;
+        }
     }
 ;
 
@@ -139,6 +147,12 @@ procedure_name:
         if(*$1!="main"){
           //  cout<<"procedure is not main"<<endl;
             current_procedure = program_object.get_procedure(*$1);
+            if(current_procedure == NULL){
+                report_error("Procedure corresponding to the name is not found", get_line_number());
+            }
+            else if(current_procedure->is_defined()){
+                report_error("Procedure has already been defined before",get_line_number());
+            }
             //cout<<" int procedure_defn\n";
         }
 
@@ -156,9 +170,9 @@ procedure_name:
         }
         if($3!=NULL){
             //cout<<"not null\n";
+            //cout<<current_procedure->get_local_symbol_table().get_variable_table().size()<<endl;
             current_procedure->check_parameter_list($3, get_line_number());
         }
-        //cout << "here\n";
         else{
             current_procedure->check_parameter_list(new Symbol_Table(), get_line_number());
         }             
@@ -169,10 +183,10 @@ procedure_name:
 procedure_body:
 	'{' declaration_statement_list
     { 
-            current_procedure->append_local_list(*$2);
+            //cout<<"before current_procedure->append_local_list(*$2);"<<endl;
+            current_procedure->append_local_list(*$2,get_line_number());
             delete $2;
     }
-	
     basic_block_list '}'
 	{ 
             if (return_statement_used_flag == false)
@@ -236,10 +250,12 @@ procedure_declaration:
             if($4==NULL){
                 //cout<<"param list is empty in declaration"<<endl;
                 proc->set_local_list(* new Symbol_Table());
+                proc->set_parameter_length(0);
             }
             else{
                 //cout<<"param list is not empty in declaration"<<endl;
                 proc->set_local_list(*$4);
+                proc->set_parameter_length($4->get_variable_table().size());
             }
 
             program_object.set_procedure_map(*proc);
@@ -250,8 +266,15 @@ procedure_declaration:
     {
             $$ = new Symbol_Table_Entry(*$2, Data_Type::function_data_type);
             Procedure* proc = new Procedure(Data_Type::void_data_type,*$2);
-            if($4==NULL){ proc->set_local_list(* new Symbol_Table());}
-            else{proc->set_local_list(*$4);}
+            
+            if($4==NULL){ 
+                proc->set_local_list(* new Symbol_Table());
+                proc->set_parameter_length(0);
+            }
+            else{
+                proc->set_local_list(*$4);
+                proc->set_parameter_length($4->get_variable_table().size());
+            }
             program_object.set_procedure_map(*proc);
     }
 ;
@@ -260,10 +283,10 @@ declaration_statement_list:
 	declaration_statement
     {
         int line = get_line_number();
-       // cout << $1->get_variable_name()<<endl;
+        //cout << $1->get_variable_name()<<endl;
         program_object.variable_in_proc_map_check($1->get_variable_name(), line);
-
         string var_name = $1->get_variable_name();
+        //cout<<var_name<<"\n";
         if (current_procedure && current_procedure->get_proc_name() == var_name)
         {
             int line = get_line_number();
@@ -326,9 +349,13 @@ para_list:
 
         else
             $$ = new Symbol_Table();
-
-        Symbol_Table_Entry* ste = new Symbol_Table_Entry(*$4, $3);
-        $$->push_symbol(ste);
+        if($$->variable_in_symbol_list_check(*$4)){
+            report_error("Formal Parameter declared twice",get_line_number());
+        }
+        else{
+            Symbol_Table_Entry* ste = new Symbol_Table_Entry(*$4, $3);
+            $$->push_symbol(ste);
+        }
     }
 ;
 
@@ -345,12 +372,9 @@ parameter_list:
 ;
 
 declaration_statement:
-	type_specifier
-    NAME ';'
+	type_specifier NAME ';'
     {
             $$ = new Symbol_Table_Entry(*$2, $1);
-
-     
     }
 ;
 
@@ -391,8 +415,16 @@ call_parameter_list:
 function_call:
     NAME '(' call_parameter_list ')'
     { 
-        Data_Type dt = program_object.get_return_type(*$1);
-        $$ = new Call_Ast(*$1,*$3, dt);
+        Procedure* p = program_object.get_procedure(*$1);  
+        if(p!=NULL){
+            Data_Type dt = program_object.get_return_type(*$1);
+            $$ = new Call_Ast(*$1,*$3, dt);
+
+        }
+        else{
+            report_error("Procedure corresponding to the name is not found", get_line_number());
+        }
+
      }
 ;
 
@@ -469,13 +501,30 @@ executable_statement_list:
     { 
              Ast * ret;
              if($3!=NULL){
+                if(current_procedure->get_proc_name() == "main"){
+                    if(current_procedure->get_return_type() != void_data_type){
+                        if(current_procedure->get_return_type() != $3->get_data_type()){
+                            report_error("Two or more types of return values", get_line_number());
+                        }
+                    }
+                    else{
+                        current_procedure->set_return_type($3->get_data_type());
+                    }
+                }
+
+                if(current_procedure->get_return_type() != $3->get_data_type()){
+                    report_error("Last return statement type, of procedure, and its prototype should match",get_line_number());
+                }
                 ret = new Return_Ast($3);
+
              }
             else{
                 ret= new Return_Ast();
             }
 
             return_statement_used_flag = true;   //Current procedure has an occurrence of return statement
+
+
 
             if ($1 != NULL){
                 $$ = $1;

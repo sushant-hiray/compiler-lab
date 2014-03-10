@@ -56,6 +56,7 @@ void Program::set_global_table(Symbol_Table & new_global_table)
 {
 	global_symbol_table = new_global_table;
 	global_symbol_table.set_table_scope(global);
+//	cout<<"<size of global table is "<<global_symbol_table.get_variable_table().size()<<endl;
 }
 
 void Program::set_procedure_map(Procedure & proc)
@@ -75,8 +76,8 @@ Symbol_Table_Entry & Program::get_symbol_table_entry(string variable_name)
 
 void Program::variable_in_proc_map_check(string variable, int line)
 {
-	if(procedure_map[variable] != NULL){
-		//cout<<"in function\n";
+	if(procedure_map.find(variable) != procedure_map.end()){
+		cout<<"in function\n";
 		report_error("Variable name cannot be same as procedure name", line);
 	}
 }

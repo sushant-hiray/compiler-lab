@@ -40,6 +40,7 @@ Procedure::Procedure(Data_Type proc_return_type, string proc_name)
 {
 	return_type = proc_return_type;
 	name = proc_name;
+	defined = false;
 }
 
 Procedure::~Procedure()
@@ -61,6 +62,7 @@ void Procedure::set_basic_block_list(list<Basic_Block *> bb_list)
 
 void Procedure::set_local_list(Symbol_Table & new_list)
 {
+	//cout<<"local_list set"<<endl;
 	local_symbol_table = new_list;
 	local_symbol_table.set_table_scope(local);
 }
@@ -218,9 +220,10 @@ void Procedure::check_parameter_list(Symbol_Table* new_table, int line){
 	list<Symbol_Table_Entry *> local_list = local_symbol_table.get_variable_table();
 	list<Symbol_Table_Entry *> new_list = new_table->get_variable_table();
 	list<Symbol_Table_Entry *>::iterator i,j;
+	int k=0;
 	//list<Symbol_Table_Entry *>::iterator j;
 	//cout<<"new_list"<<endl;
-	// cout<<new_list.size()<<endl;
+	//cout<<"sizes are: "<<new_list.size()<<" "<<parameter_length<<endl;
 	if(new_list.size() == 0){
 		// cout<<"new_list is null"<<endl;
 		if(local_list.size()!=0){
@@ -234,11 +237,12 @@ void Procedure::check_parameter_list(Symbol_Table* new_table, int line){
 	// 	cout<<"hello\n";
 	// }
 
-	for (i = local_list.begin(), j = new_list.begin() ; (i != local_list.end()) and (j != new_list.end()) ; i++ , j++)
+	for (i = local_list.begin(), j = new_list.begin(), k=0 ; (k < parameter_length) && (i != local_list.end()) and (j != new_list.end()) ; i++ , j++ , k++)
 	{
 		//cout<<local_list.size()<<endl;
+		//cout<<"name: "<<(*i)->get_variable_name() <<" "<<(*j)->get_variable_name()<<endl;
 		if ((*i)->get_variable_name() != (*j)->get_variable_name()){
-			cout<<"name: "<<(*i)->get_variable_name() <<" "<<(*j)->get_variable_name()<<endl;
+			
 			report_error("Variable name of one of the parameters of the procedre and its prototypes doesn't match",line);
 		}
 		else if((*i)->get_data_type() != (*j)->get_data_type())
@@ -249,14 +253,15 @@ void Procedure::check_parameter_list(Symbol_Table* new_table, int line){
 			continue;
 		}
 	}
-	if(i!= local_list.end()){
-		cout<<"local list: \n";
+	if(k<parameter_length){
+		//cout<<"local list: \n"<< k <<" "<<parameter_length<<endl;
 		report_error("Procedure and its prototype parameter f_list length doens't match",line);
 	}
 	else if(j!= new_list.end()){
-		cout<<new_list.size()<<" "<<local_list.size()<<endl;
-		cout<<(*j)->get_variable_name()<<endl;
-		cout<<"new list: \n";
+		//cout<<new_list.size()<<" "<<local_list.size()<<endl;
+		//cout<<"local list: \n"<< k <<" "<<parameter_length<<endl;
+		// cout<<(*j)->get_variable_name()<<endl;
+		// cout<<"new list: \n";
 		report_error("Procedure and its prototype parameter f_list length doens't match",line);
 	}
 	else{
@@ -266,9 +271,40 @@ void Procedure::check_parameter_list(Symbol_Table* new_table, int line){
 }
 
 
-void Procedure::append_local_list(Symbol_Table & new_list){
+void Procedure::append_local_list(Symbol_Table & new_table, int line){
+	list<Symbol_Table_Entry *> new_list = new_table.get_variable_table();
 	list<Symbol_Table_Entry *>::iterator i;
-	for (i = new_list.get_variable_table().begin() ; i != new_list.get_variable_table().end() ; i++){
+
+	for (i = new_list.begin() ; i != new_list.end() ; i++){
+		if(variable_in_symbol_list_check((*i)->get_variable_name())){
+			report_error("Formal parameter and local variable name cannot be same",line);
+		}
 		local_symbol_table.push_symbol(*i);
 	}
+	return;
+	//cout<<"local_list appended"<<endl;
+}
+
+Symbol_Table Procedure::get_local_symbol_table(){
+	return local_symbol_table;
+}
+
+
+void Procedure::set_parameter_length(int _a){
+	parameter_length = _a;
+}
+int Procedure::get_parameter_length(){
+	return parameter_length;
+}
+
+void  Procedure::set_defined(bool _val){
+	defined = _val;
+}
+
+bool  Procedure::is_defined(){
+	return defined;
+}
+
+void Procedure::set_return_type(Data_Type type){
+	return_type = type;
 }

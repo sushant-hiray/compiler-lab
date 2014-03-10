@@ -70,11 +70,14 @@ void Symbol_Table::global_list_in_proc_map_check(int line)
 
 bool Symbol_Table::variable_in_symbol_list_check(string variable)
 {
+	//cout<<"here\n";
+	//cout<<variable << " " << variable_table.size()<<endl;
 	list<Symbol_Table_Entry *>::iterator i;
 	for (i = variable_table.begin(); i != variable_table.end(); i++)
 	{
-		if ((*i)->get_variable_name() == variable)
+		if ((*i)->get_variable_name() == variable){
 			return true;
+		}
 	}
 
 	return false;
