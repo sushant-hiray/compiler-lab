@@ -251,7 +251,7 @@ declaration_statement:
 	type_specifier
     NAME ';'
     {
-             $$ = new Symbol_Table_Entry(*$2, $1);
+            $$ = new Symbol_Table_Entry(*$2, $1);
 
             delete $2;
      
@@ -259,17 +259,20 @@ declaration_statement:
     |
     type_specifier NAME '(' parameter_list ')' ';'
     { 
-    
-            $$ = new Symbol_Table_Entry(*$2, $1);
-
-            delete $2;
+            $$ = new Symbol_Table_Entry(*$2, Data_type::function_data_type);
+            Procedure* proc = new Procedure($1,*$2);
+            proc->set_local_list($4);
+            program_object.set_procedure_map(*proc);
+            delete $6;
      }
     |
     VOID NAME '(' parameter_list ')' ';'
     {
-             $$ = new Symbol_Table_Entry(*$2, $1);
-
-             delete $2;
+             $$ = new Symbol_Table_Entry(*$2, Data_type::function_data_type);
+             Procedure* proc = new Procedure(Data_Type::void_data_type,*$2);
+             proc->set_local_list($4);
+             program_object.set_procedure_map(*proc);
+             delete $6;
     }
 ;
 

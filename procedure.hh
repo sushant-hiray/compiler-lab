@@ -41,8 +41,8 @@ class Procedure
 	string name;
 	Symbol_Table local_symbol_table;
 	list<Basic_Block *> basic_block_list;
-    list<int> basic_block_no;
-    list<int> goto_no;
+  list<int> basic_block_no;
+  list<int> goto_no;
 
 
 public:
