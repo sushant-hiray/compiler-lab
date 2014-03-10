@@ -38,7 +38,8 @@ typedef enum
 	int_data_type,
 	float_data_type,
 	double_data_type,
-	return_data_type
+	return_data_type,
+    function_data_type
 } Data_Type;
 
 typedef enum

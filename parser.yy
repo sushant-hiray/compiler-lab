@@ -63,6 +63,8 @@
 %left '+' '-'
 %left '*' '/'
 %type <symbol_table> declaration_statement_list
+%type <symbol_table> parameter_list
+%type <symbol_table> para_list
 %type <symbol_entry> declaration_statement
 %type <basic_block_list> basic_block_list
 %type <basic_block> basic_block
@@ -253,26 +255,23 @@ declaration_statement:
     {
             $$ = new Symbol_Table_Entry(*$2, $1);
 
-            delete $2;
      
     }
     |
     type_specifier NAME '(' parameter_list ')' ';'
     { 
-            $$ = new Symbol_Table_Entry(*$2, Data_type::function_data_type);
+            $$ = new Symbol_Table_Entry(*$2, Data_Type::function_data_type);
             Procedure* proc = new Procedure($1,*$2);
-            proc->set_local_list($4);
+            proc->set_local_list(*$4);
             program_object.set_procedure_map(*proc);
-            delete $6;
      }
     |
     VOID NAME '(' parameter_list ')' ';'
     {
-             $$ = new Symbol_Table_Entry(*$2, Data_type::function_data_type);
+             $$ = new Symbol_Table_Entry(*$2, Data_Type::function_data_type);
              Procedure* proc = new Procedure(Data_Type::void_data_type,*$2);
-             proc->set_local_list($4);
+             proc->set_local_list(*$4);
              program_object.set_procedure_map(*proc);
-             delete $6;
     }
 ;
 
