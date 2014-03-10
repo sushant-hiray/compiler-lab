@@ -82,6 +82,7 @@
 %type <ast> logical_expression
 %type <ast> atomic_expression
 %type <ast> arithmetic_expression
+%type <ast> return_expression
 %type <ast> unary_expression
 %type <ast> type_expression
 %type <dt> type_specifier
@@ -128,6 +129,7 @@ procedure_name:
         current_procedure = program_object.get_procedure(*$1);
         int val = current_procedure->check_parameter_list(parameter_list);
         if(val!=4){
+            int line = get_line_number();
             report_error("Incorrect argument list" , line);
         }
 
