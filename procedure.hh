@@ -65,7 +65,7 @@ public:
   void print_nos();
 	Eval_Result & evaluate(ostream & file_buffer);
 	bool variable_in_symbol_list_check(string variable);
-  int check_parameter_list(Symbol_Table & new_list);
+  void check_parameter_list(Symbol_Table* new_list, int);
 };
 
 #endif

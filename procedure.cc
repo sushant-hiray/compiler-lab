@@ -214,30 +214,53 @@ cout<<"Goto Nos ";
 //2- less arguments  in newlist
 //3- more arguments in newlist
 //4- all is well
-int Procedure::check_parameter_list(Symbol_Table & new_list){
-	list<Symbol_Table_Entry *>::iterator i;
-	list<Symbol_Table_Entry *>::iterator j;
-	for (i = local_symbol_table.get_variable_table().begin(), j = new_list.get_variable_table().begin() ; i != local_symbol_table.get_variable_table().end() , j != new_list.get_variable_table().end() ; i++ , j++)
+void Procedure::check_parameter_list(Symbol_Table* new_table, int line){
+	list<Symbol_Table_Entry *> local_list = local_symbol_table.get_variable_table();
+	list<Symbol_Table_Entry *> new_list = new_table->get_variable_table();
+	list<Symbol_Table_Entry *>::iterator i,j;
+	//list<Symbol_Table_Entry *>::iterator j;
+	//cout<<"new_list"<<endl;
+	// cout<<new_list.size()<<endl;
+	if(new_list.size() == 0){
+		// cout<<"new_list is null"<<endl;
+		if(local_list.size()!=0){
+			report_error("Procedure and its prototype parameter f_list length doens't match",line);
+		}
+		else{
+			return;
+		}
+	}
+	// for (i = local_list.begin() ; i != local_list.end(); i++){
+	// 	cout<<"hello\n";
+	// }
+
+	for (i = local_list.begin(), j = new_list.begin() ; (i != local_list.end()) and (j != new_list.end()) ; i++ , j++)
 	{
+		//cout<<local_list.size()<<endl;
 		if ((*i)->get_variable_name() != (*j)->get_variable_name()){
-			return 0;
+			cout<<"name: "<<(*i)->get_variable_name() <<" "<<(*j)->get_variable_name()<<endl;
+			report_error("Variable name of one of the parameters of the procedre and its prototypes doesn't match",line);
 		}
 		else if((*i)->get_data_type() != (*j)->get_data_type())
 		{
-			return 1;
+			report_error("Return type of one of the parameters of the procedure and its prototype doesn't match",line);
 		}
 		else{
 			continue;
 		}
 	}
-	if(i!= local_symbol_table.get_variable_table().end()){
-		return 2;
+	if(i!= local_list.end()){
+		cout<<"local list: \n";
+		report_error("Procedure and its prototype parameter f_list length doens't match",line);
 	}
-	else if(j!= new_list.get_variable_table().end()){
-		return 3;
+	else if(j!= new_list.end()){
+		cout<<new_list.size()<<" "<<local_list.size()<<endl;
+		cout<<(*j)->get_variable_name()<<endl;
+		cout<<"new list: \n";
+		report_error("Procedure and its prototype parameter f_list length doens't match",line);
 	}
 	else{
-		return 4;
+		return;
 	}
 
 }

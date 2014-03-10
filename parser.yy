@@ -66,6 +66,7 @@
 %type <symbol_table> parameter_list
 %type <symbol_table> para_list
 %type <symbol_entry> declaration_statement
+%type <symbol_entry> procedure_declaration
 %type <basic_block_list> basic_block_list
 %type <basic_block> basic_block
 %type <ast_list> executable_statement_list
@@ -86,7 +87,7 @@
 %type <ast> unary_expression
 %type <ast> type_expression
 %type <dt> type_specifier
-%type <dt> return_type_specifier
+//%type <dt> return_type_specifier
 %type <dt> VOID
 
 /*  start symbol is named "program" */
@@ -95,16 +96,24 @@
 %%	//separates the 2 sections Bison Directives and Grammar Rules										
 
 program:
-    declaration_statement_list procedure_list 
+    declaration_statement_list procedure_declaration_list procedure_list 
     {
          program_object.set_global_table(*$1);
          return_statement_used_flag = false; 
     }
     |
-    procedure_list
+    procedure_declaration_list procedure_list
     {
-     return_statement_used_flag = false; 
+        return_statement_used_flag = false; 
     }
+    |
+    declaration_statement_list procedure_list
+    {
+
+    }
+    |
+    procedure_list
+    {}
 ;
 
 procedure_list:
@@ -118,22 +127,42 @@ procedure_list:
 procedure_defn:
     procedure_name procedure_body
     {
-        program_object.set_procedure_map(*current_procedure);
-    
+        //cout<<" int procedure_defn\n";
+        //program_object.set_procedure_map(*current_procedure);
     }
 ;
 
 procedure_name:
 	NAME '(' parameter_list ')'
     {
-        current_procedure = program_object.get_procedure(*$1);
+        //cout<<"in procedure_name"<<endl;
         if(*$1!="main"){
-            int val = current_procedure->check_parameter_list(*$3);
-            if(val!=4){
-                int line = get_line_number();
-                report_error("Incorrect argument list" , line);
+          //  cout<<"procedure is not main"<<endl;
+            current_procedure = program_object.get_procedure(*$1);
+            //cout<<" int procedure_defn\n";
+        }
+
+        else{
+            //cout<<"from here only\n";
+            current_procedure = new Procedure(void_data_type, *$1);
+            if($3==NULL){
+                current_procedure->set_local_list(* new Symbol_Table());
+               // cout<<"param list is empty in declaration"<<endl;
             }
-        }   
+            else{
+                current_procedure->set_local_list(*$3);                 
+            }
+           
+        }
+        if($3!=NULL){
+            //cout<<"not null\n";
+            current_procedure->check_parameter_list($3, get_line_number());
+        }
+        //cout << "here\n";
+        else{
+            current_procedure->check_parameter_list(new Symbol_Table(), get_line_number());
+        }             
+        //cout << "here1\n";
     }
 ;
 
@@ -190,10 +219,48 @@ procedure_body:
      }
 ;
 
+procedure_declaration_list:
+    procedure_declaration
+    {}
+    |
+    procedure_declaration_list procedure_declaration
+    {}
+;
+
+procedure_declaration:
+    type_specifier NAME '(' parameter_list ')' ';'
+    { 
+        if(*$2!="main"){
+            $$ = new Symbol_Table_Entry(*$2, Data_Type::function_data_type);
+            Procedure* proc = new Procedure($1,*$2);
+            if($4==NULL){
+                //cout<<"param list is empty in declaration"<<endl;
+                proc->set_local_list(* new Symbol_Table());
+            }
+            else{
+                //cout<<"param list is not empty in declaration"<<endl;
+                proc->set_local_list(*$4);
+            }
+
+            program_object.set_procedure_map(*proc);
+        }
+    }
+    |
+    VOID NAME '(' parameter_list ')' ';'
+    {
+            $$ = new Symbol_Table_Entry(*$2, Data_Type::function_data_type);
+            Procedure* proc = new Procedure(Data_Type::void_data_type,*$2);
+            if($4==NULL){ proc->set_local_list(* new Symbol_Table());}
+            else{proc->set_local_list(*$4);}
+            program_object.set_procedure_map(*proc);
+    }
+;
+
 declaration_statement_list:
 	declaration_statement
     {
         int line = get_line_number();
+       // cout << $1->get_variable_name()<<endl;
         program_object.variable_in_proc_map_check($1->get_variable_name(), line);
 
         string var_name = $1->get_variable_name();
@@ -267,7 +334,8 @@ para_list:
 
 parameter_list:
     {
-        $$ = new Symbol_Table();
+        //cout<<"parameter list is null:\n";
+        $$ = NULL;
     }
     |
     para_list
@@ -283,22 +351,6 @@ declaration_statement:
             $$ = new Symbol_Table_Entry(*$2, $1);
 
      
-    }
-    |
-    type_specifier NAME '(' parameter_list ')' ';'
-    { 
-            $$ = new Symbol_Table_Entry(*$2, Data_Type::function_data_type);
-            Procedure* proc = new Procedure($1,*$2);
-            proc->set_local_list(*$4);
-            program_object.set_procedure_map(*proc);
-     }
-    |
-    VOID NAME '(' parameter_list ')' ';'
-    {
-             $$ = new Symbol_Table_Entry(*$2, Data_Type::function_data_type);
-             Procedure* proc = new Procedure(Data_Type::void_data_type,*$2);
-             proc->set_local_list(*$4);
-             program_object.set_procedure_map(*proc);
     }
 ;
 
@@ -362,7 +414,6 @@ basic_block_list:
 	|
 	basic_block	
     {
-     
         if (!$1)
         {
             int line = get_line_number();
@@ -370,7 +421,7 @@ basic_block_list:
         }
 
         $$ = new list<Basic_Block *>;
-        $$->push_back($1);
+        $$->push_back($1); 
      }
 ;
 
@@ -383,9 +434,11 @@ basic_block:
     }
 
     current_procedure->add_basic_block_no($1);
-    
-    if ($3 != NULL)
-          $$ = new Basic_Block($1, *$3);
+
+    if ($3 != NULL){
+        $$ = new Basic_Block($1, *$3);
+    }
+
     else
     {
         list<Ast *> * ast_list = new list<Ast *>;
@@ -414,15 +467,23 @@ executable_statement_list:
     |
 	assignment_statement_list RETURN return_expression';'
     { 
-            Ast * ret = new Return_Ast($3);
+             Ast * ret;
+             if($3!=NULL){
+                ret = new Return_Ast($3);
+             }
+            else{
+                ret= new Return_Ast();
+            }
 
             return_statement_used_flag = true;   //Current procedure has an occurrence of return statement
 
-            if ($1 != NULL)
+            if ($1 != NULL){
                 $$ = $1;
+            }
 
-            else
-                 $$ = new list<Ast *>;
+            else{
+                $$ = new list<Ast *>;
+            }
     
             $$->push_back(ret);
      }
@@ -452,7 +513,7 @@ executable_statement_list:
 
 assignment_statement_list:
     { 
-        $$ = new list<Ast *>;
+        $$ = NULL;
      }
 	|
 	assignment_statement_list assignment_statement

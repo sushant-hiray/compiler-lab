@@ -38,6 +38,7 @@ Basic_Block::Basic_Block(int basic_block_number, list<Ast *> & ast_list)
 {
 	id_number = basic_block_number;
 	statement_list = ast_list;
+	//cout<<"hello12"<<endl;
 }
 
 Basic_Block::~Basic_Block()
