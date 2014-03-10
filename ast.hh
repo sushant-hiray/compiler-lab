@@ -264,8 +264,10 @@ public:
 class Return_Ast:public Ast
 {
 
+    Ast* ret_exp;
 public:
 	Return_Ast();
+    Return_Ast(Ast* _ret);
 	~Return_Ast();
 
 	void print_ast(ostream & file_buffer);

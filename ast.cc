@@ -844,6 +844,12 @@ Return_Ast::Return_Ast()
 	node_data_type = return_data_type;
 }
 
+Return_Ast::Return_Ast(Ast* _ret)
+{
+	ret_exp = _ret;
+	node_data_type = return_data_type;
+}
+
 Return_Ast::~Return_Ast()
 {}
 

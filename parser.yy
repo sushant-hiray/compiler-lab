@@ -96,8 +96,8 @@
 program:
     declaration_statement_list procedure_list 
     {
-             program_object.set_global_table(*$1);
-             return_statement_used_flag = false; 
+         program_object.set_global_table(*$1);
+         return_statement_used_flag = false; 
     }
     |
     procedure_list
@@ -388,10 +388,14 @@ basic_block:
 ;
 
 return_expression:
-    {}
+    {
+        $$ = NULL;
+    }
     |
     type_expression
-    {}
+    {
+        $$ = $1;
+    }
 ;
 
 executable_statement_list:
@@ -402,7 +406,7 @@ executable_statement_list:
     |
 	assignment_statement_list RETURN return_expression';'
     { 
-            Ast * ret = new Return_Ast();
+            Ast * ret = new Return_Ast($3);
 
             return_statement_used_flag = true;   //Current procedure has an occurrence of return statement
 
