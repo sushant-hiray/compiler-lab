@@ -114,6 +114,10 @@ void Symbol_Table::create(Local_Environment & local_global_variables_table)
 	}
 }
 
+
+list<Symbol_Table_Entry *> Symbol_Table::get_variable_table(){
+	return variable_table;
+}
 /////////////////////////////////////////////////////////////
 
 Symbol_Table_Entry::Symbol_Table_Entry()

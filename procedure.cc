@@ -217,7 +217,7 @@ cout<<"Goto Nos ";
 int Procedure::check_parameter_list(Symbol_Table & new_list){
 	list<Symbol_Table_Entry *>::iterator i;
 	list<Symbol_Table_Entry *>::iterator j;
-	for (i = local_symbol_table.begin(), j = new_list.begin() ; i != local_symbol_table.end() , j != new_list.end() ; i++ , j++)
+	for (i = local_symbol_table.get_variable_table().begin(), j = new_list.get_variable_table().begin() ; i != local_symbol_table.get_variable_table().end() , j != new_list.get_variable_table().end() ; i++ , j++)
 	{
 		if ((*i)->get_variable_name() != (*j)->get_variable_name()){
 			return 0;
@@ -230,10 +230,10 @@ int Procedure::check_parameter_list(Symbol_Table & new_list){
 			continue;
 		}
 	}
-	if(i!= local_symbol_table.end()){
+	if(i!= local_symbol_table.get_variable_table().end()){
 		return 2;
 	}
-	else if(j!= new_list.end()){
+	else if(j!= new_list.get_variable_table().end()){
 		return 3;
 	}
 	else{
@@ -245,7 +245,7 @@ int Procedure::check_parameter_list(Symbol_Table & new_list){
 
 void Procedure::append_local_list(Symbol_Table & new_list){
 	list<Symbol_Table_Entry *>::iterator i;
-	for (i = new_list.begin() ; i != new_list.end() ; j++){
+	for (i = new_list.get_variable_table().begin() ; i != new_list.get_variable_table().end() ; i++){
 		local_symbol_table.push_symbol(*i);
 	}
 }
