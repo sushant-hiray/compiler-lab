@@ -236,17 +236,36 @@ declaration_statement_list:
 
 para_list:
     type_specifier NAME
-    {}
+    {
+        $$ = new Symbol_Table();
+        Symbol_Table_Entry* ste = new Symbol_Table_Entry(*$2, $1);
+        $$->push_symbol(ste);
+    }
     |
     para_list ',' type_specifier NAME
-    {}
+    {
+        if ($1 != NULL)
+        {
+            $$ = $1;
+        }
+
+        else
+            $$ = new Symbol_Table();
+
+        Symbol_Table_Entry* ste = new Symbol_Table_Entry(*$4, $3);
+        $$->push_symbol(ste);
+    }
 ;
 
 parameter_list:
-    {}
+    {
+        $$ = NULL;
+    }
     |
     para_list
-    {}
+    {
+        $$ = $1;
+    }
 ;
 
 declaration_statement:
