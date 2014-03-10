@@ -137,7 +137,7 @@ procedure_name:
 procedure_body:
 	'{' declaration_statement_list
     { 
-            current_procedure->set_local_list(*$2);
+            current_procedure->append_local_list(*$2);
             delete $2;
     }
 	

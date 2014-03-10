@@ -65,6 +65,7 @@ void Procedure::set_local_list(Symbol_Table & new_list)
 	local_symbol_table.set_table_scope(local);
 }
 
+
 Data_Type Procedure::get_return_type()
 {
 	return return_type;
@@ -239,4 +240,12 @@ int Procedure::check_parameter_list(Symbol_Table & new_list){
 		return 4;
 	}
 
+}
+
+
+void Procedure::append_local_list(Symbol_Table & new_list){
+	list<Symbol_Table_Entry *>::iterator i;
+	for (i = new_list.begin() ; i != new_list.end() ; j++){
+		local_symbol_table.push_symbol(*i);
+	}
 }

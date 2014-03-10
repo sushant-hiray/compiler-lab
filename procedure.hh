@@ -52,6 +52,7 @@ public:
 	string get_proc_name();
 	void set_basic_block_list(list<Basic_Block *> bb_list);
 	void set_local_list(Symbol_Table & new_list);
+  void append_local_list(Symbol_Table & new_list);
 	Data_Type get_return_type();
 	Symbol_Table_Entry & get_symbol_table_entry(string variable_name);
   void add_basic_block_no(int n);
