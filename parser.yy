@@ -266,7 +266,7 @@ para_list:
 
 parameter_list:
     {
-        $$ = NULL;
+        $$ = new Symbol_Table();
     }
     |
     para_list
@@ -326,7 +326,7 @@ call_para_list:
 
 call_parameter_list:
     {
-        $$ = NULL;
+        $$ = new list<Ast*>();
     }
     |
     call_para_list
@@ -451,7 +451,7 @@ executable_statement_list:
 
 assignment_statement_list:
     { 
-        $$ = NULL;
+        $$ = new list<Ast *>;
      }
 	|
 	assignment_statement_list assignment_statement
