@@ -54,17 +54,17 @@ public:
 	void set_local_list(Symbol_Table & new_list);
 	Data_Type get_return_type();
 	Symbol_Table_Entry & get_symbol_table_entry(string variable_name);
-    void add_basic_block_no(int n);
-    void add_goto_no(int n);
+  void add_basic_block_no(int n);
+  void add_goto_no(int n);
 	void print_ast(ostream & file_buffer);
-    int check_valid_goto();
+  int check_valid_goto();
 	Basic_Block * get_next_bb(Basic_Block & current_bb);
 	Basic_Block * get_bb(int block_no);
 	Basic_Block & get_start_basic_block();
-    void print_nos();
+  void print_nos();
 	Eval_Result & evaluate(ostream & file_buffer);
-
 	bool variable_in_symbol_list_check(string variable);
+  int check_parameter_list(Symbol_Table & new_list);
 };
 
 #endif

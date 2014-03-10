@@ -207,3 +207,36 @@ cout<<"Goto Nos ";
         cout<<endl;
         return;
 }
+
+//0-incorrect name
+//1- incorrect type
+//2- less arguments  in newlist
+//3- more arguments in newlist
+//4- all is well
+int Procedure::check_parameter_list(Symbol_Table & new_list){
+	list<Symbol_Table_Entry *>::iterator i;
+	list<Symbol_Table_Entry *>::iterator j;
+	for (i = local_symbol_table.begin(), j = new_list.begin() ; i != local_symbol_table.end() , j != new_list.end() ; i++ , j++)
+	{
+		if ((*i)->get_variable_name() != (*j)->get_variable_name()){
+			return 0;
+		}
+		else if((*i)->get_data_type() != (*j)->get_data_type())
+		{
+			return 1;
+		}
+		else{
+			continue;
+		}
+	}
+	if(i!= local_symbol_table.end()){
+		return 2;
+	}
+	else if(j!= new_list.end()){
+		return 3;
+	}
+	else{
+		return 4;
+	}
+
+}

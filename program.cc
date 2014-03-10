@@ -91,6 +91,18 @@ Procedure * Program::get_main_procedure(ostream & file_buffer)
 	return NULL;
 }
 
+Procedure * Program::get_procedure(string & _name)
+{
+	map<string, Procedure *>::iterator i;
+	for(i = procedure_map.begin(); i != procedure_map.end(); i++)
+	{
+		if (i->second != NULL && i->second->get_proc_name() == _name)
+				return i->second;
+	}
+	
+	return NULL;
+}
+
 void Program::print_ast()
 {
 	command_options.create_ast_buffer();

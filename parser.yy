@@ -117,7 +117,7 @@ procedure_list:
 procedure_defn:
     procedure_name procedure_body
     {
-         program_object.set_procedure_map(*current_procedure);
+        program_object.set_procedure_map(*current_procedure);
     
     }
 ;
@@ -125,7 +125,12 @@ procedure_defn:
 procedure_name:
 	NAME '(' parameter_list ')'
     {
-         current_procedure = new Procedure(void_data_type, *$1);
+        current_procedure = program_object.get_procedure(*$1);
+        int val = current_procedure->check_parameter_list(parameter_list);
+        if(val!=4){
+            report_error("Incorrect argument list" , line);
+        }
+
     }
 ;
 
@@ -469,7 +474,9 @@ assignment_statement:
      }
     |
     function_call ';'
-    {}
+    {
+        $$ = $1;
+    }
 ;
 
 type_expression:
@@ -529,14 +536,14 @@ logical_expression:
     |
     type_expression LT type_expression
     {
-         $$ = new Boolean_Ast($1,$3,Boolean_Ast::BooleanOp::LT);
+        $$ = new Boolean_Ast($1,$3,Boolean_Ast::BooleanOp::LT);
         int line = get_line_number();
         $$->check_ast(line); 
      }
     |
     type_expression LE type_expression
     {
-         $$ = new Boolean_Ast($1,$3,Boolean_Ast::BooleanOp::LE);
+        $$ = new Boolean_Ast($1,$3,Boolean_Ast::BooleanOp::LE);
         int line = get_line_number();
         $$->check_ast(line); 
      }
@@ -601,7 +608,7 @@ atomic_expression:
     |
     function_call
     {
-         $$=new Type_Expression_Ast($1);
+         $$ = $1;
     }
 ;
 
