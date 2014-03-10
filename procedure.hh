@@ -75,6 +75,7 @@ public:
   void set_defined(bool _val);
   bool is_defined();
   void set_return_type(Data_Type);
+  void check_called_data_type(list<Ast*> params, int line);
 };
 
 #endif

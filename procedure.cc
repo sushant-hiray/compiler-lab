@@ -85,11 +85,13 @@ Symbol_Table_Entry & Procedure::get_symbol_table_entry(string variable_name)
 
 void Procedure::print_ast(ostream & file_buffer)
 {
-	file_buffer << PROC_SPACE << "Procedure: main" << "\n";
+	file_buffer << PROC_SPACE << "Procedure: " << name << "\n";
 
 	list<Basic_Block *>::iterator i;
 	for(i = basic_block_list.begin(); i != basic_block_list.end(); i++)
 		(*i)->print_bb(file_buffer);
+
+	file_buffer << "\n";
 }
 	
 Basic_Block & Procedure::get_start_basic_block()
@@ -271,6 +273,36 @@ void Procedure::check_parameter_list(Symbol_Table* new_table, int line){
 }
 
 
+
+
+void Procedure::check_called_data_type(list<Ast*> params, int line){
+	list<Symbol_Table_Entry *> local_list = local_symbol_table.get_variable_table();
+	list<Symbol_Table_Entry *>::iterator i = local_list.begin();
+	list<Ast*>::iterator j = params.begin();
+	int k=0;
+	for(;i!=local_list.end() && j!=params.end() && k <parameter_length ; i++, j++, k++){
+		if ((*i)->get_data_type() != (*j)->get_data_type()){
+			report_error("Actual and formal parameters data types are not matching",line);
+		}
+	}
+	if(k<parameter_length){
+		//cout<<"local list: \n"<< k <<" "<<parameter_length<<endl;
+		report_error("Actual and formal parameter count do not match",line);
+	}
+	else if(j!= params.end()){
+		//cout<<new_list.size()<<" "<<local_list.size()<<endl;
+		//cout<<"local list: \n"<< k <<" "<<parameter_length<<endl;
+		// cout<<(*j)->get_variable_name()<<endl;
+		// cout<<"new list: \n";
+		report_error("Actual and formal parameter count do not match",line);
+	}
+	else{
+		return;
+	}
+
+
+
+}
 void Procedure::append_local_list(Symbol_Table & new_table, int line){
 	list<Symbol_Table_Entry *> new_list = new_table.get_variable_table();
 	list<Symbol_Table_Entry *>::iterator i;

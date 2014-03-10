@@ -63,6 +63,7 @@ Variable has
 %left '+' '-'
 %left '*' '/'
 %type <symbol_table> declaration_statement_list
+%type <symbol_table> procedure_declaration_list
 %type <symbol_table> parameter_list
 %type <symbol_table> para_list
 %type <symbol_entry> declaration_statement
@@ -107,12 +108,14 @@ program:
     procedure_declaration_list 
     {
          program_object.set_global_table(*$1);
+         program_object.append_global_table(*$2,get_line_number());
          return_statement_used_flag = false; 
     }
     procedure_list
     |
     procedure_declaration_list 
     {
+        program_object.append_global_table(*$1,get_line_number());
     }
     procedure_list
     |
@@ -159,14 +162,18 @@ procedure_name:
         else{
             //cout<<"from here only\n";
             current_procedure = new Procedure(void_data_type, *$1);
+            
             if($3==NULL){
+                //cout<<"in NULL"<<endl;
                 current_procedure->set_local_list(* new Symbol_Table());
+                current_procedure->set_parameter_length(0);
                // cout<<"param list is empty in declaration"<<endl;
             }
             else{
                 current_procedure->set_local_list(*$3);                 
+                current_procedure->set_parameter_length($3->get_variable_table().size());
             }
-           
+            program_object.set_procedure_map(*current_procedure);
         }
         if($3!=NULL){
             //cout<<"not null\n";
@@ -191,8 +198,11 @@ procedure_body:
 	{ 
             if (return_statement_used_flag == false)
             {
-              int line = get_line_number();
-              report_error("Atleast 1 basic block should have a return statement", line);
+                int line = get_line_number();
+                if(current_procedure->get_return_type() != Data_Type::void_data_type){
+                    report_error("Atleast 1 basic block should have a return statement", line);
+                }
+
             }
             int a = current_procedure->check_valid_goto();
             if(a!=0){
@@ -235,10 +245,30 @@ procedure_body:
 
 procedure_declaration_list:
     procedure_declaration
-    {}
+    {
+        $$ = new Symbol_Table();
+        $$->push_symbol($1);
+    }
     |
     procedure_declaration_list procedure_declaration
-    {}
+    {
+        string var_name = $2->get_variable_name();
+        if ($1 != NULL)
+        {
+            if($1->variable_in_symbol_list_check(var_name))
+            {
+                int line = get_line_number();
+                report_error("Procedure is declared twice", line);
+            }
+
+            $$ = $1;
+        }
+
+        else
+        $$ = new Symbol_Table();
+
+        $$->push_symbol($2);
+    }
 ;
 
 procedure_declaration:
@@ -418,6 +448,7 @@ function_call:
         Procedure* p = program_object.get_procedure(*$1);  
         if(p!=NULL){
             Data_Type dt = program_object.get_return_type(*$1);
+            p->check_called_data_type(*$3, get_line_number());
             $$ = new Call_Ast(*$1,*$3, dt);
 
         }

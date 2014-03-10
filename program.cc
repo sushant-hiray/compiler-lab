@@ -59,6 +59,20 @@ void Program::set_global_table(Symbol_Table & new_global_table)
 //	cout<<"<size of global table is "<<global_symbol_table.get_variable_table().size()<<endl;
 }
 
+
+void Program::append_global_table(Symbol_Table & new_table, int line){
+	list<Symbol_Table_Entry *> new_list = new_table.get_variable_table();
+	list<Symbol_Table_Entry *>::iterator i;
+
+	for (i = new_list.begin() ; i != new_list.end() ; i++){
+		if(variable_in_symbol_list_check((*i)->get_variable_name())){
+			report_error("Procedure name cannot be same as global variable",line);
+		}
+		global_symbol_table.push_symbol(*i);
+	}
+	return;
+	//cout<<"local_list appended"<<endl;
+}
 void Program::set_procedure_map(Procedure & proc)
 {
 	procedure_map[proc.get_proc_name()] = &proc;
@@ -119,9 +133,12 @@ void Program::print_ast()
         return;
     }
 
-	else
-	{
-		main->print_ast(ast_buffer);
+	else{
+		map<string, Procedure *>::iterator it = procedure_map.begin();
+		for(;it!=procedure_map.end();it++){
+			(it->second)->print_ast(ast_buffer);
+		}
+		// main->print_ast(ast_buffer);
 	}
 }
 

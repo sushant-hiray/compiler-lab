@@ -26,7 +26,7 @@ for f in cfgFiles:
     os.system(command) 
     command = "./cfglp -tokens -d "  + f + " > generated  "
     os.system(command)
-    os.system("diff -bB expected generated");
+    os.system("diff expected generated");
 
 error_files=[]
 for f in files:
@@ -36,8 +36,8 @@ for f in files:
 
 for f in error_files:
     print("Testing file  " + f ); 
-    command = "./cfg-test -parse -tokens -d  " + f + " > expected " 
+    command = "./cfg-test -ast -d  " + f + " > expected " 
     os.system(command) 
-    command = "./cfglp -tokens -d  " + f + " > generated " 
+    command = "./cfglp -ast -d  " + f + " > generated " 
     os.system(command)
     os.system("diff -b expected generated");

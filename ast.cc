@@ -370,7 +370,13 @@ Call_Ast::~Call_Ast(){
 }
 
 void Call_Ast::print_ast(ostream & file_buffer){
-	//type_exp->print_ast(file_buffer);
+	file_buffer << "\n" << AST_SPACE << "FN CALL: " << fn_name <<"(";
+	list<Ast*>::iterator it = par_list.begin();
+	for(; it!= par_list.end();it++){
+		file_buffer<< "\n" << AST_NODE_SPACE;
+		(*it)->print_ast(file_buffer);
+	}
+	file_buffer << ")";
 }
 
 Data_Type Call_Ast::get_data_type(){
@@ -842,6 +848,7 @@ Eval_Result & Number_Ast<DATA_TYPE>::evaluate(Local_Environment & eval_env, ostr
 Return_Ast::Return_Ast()
 {
 	node_data_type = return_data_type;
+	ret_exp = NULL;
 }
 
 Return_Ast::Return_Ast(Ast* _ret)
@@ -855,7 +862,14 @@ Return_Ast::~Return_Ast()
 
 void Return_Ast::print_ast(ostream & file_buffer)
 {
-	file_buffer << "\n" << AST_SPACE << "Return <NOTHING>\n";
+	if(ret_exp==NULL){
+		file_buffer << "\n" << AST_SPACE << "RETURN <NOTHING>\n";
+	}
+	else{
+		file_buffer << "\n" << AST_SPACE << "RETURN ";
+		ret_exp->print_ast(file_buffer);
+		file_buffer << "\n";	
+	}
 }
 
 Eval_Result & Return_Ast::evaluate(Local_Environment & eval_env, ostream & file_buffer)
