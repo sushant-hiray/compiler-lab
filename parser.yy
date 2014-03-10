@@ -127,12 +127,13 @@ procedure_name:
 	NAME '(' parameter_list ')'
     {
         current_procedure = program_object.get_procedure(*$1);
-        int val = current_procedure->check_parameter_list(*$3);
-        if(val!=4){
-            int line = get_line_number();
-            report_error("Incorrect argument list" , line);
-        }
-
+        if(*$1!="main"){
+            int val = current_procedure->check_parameter_list(*$3);
+            if(val!=4){
+                int line = get_line_number();
+                report_error("Incorrect argument list" , line);
+            }
+        }   
     }
 ;
 
