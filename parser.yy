@@ -140,6 +140,11 @@ procedure_defn:
         if(return_statement_used_flag == false){
             cout<<"no return statement"<<endl;
         }
+        if(current_procedure->get_return_type()!=void_data_type){
+            if(check_return_flag==false){
+                report_error("Last return statement type, of procedure, and its prototype should match",get_line_number());
+            }
+        }
     }
 ;
 
@@ -147,7 +152,7 @@ procedure_name:
 	NAME '(' parameter_list ')'
     {
         //cout<<"in procedure_name"<<endl;
-        if(*$1!="main"){
+        //if(*$1!="main"){
           //  cout<<"procedure is not main"<<endl;
             current_procedure = program_object.get_procedure(*$1);
             if(current_procedure == NULL){
@@ -157,8 +162,9 @@ procedure_name:
                 report_error("Procedure has already been defined before",get_line_number());
             }
             //cout<<" int procedure_defn\n";
-        }
-
+            check_return_flag = false;
+       // }
+        /*
         else{
             //cout<<"from here only\n";
             current_procedure = new Procedure(void_data_type, *$1);
@@ -174,7 +180,7 @@ procedure_name:
                 current_procedure->set_parameter_length($3->get_variable_table().size());
             }
             program_object.set_procedure_map(*current_procedure);
-        }
+        }*/
         if($3!=NULL){
             //cout<<"not null\n";
             //cout<<current_procedure->get_local_symbol_table().get_variable_table().size()<<endl;
@@ -274,7 +280,7 @@ procedure_declaration_list:
 procedure_declaration:
     type_specifier NAME '(' parameter_list ')' ';'
     { 
-        if(*$2!="main"){
+        //if(*$2!="main"){
             $$ = new Symbol_Table_Entry(*$2, Data_Type::function_data_type);
             Procedure* proc = new Procedure($1,*$2);
             if($4==NULL){
@@ -289,7 +295,7 @@ procedure_declaration:
             }
 
             program_object.set_procedure_map(*proc);
-        }
+        //}
     }
     |
     VOID NAME '(' parameter_list ')' ';'
@@ -532,25 +538,28 @@ executable_statement_list:
     { 
              Ast * ret;
              if($3!=NULL){
-                if(current_procedure->get_proc_name() == "main"){
+                check_return_flag = true;
+               // if(current_procedure->get_proc_name() == "main"){
                     if(current_procedure->get_return_type() != void_data_type){
                         if(current_procedure->get_return_type() != $3->get_data_type()){
                             report_error("Two or more types of return values", get_line_number());
                         }
                     }
                     else{
-                        current_procedure->set_return_type($3->get_data_type());
+                        //current_procedure->set_return_type($3->get_data_type());
+                        report_error("Last return statement type, of procedure, and its prototype should match",get_line_number());
                     }
-                }
+                //}
 
                 if(current_procedure->get_return_type() != $3->get_data_type()){
                     report_error("Last return statement type, of procedure, and its prototype should match",get_line_number());
                 }
                 ret = new Return_Ast($3);
 
-             }
+            }
             else{
                 ret= new Return_Ast();
+
             }
 
             return_statement_used_flag = true;   //Current procedure has an occurrence of return statement
