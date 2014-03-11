@@ -38,6 +38,7 @@ typedef enum
 	double_result,
 	void_result,
 	goto_result,
+	function_result,
 	return_result
 } Result_Enum;
 

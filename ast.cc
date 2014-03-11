@@ -387,32 +387,18 @@ Data_Type Call_Ast::get_data_type(){
 }
 
 Eval_Result & Call_Ast::evaluate(Local_Environment & eval_env, ostream & file_buffer){
-	
+
 	Procedure* p = program_object.get_procedure(fn_name);
 	list<Symbol_Table_Entry *> var_table = (p->get_local_symbol_table()).get_variable_table();
 	list<Ast*>::iterator it = par_list.begin();
 	list<Symbol_Table_Entry *>::iterator sym_it = var_table.begin();
 
 	Local_Environment interpreter_local_table;
-	// cout<<"before create\n";
 	(p->get_local_symbol_table()).create(interpreter_local_table);
-	// cout<<"after create\n";
-	// cout<<"/////////////////////////////////////////////////////////\n";
-	// // interpreter_local_table.is_variable_defined(name);
 
-	// interpreter_local_table.print(file_buffer);
-
-
-	// cout<<"/////////////////////////////////////////////////////////\n";
-
-	// if(var_table.size() != p->get_parameter_length()){
-	// 	cout<<fn_name<<": parameter length not equal"<<endl;
-	// }
-	// cout<<"param length: "<<p->get_parameter_length()<<endl;
 	for(int i=0;it!=par_list.end() && i< p->get_parameter_length() ;it++,i++,sym_it++){
 		Eval_Result & result = (*it)->evaluate(eval_env, file_buffer);
 		string var_name = (*sym_it)->get_variable_name();
-		// cout<<var_name<<" defined or not: "<<interpreter_local_table.is_variable_defined(var_name)<<endl;
 		Eval_Result_Value* i ; 
 
 		if (result.get_result_enum() == int_result){
@@ -420,7 +406,6 @@ Eval_Result & Call_Ast::evaluate(Local_Environment & eval_env, ostream & file_bu
 			i = new Eval_Result_Value_Int();
 			i->set_result_enum(int_result);
 		 	i->set_value(result.get_value());
-		 	//cout<<i->get_value().no<<endl;
 		}
 		else if (result.get_result_enum() == float_result)
 		{
@@ -440,15 +425,36 @@ Eval_Result & Call_Ast::evaluate(Local_Environment & eval_env, ostream & file_bu
 			interpreter_local_table.put_variable_value(*i, var_name);
 		else{
 			interpreter_global_table.put_variable_value(*i, var_name);
-			//cout<<"aa rha hai\n";
 		}
 	}
 
-
 	//evvironment created
+	Eval_Result& result =  p->evaluate(interpreter_local_table, file_buffer);
+	Eval_Result_Value* i;
 
-	Eval_Result& call_res =  p->evaluate(interpreter_local_table, file_buffer);
-	return call_res;
+	if (p->get_return_type() == int_data_type){
+		i = new Eval_Result_Value_Int();
+		i->set_result_enum(int_result);
+	 	i->set_value(result.get_value());
+	}
+	else if (p->get_return_type() == float_data_type){
+		i = new Eval_Result_Value_Float();
+		i->set_result_enum(float_result);
+	 	i->set_value(result.get_value());
+	}
+
+	else if (p->get_return_type() == double_data_type){
+		i = new Eval_Result_Value_Double();
+		i->set_result_enum(double_result);
+	 	i->set_value(result.get_value());
+	}
+	else if (p->get_return_type() == void_data_type){
+		i = new Eval_Result_Value_Double();
+		i->set_result_enum(double_result);
+	 	i->set_value(result.get_value());
+	}
+
+	return *i;
 }
 
 
