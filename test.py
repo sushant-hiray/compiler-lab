@@ -16,8 +16,11 @@ cfgFiles=[]
 for f in correct_files:
     command = "make -f Makefile.cfg FILE=" + f+ " >/dev/null";
     os.system(command);
-    cfgFiles.append(path+"/"+f+"s306.cfg"); 
 
+for f in files:
+    fileName,fileExt = os.path.splitext( path + f)
+    if( fileExt == '.cfg'):
+        cfgFiles.append(path + "/" +f)
 print("Done generating cfg files\n");
 
 for f in cfgFiles:
@@ -31,13 +34,13 @@ for f in cfgFiles:
 error_files=[]
 for f in files:
     fileName,fileExt = os.path.splitext( path + f)
-    if( fileExt == '.cfg'):
+    if( fileExt == '.ecfg'):
         error_files.append(path + "/" +f)
 
 for f in error_files:
     print("Testing file  " + f ); 
-    command = "./cfg-test -ast -d  " + f + " > expected " 
+    command = "./cfg-test -eval -d  " + f + " > expected " 
     os.system(command) 
-    command = "./cfglp -ast -d  " + f + " > generated " 
+    command = "./cfglp -eval -d  " + f + " > generated " 
     os.system(command)
-    os.system("diff -b expected generated");
+    #os.system("diff -b expected generated");
