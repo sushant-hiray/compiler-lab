@@ -26,6 +26,8 @@
 
 using namespace std;
 
+#include <iomanip>
+
 #include"local-environment.hh"
 #include"error-display.hh"
 #include"user-options.hh"
@@ -262,6 +264,7 @@ void Local_Environment::print(ostream & file_buffer)
 	for (i = variable_table.begin(); i != variable_table.end(); i++)
 	{
 		Eval_Result_Value * vi = variable_table[(*i).first];
+		file_buffer << std::fixed << std::setprecision(2);
 		if (vi != NULL)
 		{
 			if (vi->is_variable_defined() == false)
@@ -270,6 +273,7 @@ void Local_Environment::print(ostream & file_buffer)
 			else{
 				Result r = vi->get_value();
 				file_buffer << VAR_SPACE << (*i).first << " : " ;
+				// cout<<"r ka number: "<<r.no<<endl;
 				switch(r.no){
 					case 1:
 						file_buffer << (int)(vi->get_value()).res << "\n";

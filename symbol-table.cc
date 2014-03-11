@@ -102,15 +102,51 @@ void Symbol_Table::create(Local_Environment & local_global_variables_table)
 	for (i = variable_table.begin(); i != variable_table.end(); i++)
 	{
 		string name = (*i)->get_variable_name();
-		Eval_Result_Value_Int * j = new Eval_Result_Value_Int();
+		Eval_Result_Value * j;
 		Result r;
-		r.no = 1;
+		switch((*i)->get_data_type()){
+			case int_data_type:
+				j = new Eval_Result_Value_Int();
+				r.no = 1;
+				break;
 
-		if (scope == global)
-		{
-			j->set_variable_status(true);
+			case float_data_type:
+				j = new Eval_Result_Value_Float();
+				r.no = 2;
+				break;
+
+			case double_data_type:
+				j = new Eval_Result_Value_Double();
+				r.no = 3;
+				break;
+
+			case function_data_type:
+				//cout<< name <<": function data type\n";
+				continue;
+				break;
+
+			case return_data_type:
+				//cout<< name << ": symbol type is return\n";
+				exit(0);
+				break;
+
+			case void_data_type:
+				//cout<< name <<": symbol type is void\n";
+				exit(0);
+				break;
+		}
+		
+
+		if (scope == global){
+			// cout<< name <<": scope global set\n";
 			r.res = 0;
 			j->set_value(r);
+			j->set_variable_status(true);
+		}
+		if (scope == local){
+			// scout<< name <<": scope local set \n";
+			j->set_value(r);
+			j->set_variable_status(false);
 		}
 
 		local_global_variables_table.put_variable_value(*j, name);

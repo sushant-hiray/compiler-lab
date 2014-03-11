@@ -34,7 +34,9 @@
 using namespace std;
 
 class Procedure;
-
+class Basic_Block;
+class Ast;
+class Local_Environment;
 class Procedure
 {
 	Data_Type return_type;
@@ -67,6 +69,7 @@ public:
 	Basic_Block & get_start_basic_block();
   void print_nos();
 	Eval_Result & evaluate(ostream & file_buffer);
+  Eval_Result & evaluate(Local_Environment&, ostream & file_buffer);
 	bool variable_in_symbol_list_check(string variable);
   void check_parameter_list(Symbol_Table* new_list, int);
   Symbol_Table get_local_symbol_table();

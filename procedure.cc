@@ -140,7 +140,7 @@ Eval_Result & Procedure::evaluate(ostream & file_buffer)
 	
 	Eval_Result * result = NULL;
 
-	file_buffer << PROC_SPACE << "Evaluating Procedure " << name << "\n";
+	file_buffer << PROC_SPACE << "Evaluating Procedure << " << name << " >>\n";
 	file_buffer << LOC_VAR_SPACE << "Local Variables (before evaluating):\n";
 	eval_env.print(file_buffer);
 	file_buffer << "\n";
@@ -164,7 +164,41 @@ Eval_Result & Procedure::evaluate(ostream & file_buffer)
 	}
 
 	file_buffer << "\n\n";
-	file_buffer << LOC_VAR_SPACE << "Local Variables (after evaluating):\n";
+	file_buffer << LOC_VAR_SPACE << "Local Variables (after evaluating) Function: << " <<name<<" >>\n";
+	eval_env.print(file_buffer);
+
+	return *result;
+}
+
+Eval_Result & Procedure::evaluate(Local_Environment& eval_env , ostream & file_buffer){
+	
+	Eval_Result * result = NULL;
+
+	file_buffer << PROC_SPACE << "Evaluating Procedure << " << name << " >>\n";
+	file_buffer << LOC_VAR_SPACE << "Local Variables (before evaluating):\n";
+	eval_env.print(file_buffer);
+	file_buffer << "\n";
+	
+	Basic_Block * current_bb = &(get_start_basic_block());
+	while (current_bb)
+	{
+		result = &(current_bb->evaluate(eval_env, file_buffer));
+		if(result==NULL){
+			report_error("Basic Block is empty",-1);
+		}
+		else if(result->get_result_enum()==return_result){
+			break;
+		}
+		else if(result->get_result_enum()==goto_result){
+			current_bb = get_bb(result->get_value().res);
+		}
+		else{
+			current_bb = get_next_bb(*current_bb);		
+		}
+	}
+
+	file_buffer << "\n\n";
+	file_buffer << LOC_VAR_SPACE << "Local Variables (after evaluating) Function: << " <<name<<" >>\n";
 	eval_env.print(file_buffer);
 
 	return *result;

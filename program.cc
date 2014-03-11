@@ -155,7 +155,7 @@ Eval_Result & Program::evaluate()
 		report_error("No main function found in the program", NOLINE);
 
 	global_symbol_table.create(interpreter_global_table);
-
+	//cout<<"Created global table"<<endl;
 	command_options.create_output_buffer();
 	ostream & file_buffer = command_options.get_output_buffer();
 	file_buffer << "Evaluating Program\n";
