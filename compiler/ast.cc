@@ -180,6 +180,7 @@ Code_For_Ast & Assignment_Ast::compile()
 	Code_For_Ast & load_stmt = rhs->compile();
 
 	Register_Descriptor * load_register = load_stmt.get_reg();
+	load_register->set_used_for_expr_result(true);
 
 	Code_For_Ast store_stmt = lhs->create_store_stmt(load_register);
 
@@ -193,6 +194,7 @@ Code_For_Ast & Assignment_Ast::compile()
 	if (store_stmt.get_icode_list().empty() == false)
 		ic_list.splice(ic_list.end(), store_stmt.get_icode_list());
 
+	load_register->reset_use_for_expr_result();
 	Code_For_Ast * assign_stmt;
 	
 	if (ic_list.empty() == false)
@@ -685,14 +687,26 @@ void Goto_Ast::print(ostream & file_buffer){
 
 Code_For_Ast & Goto_Ast::compile()
 {
-	Code_For_Ast * assign_stmt;
-	return *assign_stmt;
+	Ics_Opd* opd = new Label_Addr_Opd(block_no);
+	Icode_Stmt* goto_stmt = new Branch_IC_Stmt(j, opd, NULL, NULL);
+	
+	list<Icode_Stmt *> ic_list;
+	ic_list.push_back(goto_stmt);
+
+	Code_For_Ast & comp_code = *new Code_For_Ast(ic_list, NULL);
+	return comp_code;
 }
 
 Code_For_Ast & Goto_Ast::compile_and_optimize_ast(Lra_Outcome & lra)
 {
-	Code_For_Ast * assign_stmt;
-	return *assign_stmt;
+	Ics_Opd* opd = new Label_Addr_Opd(block_no);
+	Icode_Stmt* goto_stmt = new Branch_IC_Stmt(j, opd, NULL, NULL);
+	
+	list<Icode_Stmt *> ic_list;
+	ic_list.push_back(goto_stmt);
+
+	Code_For_Ast & comp_code = *new Code_For_Ast(ic_list, NULL);
+	return comp_code;
 }
 
 /////////////////////////////////////////////////////////////////////////////

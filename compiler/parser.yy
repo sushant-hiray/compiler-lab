@@ -531,6 +531,14 @@ atomic_expression:
          $$ = $1;
     }
     }
+    |
+    '(' expression ')'
+    {
+    if (NOT_ONLY_PARSE)
+	{
+         $$ = $2;
+    }
+    }
 ;
 
 
