@@ -194,6 +194,7 @@ Code_For_Ast & Assignment_Ast::compile()
 		ic_list.splice(ic_list.end(), store_stmt.get_icode_list());
 
 	Code_For_Ast * assign_stmt;
+	
 	if (ic_list.empty() == false)
 		assign_stmt = new Code_For_Ast(ic_list, load_register);
 
@@ -477,15 +478,73 @@ Eval_Result & Boolean_Ast:: evaluate(Local_Environment & eval_env, ostream & fil
         return result;
 }
 
+// Code_For_Ast & Boolean_Ast::create_compare_stmt(Register_Descriptor * result_register)
+// {
+// 	CHECK_INVARIANT((result_register != NULL), "Result register cannot be null");
 
+// 	Ics_Opd * register_opd = new Register_Addr_Opd(store_register);
 
-Code_For_Ast & Boolean_Ast::compile()
-{
+// 	Icode_Stmt * store_stmt = new Move_IC_Stmt(store, register_opd, opd);
+
+// 	if (command_options.is_do_lra_selected() == false)
+// 		variable_symbol_entry->free_register(store_register);
+
+// 	list<Icode_Stmt *> & ic_list = *new list<Icode_Stmt *>;
+// 	ic_list.push_back(store_stmt);
+
+// 	Code_For_Ast & name_code = *new Code_For_Ast(ic_list, store_register);
+
+// 	return name_code;
+// }
+
+Code_For_Ast & Boolean_Ast::compile(){
 	CHECK_INVARIANT((lhs_exp != NULL), "Lhs cannot be null");
 	CHECK_INVARIANT((rhs_exp != NULL), "Rhs cannot be null");
 
-	Code_For_Ast * assign_stmt;
-	return *assign_stmt;
+	Code_For_Ast & rhs_stmt = rhs_exp->compile();
+	Code_For_Ast & lhs_stmt = lhs_exp->compile();
+
+	Register_Descriptor * lhs_register = lhs_stmt.get_reg();
+	Register_Descriptor * rhs_register = rhs_stmt.get_reg();
+	Register_Descriptor * result_register = machine_dscr_object.get_new_register();
+
+	Ics_Opd* lhs_opd = new Register_Addr_Opd(lhs_register);
+	Ics_Opd* rhs_opd = new Register_Addr_Opd(rhs_register);
+	Ics_Opd* res_opd = new Register_Addr_Opd(result_register);
+
+	Icode_Stmt * comp_stmt;
+
+	switch (op) {
+		case EQ :
+			comp_stmt = new Compare_IC_Stmt(seq, lhs_opd, rhs_opd, res_opd);
+			break;
+		case NE :
+			comp_stmt = new Compare_IC_Stmt(sne, lhs_opd, rhs_opd, res_opd);
+			break;
+		case GT :
+			comp_stmt = new Compare_IC_Stmt(sgt, lhs_opd, rhs_opd, res_opd);
+			break;
+		case LT :
+			comp_stmt = new Compare_IC_Stmt(slt, lhs_opd, rhs_opd, res_opd);
+			break;
+		case GE :
+			comp_stmt = new Compare_IC_Stmt(sge, lhs_opd, rhs_opd, res_opd);
+			break;
+		case LE :
+			comp_stmt = new Compare_IC_Stmt(sle, lhs_opd, rhs_opd, res_opd);
+			break;
+
+		default:
+			CHECK_INVARIANT(CONTROL_SHOULD_NOT_REACH, "Intermediate code format not supported");
+			break;
+	}
+
+
+	list<Icode_Stmt *> ic_list;
+	ic_list.push_back(comp_stmt);
+
+	Code_For_Ast & comp_code = *new Code_For_Ast(ic_list, result_register);
+	return comp_code;
 }
 
 Code_For_Ast & Boolean_Ast::compile_and_optimize_ast(Lra_Outcome & lra)
@@ -493,6 +552,7 @@ Code_For_Ast & Boolean_Ast::compile_and_optimize_ast(Lra_Outcome & lra)
 	Code_For_Ast * assign_stmt;
 	return *assign_stmt;
 }
+
 
 ///////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////

@@ -79,7 +79,13 @@ typedef enum
 	load, 
 	imm_load, 
 	store, 
-	nop 
+	nop,
+	sne,
+	seq,
+	sge,
+	sgt,
+	sle,
+	slt
 } Tgt_Op;
 
 ///////////////////////// Instruction Descriptor ///////////////////////////////////
@@ -224,6 +230,31 @@ public:
 
 	Ics_Opd * get_opd1();
 	void set_opd1(Ics_Opd * io);
+
+	Ics_Opd * get_result();
+	void set_result(Ics_Opd * io);
+
+	void print_icode(ostream & file_buffer);
+	void print_assembly(ostream & file_buffer);
+};
+
+class Compare_IC_Stmt: public Icode_Stmt
+{ 
+	Ics_Opd * opd1;
+	Ics_Opd * opd2;   
+	Ics_Opd * result; 
+
+public:
+	Compare_IC_Stmt(Tgt_Op inst_op, Ics_Opd * opd1, Ics_Opd * opd2, Ics_Opd * result); 
+	~Compare_IC_Stmt() {} 
+	Compare_IC_Stmt & operator=(const Compare_IC_Stmt & rhs);
+
+	Instruction_Descriptor & get_inst_op_of_ics();
+
+	Ics_Opd * get_opd1();
+	Ics_Opd * get_opd2();
+	void set_opd1(Ics_Opd * io);
+	void set_opd2(Ics_Opd * io);
 
 	Ics_Opd * get_result();
 	void set_result(Ics_Opd * io);
