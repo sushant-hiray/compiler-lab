@@ -37,6 +37,20 @@ return		{
 		}
 
 
+if      {
+        store_token_name("IF");
+        return Parser::IF;
+        }
+else    {
+        store_token_name("ELSE");
+        return Parser::ELSE;
+        }
+
+goto    {
+        store_token_name("GOTO");
+        return Parser::GOTO;
+        }
+
 
 [-]?[[:digit:]]+ 	{ 
 				store_token_name("NUM");
@@ -72,6 +86,36 @@ return		{
 		store_token_name("ASSIGN_OP");
 		return Parser::ASSIGN;
 	}
+	
+[=][=]      {
+        store_token_name("EQ");
+        return Parser::EQ;
+        }
+
+[!][=]      {
+        store_token_name("NE");
+        return Parser::NE;
+        }
+
+[>]      {
+        store_token_name("GT");
+        return Parser::GT;
+        }
+
+[<]      {
+        store_token_name("LT");
+        return Parser::LT;
+        }
+
+[>][=]      {
+        store_token_name("GE");
+        return Parser::GE;
+        }
+
+[<][=]      {
+            store_token_name("LE");
+            return Parser::LE;
+        }
 
 [:{}();]	{
 			store_token_name("META CHAR");

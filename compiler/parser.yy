@@ -42,8 +42,10 @@
 
 %token <integer_value> INTEGER_NUMBER BBNUM
 %token <string_value> NAME
-%token RETURN INTEGER 
-%token ASSIGN
+%token RETURN INTEGER IF ELSE GOTO 
+%token ASSIGN 
+%left NE EQ
+%left LT LE GT GE
 
 %type <symbol_table> optional_variable_declaration_list
 %type <symbol_table> variable_declaration_list
