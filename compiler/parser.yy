@@ -38,6 +38,8 @@
 	Basic_Block * basic_block;
 	list<Basic_Block *> * basic_block_list;
 	Procedure * procedure;
+	Goto_Ast * goto_ast;
+    Conditional_Ast * cond_ast;
 };
 
 %token <integer_value> INTEGER_NUMBER BBNUM
@@ -58,6 +60,11 @@
 %type <ast> assignment_statement
 %type <ast> variable
 %type <ast> constant
+%type <cond_ast> if_control_block
+%type <goto_ast> goto_statement
+%type <ast> expression
+%type <ast> logical_expression
+%type <ast> atomic_expression
 
 %start program
 
@@ -341,7 +348,46 @@ executable_statement_list:
 		$$ = exe_list;
 	}
 	}
+|
+	assignment_statement_list if_control_block
+	{
+	if (NOT_ONLY_PARSE)
+	{
+		list<Ast *> * assign_list = $1;
+		list<Ast *> * exe_list = NULL;
+
+		if (assign_list)
+			exe_list = assign_list;
+
+		else
+			exe_list = new list<Ast *>;
+
+		exe_list->push_back($2);
+
+		$$ = exe_list;
+	}
+	}
+|
+    assignment_statement_list goto_statement
+    {
+    if (NOT_ONLY_PARSE)
+	{
+		list<Ast *> * assign_list = $1;
+		list<Ast *> * exe_list = NULL;
+
+		if (assign_list)
+			exe_list = assign_list;
+
+		else
+			exe_list = new list<Ast *>;
+
+		exe_list->push_back($2);
+
+		$$ = exe_list;
+	}
+    }
 ;
+
 
 assignment_statement_list:
 	{
@@ -375,24 +421,7 @@ assignment_statement_list:
 ;
 
 assignment_statement:
-	variable ASSIGN variable ';'
-	{
-	if (NOT_ONLY_PARSE)
-	{
-		CHECK_INVARIANT((($1 != NULL) && ($3 != NULL)), "lhs/rhs cannot be null");
-
-		Ast * lhs = $1;
-		Ast * rhs = $3;
-
-		Ast * assign = new Assignment_Ast(lhs, rhs, get_line_number());
-
-		assign->check_ast();
-
-		$$ = assign;
-	}
-	}
-|
-	variable ASSIGN constant ';'
+	variable ASSIGN expression ';'
 	{
 	if (NOT_ONLY_PARSE)
 	{
@@ -409,6 +438,129 @@ assignment_statement:
 	}
 	}
 ;
+
+
+
+
+
+
+
+
+expression:
+    logical_expression
+    {
+    if (NOT_ONLY_PARSE)
+	{
+        $$=$1;
+    }
+    }
+;
+
+
+logical_expression:
+    expression EQ expression
+    {
+    if (NOT_ONLY_PARSE)
+	{
+        $$ = new Boolean_Ast($1,$3,Boolean_Ast::BooleanOp::EQ);
+    }
+    }
+    |
+    expression NE expression
+    {
+    if (NOT_ONLY_PARSE)
+	{
+        $$ = new Boolean_Ast($1,$3,Boolean_Ast::BooleanOp::NE);
+    }
+    }
+    |
+    expression GT expression
+    {
+    if (NOT_ONLY_PARSE)
+	{
+        $$ = new Boolean_Ast($1,$3,Boolean_Ast::BooleanOp::GT);
+    }
+    }
+    |
+    expression GE expression
+    {
+    if (NOT_ONLY_PARSE)
+	{
+        $$ = new Boolean_Ast($1,$3,Boolean_Ast::BooleanOp::GE);
+    }
+    }
+    |
+    expression LT expression
+    {
+    if (NOT_ONLY_PARSE)
+	{
+        $$ = new Boolean_Ast($1,$3,Boolean_Ast::BooleanOp::LT);
+    }
+    }
+    |
+    expression LE expression
+    {
+    if (NOT_ONLY_PARSE)
+	{
+        $$ = new Boolean_Ast($1,$3,Boolean_Ast::BooleanOp::LE);
+    }
+    }
+    |
+    atomic_expression
+    {
+    if (NOT_ONLY_PARSE)
+	{
+         $$ = $1;
+    }
+    }
+;
+
+atomic_expression:
+    variable
+    {
+    if (NOT_ONLY_PARSE)
+	{
+         $$ = $1;
+    }
+    }
+    |
+    constant
+    {
+    if (NOT_ONLY_PARSE)
+	{
+         $$ = $1;
+    }
+    }
+;
+
+
+if_control_block:
+    IF '(' logical_expression ')' goto_statement ELSE goto_statement
+    {
+    if (NOT_ONLY_PARSE)
+	{
+        $$ = new Conditional_Ast($3,$5,$7);   
+    }
+    }
+;
+
+goto_statement:
+    GOTO BBNUM ';' 
+    {
+    if (NOT_ONLY_PARSE)
+	{
+        $$ =  new Goto_Ast($2); 
+        current_procedure->add_goto_no($2);
+    }
+    }
+
+;
+
+
+
+
+
+
 
 variable:
 	NAME

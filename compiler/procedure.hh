@@ -41,7 +41,7 @@ class Procedure
 	string name;
 	Symbol_Table local_symbol_table;
 	list<Basic_Block *> basic_block_list;
-
+	list<int> goto_no;
 	int lineno;
 
 public:
@@ -55,7 +55,7 @@ public:
 	Symbol_Table_Entry & get_symbol_table_entry(string variable_name);
 
 	void print(ostream & file_buffer);
-
+    void add_goto_no(int n);
 	Basic_Block * get_next_bb(Basic_Block & current_bb);
 	Basic_Block & get_start_basic_block();
 

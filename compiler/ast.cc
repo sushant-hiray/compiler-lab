@@ -398,6 +398,213 @@ Code_For_Ast & Name_Ast::compile_and_optimize_ast(Lra_Outcome & lra)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////
+
+Boolean_Ast::Boolean_Ast(Ast * lhs , Ast *  rhs , BooleanOp _op){
+	lhs_exp = lhs;
+	rhs_exp = rhs;
+	op  = _op;
+	node_data_type = int_data_type;
+}
+
+Boolean_Ast::~Boolean_Ast(){
+	delete(lhs_exp);
+	delete(rhs_exp);
+}
+void Boolean_Ast :: print(ostream & file_buffer){
+
+	file_buffer << "\n"<<AST_NODE_SPACE <<"Condition: "<<opNames[op]<<"\n";
+	file_buffer << COND_NODE_SPACE << "LHS (";
+	lhs_exp->print(file_buffer);
+	file_buffer << ")\n";
+	file_buffer  << COND_NODE_SPACE << "RHS (";
+	rhs_exp->print(file_buffer);
+	file_buffer << ")";
+}
+
+Data_Type Boolean_Ast::get_data_type()
+{
+	return node_data_type;
+}
+
+Eval_Result & Boolean_Ast:: evaluate(Local_Environment & eval_env, ostream & file_buffer){
+		Eval_Result & l_res = lhs_exp->evaluate(eval_env, file_buffer);
+		if (l_res.is_variable_defined() == false){
+			report_error("Variable should be defined to be on lhs of condition", NOLINE);
+		}
+		Eval_Result & r_res = rhs_exp->evaluate(eval_env, file_buffer);
+		if (r_res.is_variable_defined() == false){
+			report_error("Variable should be defined to be on rhs of condition", NOLINE);
+		}
+		Eval_Result & result = *new Eval_Result_Value_Int();
+		int l = l_res.get_int_value();
+		int r = r_res.get_int_value();
+		int temp = 0;
+		switch (op) {
+			case EQ :
+				if(l==r){
+					temp=1;
+				}
+				break;
+			case NE :
+				if(l!=r){
+					temp=1;
+				}
+				break;
+			case GT :
+				if(l>r){
+					temp=1;
+				}
+				break;
+			case LT :
+				if(l<r){
+					temp=1;
+				}
+				break;
+			case GE :
+				if(l>=r){
+					temp=1;
+				}
+				break;
+			case LE :
+				if(l<=r){
+					temp=1;
+				}
+				break;
+		}
+		result.set_value(temp);
+		result.set_result_enum(int_result);
+        return result;
+}
+
+
+
+Code_For_Ast & Boolean_Ast::compile()
+{
+	CHECK_INVARIANT((lhs_exp != NULL), "Lhs cannot be null");
+	CHECK_INVARIANT((rhs_exp != NULL), "Rhs cannot be null");
+
+	Code_For_Ast * assign_stmt;
+	return *assign_stmt;
+}
+
+Code_For_Ast & Boolean_Ast::compile_and_optimize_ast(Lra_Outcome & lra)
+{
+	Code_For_Ast * assign_stmt;
+	return *assign_stmt;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////
+
+Conditional_Ast::Conditional_Ast(Ast* _condition, Goto_Ast*  trueGoto, Goto_Ast* falseGoto){
+	condition = _condition;
+	true_goto = trueGoto;
+	false_goto = falseGoto;
+}
+
+Conditional_Ast::~Conditional_Ast(){
+	delete(condition);
+	delete(true_goto);
+	delete(false_goto);
+	
+}
+
+void Conditional_Ast ::  print(ostream & file_buffer){
+	
+	file_buffer << "\n" << AST_SPACE << "If_Else statement:";
+    condition->print(file_buffer);
+	file_buffer << "\n" << AST_NODE_SPACE <<"True Successor: "<<true_goto->getBlockNo()<<"\n"; 
+	file_buffer << AST_NODE_SPACE << "False Successor: "<<false_goto->getBlockNo();
+}
+
+Eval_Result & Conditional_Ast:: evaluate(Local_Environment & eval_env, ostream & file_buffer){
+
+        
+	file_buffer <<"\n"<< AST_SPACE << "If_Else statement:";
+    condition->print(file_buffer);
+	Eval_Result & cond_result = condition->evaluate(eval_env,file_buffer);
+	file_buffer << "\n"<<AST_NODE_SPACE <<"True Successor: "<<true_goto->getBlockNo()<<"\n"; 
+	file_buffer << AST_NODE_SPACE << "False Successor: "<<false_goto->getBlockNo()<<"\n";
+		if(cond_result.get_int_value()==1){
+            file_buffer <<AST_SPACE<< "Condition True : Goto (BB " << true_goto->getBlockNo()<<")\n";
+            Eval_Result & result = *new Eval_Result_Value_Goto();
+            result.set_value(true_goto->getBlockNo());
+			return result;
+		}
+        else{
+
+            file_buffer <<AST_SPACE<< "Condition False : Goto (BB " << false_goto->getBlockNo()<<")\n";
+            Eval_Result & result = *new Eval_Result_Value_Goto();
+            result.set_value(false_goto->getBlockNo());
+			return result;
+        }
+}
+
+
+
+Code_For_Ast & Conditional_Ast::compile()
+{
+	Code_For_Ast * assign_stmt;
+	return *assign_stmt;
+}
+
+Code_For_Ast & Conditional_Ast::compile_and_optimize_ast(Lra_Outcome & lra)
+{
+	Code_For_Ast * assign_stmt;
+	return *assign_stmt;
+}
+/////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////
+
+
+
+Goto_Ast::Goto_Ast(int bb){
+	block_no=bb;
+}
+
+
+Goto_Ast::~Goto_Ast(){
+	//nothing to delete
+}
+
+int Goto_Ast::getBlockNo(){
+    return block_no;
+}
+
+Eval_Result & Goto_Ast::evaluate(Local_Environment & eval_env, ostream & file_buffer){
+        file_buffer<<"\n"<<AST_SPACE<< "Goto statement:\n"<<AST_NODE_SPACE <<"Successor: "<< block_no;
+        file_buffer<< "\n" <<AST_SPACE<< "GOTO (BB "<< block_no <<")\n";
+		Eval_Result & result = *new Eval_Result_Value_Goto();
+		result.set_value(block_no);
+        return result;
+}
+
+
+
+void Goto_Ast::print(ostream & file_buffer){
+	file_buffer<<"\n"<<AST_SPACE<< "Goto statement:\n"<<AST_NODE_SPACE <<"Successor: "<< block_no;
+};
+
+
+
+Code_For_Ast & Goto_Ast::compile()
+{
+	Code_For_Ast * assign_stmt;
+	return *assign_stmt;
+}
+
+Code_For_Ast & Goto_Ast::compile_and_optimize_ast(Lra_Outcome & lra)
+{
+	Code_For_Ast * assign_stmt;
+	return *assign_stmt;
+}
+
+/////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////
+
+
 
 template <class DATA_TYPE>
 Number_Ast<DATA_TYPE>::Number_Ast(DATA_TYPE number, Data_Type constant_data_type, int line)

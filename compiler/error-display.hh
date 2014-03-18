@@ -28,15 +28,18 @@
 #include <string>
 
 #define NO_FILE_LINE -1
+#define NOLINE NO_FILE_LINE
+#define NOTEXIT 0
 
 #define CONTROL_SHOULD_NOT_REACH false
 
 using namespace std;
-
+void report_error(string error_message, int line);
 bool error_status();
 void report_violation_of_condition(bool condition, string s, int lineno);
 void report_violation_and_abort(bool condition, string s, int lineno);
 void check_invariant_underlying_function(bool condition, string error_message);
+void print_error(string error_message, int exit_flag);
 
 #define CHECK_INVARIANT(x,y) \
      {  stringstream ___new___string___; \

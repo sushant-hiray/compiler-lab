@@ -33,11 +33,12 @@
 #define AST_SPACE "         "
 #define AST_NODE_SPACE "            "
 #define AST_SUB_NODE_SPACE "               "
+#define COND_NODE_SPACE "               "
 
 using namespace std;
 
 class Ast;
-
+static const char* opNames[] = {"EQ","NE","GT","LT","GE","LE" };  
 class Ast
 {
 protected:
@@ -114,6 +115,94 @@ public:
 	Code_For_Ast & compile_and_optimize_ast(Lra_Outcome & lra);
 	Code_For_Ast & create_store_stmt(Register_Descriptor * store_register);
 };
+
+
+
+
+
+
+
+
+
+class Boolean_Ast:public Ast
+{
+    public:
+        enum BooleanOp{
+            EQ = 0,
+            NE,
+            GT,
+            LT,
+            GE,
+            LE
+        };
+
+    private:
+        Ast* lhs_exp;
+        Ast* rhs_exp;
+        BooleanOp op;
+
+    public:
+        Boolean_Ast(Ast * lhs_exp , Ast * rhs_exp , BooleanOp op);
+        ~Boolean_Ast();
+        Data_Type get_data_type();
+        void print(ostream & file_buffer);
+        Eval_Result & evaluate(Local_Environment & eval_env, ostream & file_buffer);
+        Code_For_Ast & compile();
+		Code_For_Ast & compile_and_optimize_ast(Lra_Outcome & lra);
+
+};
+
+
+
+
+
+
+
+
+
+class Goto_Ast:public Ast
+{
+    private:
+        int block_no;
+    public:
+        Goto_Ast(int bb_no);
+        ~Goto_Ast();
+        void print(ostream &file_buffer);
+        int getBlockNo();
+        Eval_Result & evaluate(Local_Environment & eval_env, ostream & file_buffer);
+        Code_For_Ast & compile();
+		Code_For_Ast & compile_and_optimize_ast(Lra_Outcome & lra);
+
+};
+
+
+
+
+
+
+
+
+class Conditional_Ast:public Ast
+{
+    private:
+        Ast* condition;
+        Goto_Ast* true_goto;
+        Goto_Ast* false_goto;
+
+    public:
+        Conditional_Ast(Ast* condition,Goto_Ast* trueGoto, Goto_Ast* falseGoto);
+        ~Conditional_Ast();
+        void print(ostream &file_buffer);
+        Eval_Result & evaluate(Local_Environment & eval_env, ostream & file_buffer);
+        Code_For_Ast & compile();
+		Code_For_Ast & compile_and_optimize_ast(Lra_Outcome & lra);
+};
+
+
+
+
+
+
 
 template <class T>
 class Number_Ast:public Ast

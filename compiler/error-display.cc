@@ -33,6 +33,32 @@ using namespace std;
 #include "user-options.hh"
 #include "error-display.hh"
 
+void report_error(string error_message, int line)
+{
+	string file_name = command_options.get_file_name();
+
+	stringstream message;
+	if (line > NOLINE)
+		message << file_name << " : line " << line << " :: error : " << error_message;
+	else
+		message << file_name << " :: cfglp error : " << error_message;
+	print_error(message.str(), NOTEXIT);
+	exit(0);
+}
+
+void print_error(string error_message, int exit_flag)
+{
+	cerr << error_message << "\n";
+
+	if (command_options.is_do_eval_selected())
+	{
+		exit(0);
+	}
+
+	if (exit_flag)
+		exit(0);
+}
+
 void check_invariant_underlying_function(bool condition, string error_message)
 {
 	if (!condition)

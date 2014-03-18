@@ -230,3 +230,7 @@ void Procedure::print_epilogue(ostream & file_buffer)
 
 	file_buffer << epilogue.str();
 }
+
+void Procedure::add_goto_no(int n){
+    goto_no.push_back(n);
+}
