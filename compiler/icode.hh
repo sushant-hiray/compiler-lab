@@ -50,6 +50,7 @@ typedef enum
 	a_op_r_r_o1,	/* r <- r op o1 */
 	a_op_r_o1_o2,	/* r <- o1 op o2 */ 
 	a_op_o1_o2_r,	/* r <- o1 op o2 */
+	a_op_o1_o2_o3,	/* like bne :  o3 : o1 != o2*/
 	a_nsy		/* not specified yet */
 } Assembly_Format;
 
@@ -63,6 +64,7 @@ typedef enum
 	i_r_op_o1,	/* r <- o1 */
 	i_r_r_op_o1,	/* r <- r op o1 */
 	i_r_o1_op_o2,	/* r <- o1 op o2 */ 
+	i_op_o1_o2_o3,	/* like bne :  o3 : o1 != o2*/
 	i_nsy		/* not specified yet */
 } Icode_Format;
 
@@ -85,7 +87,9 @@ typedef enum
 	sge,
 	sgt,
 	sle,
-	slt
+	slt,
+	bne,
+	j
 } Tgt_Op;
 
 ///////////////////////// Instruction Descriptor ///////////////////////////////////
@@ -169,6 +173,22 @@ public:
 	void print_asm_opd(ostream & file_buffer);
 
 	Register_Addr_Opd & operator=(const Register_Addr_Opd & rhs);
+};
+
+class Label_Addr_Opd: public Ics_Opd
+{
+	int label_number;
+
+public:
+	Label_Addr_Opd(int num);
+	~Label_Addr_Opd() {}
+
+	int get_label_number();
+	void set_label_number(int);
+	void print_ics_opd(ostream & file_buffer);
+	void print_asm_opd(ostream & file_buffer);
+
+	Label_Addr_Opd & operator=(const Label_Addr_Opd & rhs);
 };
 
 template <class T>
@@ -262,6 +282,31 @@ public:
 	void print_icode(ostream & file_buffer);
 	void print_assembly(ostream & file_buffer);
 };
+
+class Branch_IC_Stmt: public Icode_Stmt
+{ 
+	Ics_Opd * opd1;
+	Ics_Opd * opd2;   
+	Ics_Opd * opd3; 
+
+public:
+	Branch_IC_Stmt(Tgt_Op inst_op, Ics_Opd * opd1, Ics_Opd * opd2, Ics_Opd * result); 
+	~Branch_IC_Stmt() {} 
+	Branch_IC_Stmt & operator=(const Branch_IC_Stmt & rhs);
+
+	Instruction_Descriptor & get_inst_op_of_ics();
+
+	Ics_Opd * get_opd1();
+	Ics_Opd * get_opd2();
+	Ics_Opd * get_opd3();
+	void set_opd1(Ics_Opd * io);
+	void set_opd2(Ics_Opd * io);
+	void set_opd3(Ics_Opd * io);
+
+	void print_icode(ostream & file_buffer);
+	void print_assembly(ostream & file_buffer);
+};
+
 
 //////////////////////// Intermediate code for Ast statements ////////////////////////
 

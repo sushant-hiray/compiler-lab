@@ -56,10 +56,17 @@ Register_Use_Category Register_Descriptor::get_use_category() 	{ return reg_use;
 Spim_Register Register_Descriptor::get_register()             	{ return reg_id; }
 string Register_Descriptor::get_name()				{ return reg_name; }
 bool Register_Descriptor::is_symbol_list_empty()         	{ return lra_symbol_list.empty(); }
+void Register_Descriptor::reset_use_for_expr_result(){
+	used_for_expr_result=false;
+}
+
+void Register_Descriptor::set_used_for_expr_result(bool flag){
+	used_for_expr_result=flag;
+}
 
 bool Register_Descriptor::is_free()     
-{ 
-	if ((reg_use == gp_data) && (lra_symbol_list.empty())) 
+{
+	if ((reg_use == gp_data) && (lra_symbol_list.empty()) && !used_for_expr_result) 
 		return true;
 	else 
 		return false;
@@ -284,6 +291,8 @@ void Machine_Description::initialize_instruction_table()
 	spim_instruction_table[sgt] = new Instruction_Descriptor(sgt, "sgt", "sgt", "", i_r_o1_op_o2, a_op_r_o1_o2);
 	spim_instruction_table[sle] = new Instruction_Descriptor(sle, "sle", "sle", "", i_r_o1_op_o2, a_op_r_o1_o2);
 	spim_instruction_table[slt] = new Instruction_Descriptor(slt, "slt", "slt", "", i_r_o1_op_o2, a_op_r_o1_o2);
+	spim_instruction_table[bne] = new Instruction_Descriptor(bne, "bne", "bne", "", i_op_o1_o2_o3, a_op_o1_o2_o3);
+	spim_instruction_table[j] = new Instruction_Descriptor(j, "goto", "j", "", i_op_o1, a_op_o1);
 }
 
 void Machine_Description::validate_init_local_register_mapping()

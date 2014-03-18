@@ -478,35 +478,20 @@ Eval_Result & Boolean_Ast:: evaluate(Local_Environment & eval_env, ostream & fil
         return result;
 }
 
-// Code_For_Ast & Boolean_Ast::create_compare_stmt(Register_Descriptor * result_register)
-// {
-// 	CHECK_INVARIANT((result_register != NULL), "Result register cannot be null");
-
-// 	Ics_Opd * register_opd = new Register_Addr_Opd(store_register);
-
-// 	Icode_Stmt * store_stmt = new Move_IC_Stmt(store, register_opd, opd);
-
-// 	if (command_options.is_do_lra_selected() == false)
-// 		variable_symbol_entry->free_register(store_register);
-
-// 	list<Icode_Stmt *> & ic_list = *new list<Icode_Stmt *>;
-// 	ic_list.push_back(store_stmt);
-
-// 	Code_For_Ast & name_code = *new Code_For_Ast(ic_list, store_register);
-
-// 	return name_code;
-// }
-
 Code_For_Ast & Boolean_Ast::compile(){
 	CHECK_INVARIANT((lhs_exp != NULL), "Lhs cannot be null");
 	CHECK_INVARIANT((rhs_exp != NULL), "Rhs cannot be null");
 
-	Code_For_Ast & rhs_stmt = rhs_exp->compile();
 	Code_For_Ast & lhs_stmt = lhs_exp->compile();
-
 	Register_Descriptor * lhs_register = lhs_stmt.get_reg();
+	lhs_register->set_used_for_expr_result(true);
+	
+	Code_For_Ast & rhs_stmt = rhs_exp->compile();
 	Register_Descriptor * rhs_register = rhs_stmt.get_reg();
+	rhs_register->set_used_for_expr_result(true);
+	//cout<<lhs_register->get_name()<< " "<< rhs_register->get_name()<<endl;
 	Register_Descriptor * result_register = machine_dscr_object.get_new_register();
+	result_register->set_used_for_expr_result(true);
 
 	Ics_Opd* lhs_opd = new Register_Addr_Opd(lhs_register);
 	Ics_Opd* rhs_opd = new Register_Addr_Opd(rhs_register);
@@ -541,7 +526,23 @@ Code_For_Ast & Boolean_Ast::compile(){
 
 
 	list<Icode_Stmt *> ic_list;
+	
+	if (lhs_stmt.get_icode_list().empty() == false)
+		ic_list = lhs_stmt.get_icode_list();
+
+	if (rhs_stmt.get_icode_list().empty() == false)
+		ic_list.splice(ic_list.end(), rhs_stmt.get_icode_list());
+
 	ic_list.push_back(comp_stmt);
+	Code_For_Ast * assign_stmt;
+	
+	if (ic_list.empty() == false)
+		assign_stmt = new Code_For_Ast(ic_list, result_register);
+
+
+
+	lhs_register->reset_use_for_expr_result();
+	rhs_register->reset_use_for_expr_result();
 
 	Code_For_Ast & comp_code = *new Code_For_Ast(ic_list, result_register);
 	return comp_code;
@@ -605,8 +606,41 @@ Eval_Result & Conditional_Ast:: evaluate(Local_Environment & eval_env, ostream &
 
 Code_For_Ast & Conditional_Ast::compile()
 {
-	Code_For_Ast * assign_stmt;
-	return *assign_stmt;
+
+	CHECK_INVARIANT((condition != NULL), "Condition cannot be null");
+	
+	Code_For_Ast & cond_stmt = condition->compile();
+	Register_Descriptor * cond_register = cond_stmt.get_reg();
+	cond_register->set_used_for_expr_result(true);
+	Ics_Opd* opd1 = new Register_Addr_Opd(cond_register);
+
+	Register_Descriptor * zero_register = new Register_Descriptor(zero, "zero", int_num, fixed_reg);
+	Ics_Opd* opd2 = new Register_Addr_Opd(zero_register);
+
+	int true_num = true_goto->getBlockNo();
+	int false_num = false_goto->getBlockNo();
+
+	// cout<<"true goto: "<<true_num<<" false goto: "<<false_num<<endl;
+
+	Ics_Opd* opd3 = new Label_Addr_Opd(true_num);
+	Ics_Opd* opd4 = new Label_Addr_Opd(false_num);
+
+	Icode_Stmt* true_stmt = new Branch_IC_Stmt(bne, opd1, opd2, opd3);
+	Icode_Stmt* false_stmt = new Branch_IC_Stmt(j, opd4, NULL, NULL);
+
+
+
+	list<Icode_Stmt *> ic_list;
+	
+	if (cond_stmt.get_icode_list().empty() == false)
+		ic_list = cond_stmt.get_icode_list();
+
+	ic_list.push_back(true_stmt);
+	ic_list.push_back(false_stmt);
+	cond_register->reset_use_for_expr_result();
+
+	Code_For_Ast & comp_code = *new Code_For_Ast(ic_list, NULL);
+	return comp_code;
 }
 
 Code_For_Ast & Conditional_Ast::compile_and_optimize_ast(Lra_Outcome & lra)
@@ -620,6 +654,7 @@ Code_For_Ast & Conditional_Ast::compile_and_optimize_ast(Lra_Outcome & lra)
 
 
 Goto_Ast::Goto_Ast(int bb){
+	// cout << bb<<endl;
 	block_no=bb;
 }
 
@@ -722,7 +757,6 @@ Code_For_Ast & Number_Ast<DATA_TYPE>::compile()
 	ic_list.push_back(load_stmt);
 
 	Code_For_Ast & num_code = *new Code_For_Ast(ic_list, result_register);
-
 	return num_code;
 }
 

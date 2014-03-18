@@ -94,6 +94,7 @@ class Register_Descriptor
     void clear_lra_symbol_list();
 
     bool get_used_for_expr_result();
+    void set_used_for_expr_result(bool);
     void reset_use_for_expr_result();
 
     bool is_free();

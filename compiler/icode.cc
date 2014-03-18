@@ -133,6 +133,29 @@ void Register_Addr_Opd::print_asm_opd(ostream & file_buffer)
 	file_buffer << "$" << name;
 }
 
+/****************************** Class Label_Addr_Opd *****************************/
+Label_Addr_Opd::Label_Addr_Opd(int num){
+	// cout<<"label created of value "<<num<<endl;
+	label_number=num;
+}
+
+int Label_Addr_Opd::get_label_number(){
+	return label_number;
+}
+
+void Label_Addr_Opd::set_label_number(int num){
+	label_number = num;
+}
+
+void Label_Addr_Opd::print_ics_opd(ostream & file_buffer){
+	CHECK_INVARIANT((label_number >= 2), "Label cannot be less than 2");
+	file_buffer << "label"<< label_number;
+}
+
+void Label_Addr_Opd::print_asm_opd(ostream & file_buffer){
+	CHECK_INVARIANT((label_number >= 2), "Label cannot be less than 2");
+	file_buffer <<"label" << label_number;
+}
 /****************************** Class Const_Opd *****************************/
 
 template <class DATA_TYPE>
@@ -328,7 +351,7 @@ void Compare_IC_Stmt::print_icode(ostream & file_buffer)
 
 	switch (ic_format){
 		case i_r_o1_op_o2:
-			file_buffer << " " << operation_name << ":\t";
+			file_buffer << " " << operation_name << ": ";
 			result->print_ics_opd(file_buffer);
 			file_buffer << " <- ";
 			opd1->print_ics_opd(file_buffer);
@@ -336,7 +359,6 @@ void Compare_IC_Stmt::print_icode(ostream & file_buffer)
 			opd2->print_ics_opd(file_buffer);
 			file_buffer << "\n";
 			break; 
-
 
 		default: CHECK_INVARIANT(CONTROL_SHOULD_NOT_REACH, 
 					"Intermediate code format not supported");
@@ -355,7 +377,7 @@ void Compare_IC_Stmt::print_assembly(ostream & file_buffer)
 	switch (assem_format){ 
 
 		case a_op_r_o1_o2:
-			file_buffer << "\t" << op_name << ", ";
+			file_buffer << "\t" << op_name << " ";
 			result->print_asm_opd(file_buffer);
 			file_buffer << ", ";
 			opd1->print_asm_opd(file_buffer);
@@ -364,6 +386,105 @@ void Compare_IC_Stmt::print_assembly(ostream & file_buffer)
 			file_buffer << "\n";
 			break;
 
+		default: CHECK_INVARIANT(CONTROL_SHOULD_NOT_REACH, "Intermediate code format not supported");
+			break;
+	}
+}
+
+/*************************** Class Branch_IC_Stmt *****************************/
+
+Branch_IC_Stmt::Branch_IC_Stmt(Tgt_Op op, Ics_Opd * o1, Ics_Opd * o2, Ics_Opd * o3)
+{
+	CHECK_INVARIANT((machine_dscr_object.spim_instruction_table[op] != NULL),
+			"Instruction description in spim table cannot be null");
+
+	op_desc = *(machine_dscr_object.spim_instruction_table[op]);
+	opd1 = o1;
+	opd2 = o2;   
+	opd3 = o3; 
+}
+
+Ics_Opd * Branch_IC_Stmt::get_opd1()          { return opd1; }
+Ics_Opd * Branch_IC_Stmt::get_opd2()          { return opd2; }
+Ics_Opd * Branch_IC_Stmt::get_opd3()        { return opd3; }
+
+void Branch_IC_Stmt::set_opd1(Ics_Opd * io)   { opd1 = io; }
+void Branch_IC_Stmt::set_opd2(Ics_Opd * io)   { opd2 = io; }
+void Branch_IC_Stmt::set_opd3(Ics_Opd * io)   { opd3 = io; }
+
+Branch_IC_Stmt& Branch_IC_Stmt::operator=(const Branch_IC_Stmt& rhs)
+{
+	op_desc = rhs.op_desc;
+	opd1 = rhs.opd1;
+	opd2 = rhs.opd2;
+	opd3 = rhs.opd3; 
+
+	return *this;
+}
+
+void Branch_IC_Stmt::print_icode(ostream & file_buffer)
+{
+	string operation_name = op_desc.get_name();
+
+	Icode_Format ic_format = op_desc.get_ic_format();
+
+	switch (ic_format){
+		case i_op_o1_o2_o3:
+			CHECK_INVARIANT (opd1, "Opd1 cannot be NULL for a Branch IC Stmt");
+			CHECK_INVARIANT (opd2, "Opd2 cannot be NULL for a Branch IC Stmt");
+			CHECK_INVARIANT (opd3, "Opd3 cannot be NULL for a Branch IC Stmt");
+
+			file_buffer << " " << operation_name << ": ";
+			opd1->print_ics_opd(file_buffer);
+			file_buffer << " , ";
+			opd2->print_ics_opd(file_buffer);
+			file_buffer << " : goto ";
+			opd3->print_ics_opd(file_buffer);
+			file_buffer << "\n";
+			break;
+
+		case i_op_o1:
+			CHECK_INVARIANT (opd1, "Opd1 cannot be NULL for a Branch IC Stmt");
+
+			file_buffer << " " << operation_name << " ";
+			opd1->print_ics_opd(file_buffer);
+			file_buffer << "\n";
+			break;
+
+		default: CHECK_INVARIANT(CONTROL_SHOULD_NOT_REACH, 
+					"Intermediate code format not supported");
+			break;
+	}
+}
+
+void Branch_IC_Stmt::print_assembly(ostream & file_buffer)
+{
+	string op_name = op_desc.get_mnemonic();
+
+	Assembly_Format assem_format = op_desc.get_assembly_format();
+	switch (assem_format){ 
+
+		case a_op_o1_o2_o3:
+			CHECK_INVARIANT (opd1, "Opd1 cannot be NULL for a move IC Stmt");
+			CHECK_INVARIANT (opd2, "Opd2 cannot be NULL for a move IC Stmt");
+			CHECK_INVARIANT (opd3, "Result cannot be NULL for a move IC Stmt");
+
+			file_buffer << "\t" << op_name << " ";
+			opd1->print_asm_opd(file_buffer);
+			file_buffer << ", ";
+			opd2->print_asm_opd(file_buffer);
+			file_buffer << ", ";
+			opd3->print_asm_opd(file_buffer);
+			file_buffer << " \n";
+			break;
+
+		case a_op_o1:
+			CHECK_INVARIANT (opd1, "Opd1 cannot be NULL for a move IC Stmt");
+
+			file_buffer << "\t" << op_name << " ";
+			opd1->print_asm_opd(file_buffer);
+			file_buffer << "\n";
+			break;	
 
 		default: CHECK_INVARIANT(CONTROL_SHOULD_NOT_REACH, "Intermediate code format not supported");
 			break;
