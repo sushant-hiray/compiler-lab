@@ -142,6 +142,16 @@ procedure_definition:
 
 		CHECK_INVARIANT((current_procedure != NULL), "Current procedure cannot be null");
 		CHECK_INVARIANT((bb_list != NULL), "Basic block list cannot be null");
+		int a = current_procedure->check_valid_goto();
+
+		string error_message = "bb ";
+        char intStr[100];
+        sprintf(intStr,"%d",a);
+        string str = string(intStr);
+        error_message.append(str);
+        error_message.append(" doesn't exist");
+
+        CHECK_INVARIANT((a==0),error_message);
 
 		current_procedure->set_basic_block_list(*bb_list);
 	}
@@ -304,6 +314,8 @@ basic_block:
 		list<Ast *> * exe_stmt = $3;
 
 		CHECK_INPUT((bb_number >= 2), "Illegal basic block lable", get_line_number());
+
+		current_procedure->add_basic_block_no(bb_number);
 
 		Basic_Block * bb = new Basic_Block(bb_number, get_line_number());
 

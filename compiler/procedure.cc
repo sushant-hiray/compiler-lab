@@ -131,6 +131,22 @@ Basic_Block * Procedure::get_next_bb(Basic_Block & current_bb)
 	return NULL;
 }
 
+int Procedure::check_valid_goto(){
+
+    for (std::list<int>::iterator git=goto_no.begin(); git != goto_no.end(); ++git){
+        bool flag=false;
+        for (std::list<int>::iterator it=basic_block_no.begin(); it != basic_block_no.end(); ++it){
+            if(*it==*git){
+                flag=true;
+            }
+        }
+        if(!flag){
+            return *git;
+        }
+    }
+    return 0;
+}
+
 Eval_Result & Procedure::evaluate(ostream & file_buffer)
 {
 	Local_Environment & eval_env = *new Local_Environment();
@@ -233,4 +249,8 @@ void Procedure::print_epilogue(ostream & file_buffer)
 
 void Procedure::add_goto_no(int n){
     goto_no.push_back(n);
+}
+
+void Procedure::add_basic_block_no(int n){
+    basic_block_no.push_back(n);
 }
