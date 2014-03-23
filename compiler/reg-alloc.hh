@@ -141,16 +141,16 @@ class Register_Descriptor
         we use a new register because the value may be updated by the
         computation. This can be minimized by traversing the tree using
         Sethi-Ullman lablelling, but we do not do it in this version.
-               if (rhs is in a register)
-               {
-                   use a new register. 
-                   move from source register into the new register.
-               }
-               else
-               {
-                   use a new register.
-                   load rhs into the register.
-               }
+         if (rhs is in a register)
+         {
+             use a new register. 
+             move from source register into the new register.
+         }
+         else
+         {
+             use a new register.
+             load rhs into the register.
+         }
     3. r2m. This is a typical store for a compute statemenmt. It does not need a 
        new register 
     4. c2m. This is a store that needs an intermediate register.

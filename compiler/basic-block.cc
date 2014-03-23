@@ -118,6 +118,7 @@ void Basic_Block::compile()
 	}
 
 	machine_dscr_object.clear_local_register_mappings();
+	//out<<"bb end "<<get_bb_number()<<endl;
 }
 
 void Basic_Block::print_assembly(ostream & file_buffer)

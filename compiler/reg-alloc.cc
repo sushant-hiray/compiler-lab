@@ -163,6 +163,7 @@ void Lra_Outcome::optimize_lra(Lra_Scenario lcase, Ast * destination_memory, Ast
 			destination_register = NULL;
 		else
 		{
+			//cout<<"12"<<endl;
 			destination_symbol_entry = &(destination_memory->get_symbol_entry());
 			destination_register = destination_symbol_entry->get_register(); 
 		}
@@ -171,7 +172,9 @@ void Lra_Outcome::optimize_lra(Lra_Scenario lcase, Ast * destination_memory, Ast
 			source_register = NULL;
 		else
 		{
+			//cout<<"23"<<endl;
 			source_symbol_entry = &(source_memory->get_symbol_entry());
+			//cout<<"34"<<endl;
 			source_register = source_symbol_entry->get_register(); 
 		}
 
@@ -194,13 +197,26 @@ void Lra_Outcome::optimize_lra(Lra_Scenario lcase, Ast * destination_memory, Ast
 			load_needed = true;
 		}
 
+		if (destination_register){
+			destination_symbol_entry->free_register(destination_register); 
+		}
+
+		destination_symbol_entry->update_register(result_register);
+		// cout<<"ghusa hai ke nahi\n";
+
 		break;
 
 	case mc_2r:
 		CHECK_INVARIANT(source_memory, "Sourse ast pointer cannot be NULL for m2r scenario in lra");
 
-		source_symbol_entry = &(source_memory->get_symbol_entry());
-		source_register = source_symbol_entry->get_register(); 
+		if (typeid(*source_memory) == typeid(Number_Ast<int>))
+			source_register = NULL;
+		else
+		{
+			//cout<<"56"<<endl;
+			source_symbol_entry = &(source_memory->get_symbol_entry());
+			source_register = source_symbol_entry->get_register(); 
+		}
 
 		if (source_register != NULL)
 		{
@@ -239,10 +255,6 @@ void Lra_Outcome::optimize_lra(Lra_Scenario lcase, Ast * destination_memory, Ast
 	CHECK_INVARIANT ((result_register != NULL), "Inconsistent information in lra");
 	register_description = result_register;
 
-	if (destination_register)
-		destination_symbol_entry->free_register(destination_register); 
-
-	destination_symbol_entry->update_register(result_register);
 }
 
 /******************************* Machine Description *****************************************/
@@ -335,8 +347,11 @@ Register_Descriptor * Machine_Description::get_new_register()
 	{
 		reg_desc = i->second;
 
-		if (reg_desc->is_free())
+		if (reg_desc->is_free()){
+			reg_desc->set_used_for_expr_result(true);
 			return reg_desc;
+		}
+			
 	}
 
 	CHECK_INVARIANT(CONTROL_SHOULD_NOT_REACH, 

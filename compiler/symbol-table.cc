@@ -306,9 +306,11 @@ void Symbol_Table_Entry::update_register(Register_Descriptor * result_reg_descr)
 
 	Register_Descriptor * destination_reg_descr = get_register();
 
-	if(destination_reg_descr != NULL)
+	if(destination_reg_descr != NULL){
+		// cout<<"should reach\n";
 		free_register(destination_reg_descr);
-
+	}
+	// cout<<"should reach 1\n";
 	/* set the register of the destination as the new register */
 	set_register(result_reg_descr);
 
