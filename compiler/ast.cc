@@ -670,7 +670,7 @@ Conditional_Ast::~Conditional_Ast(){
 	
 }
 
-void Conditional_Ast ::  print(ostream & file_buffer){
+void Conditional_Ast::print(ostream & file_buffer){
 	
 	file_buffer << "\n" << AST_SPACE << "If_Else statement:";
     condition->print(file_buffer);
