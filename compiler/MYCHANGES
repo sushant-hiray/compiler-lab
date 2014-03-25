@@ -5,42 +5,19 @@ The following changes were made for this submission
 ------------------------------------------------------------------------------------------
 
 
-Changes in scanner.ll
+Changes in ast.cc
+    
+    Write the code for the method <x::compile_and_optimize_ast> where x is either:
 
-    Updated token names corresponding to operators.
-    Added regex to recognize the basic block structure.
+        Boolean_Ast; or
+        Conditional_Ast; or
+        Assignment_Ast; or
+        Goto_Ast
 
-Also we have made sure that there are no shift reduce conflicts by assigning appropriate associative rules!
-------------------------------------------------------------------------------------------
-
-
-Changes in parser.yy
-
-    Added precedence order and associativity to the operators.
-    Defined various types to refer other classes.
-    Added Actions Rules corresponding to all the production statements.
-    Added error handling in the action rules.
 ---------------------------------------------------------------------------------------
 
+Changes in reg-alloc.cc
 
-Changes in ast.cc and ast.hh
-    
-    Added 3 Classes derived from Ast namely:
-    Boolean_Ast  ->  Handles Relation Expression
-    Conditional_Ast ->  Handles Conditional Statements e.g. "if else"
-    Goto_Ast        ->  Handles goto statements
+    Modified the method <Lra_Outcome::optimize_lra>
 
-    Added static char array for referring operators(defined as enum in Expression_Ast).
-    Added code for method compile for each class.
----------------------------------------------------------------------------------------
-
-Changes in procedure.cc and procedure.hh
-    
-    Added list of Basic-Block No.s and Goto-Block No.s to its private variables.
-    Added 5 functions:
-        void add_basic_block_no(int n)  ->  Appends block number to the list of basic-block-no.
-        void add_goto_no(int n)  ->  Appends goto number to the list of goto-block-no.
-        int check_valid_goto()  ->  Checks if goto blocks are referenced are in the basic-block-no list.
-        Basic_Block * get_bb(int block_no) ->  returns Basic_Block* corresponding to block_no.
-        void print_nos();   ->  prints the value in list (Added for debugging).
  ---------------------------------------------------------------------------------------

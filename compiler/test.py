@@ -23,13 +23,13 @@ for f in files:
         cfgFiles.append(path + "/" +f)
 print("Done generating cfg files\n");
 
-# for f in cfgFiles:
-#     print("Testing file  " + f ); 
-#     command = "./cfg-test -icode -lra -d " + f + " > expected "
-#     os.system(command) 
-#     command = "./cfglp64 -icode -lra -d "  + f + " > generated  "
-#     os.system(command)
-#     os.system("diff expected generated");
+for f in cfgFiles:
+    print("Testing file  " + f ); 
+    command = "./cfg-test -icode -lra -d " + f + " > expected "
+    os.system(command) 
+    command = "./cfglp64 -icode -lra -d "  + f + " > generated  "
+    os.system(command)
+    os.system("diff expected generated");
 
 error_files=[]
 for f in files:
