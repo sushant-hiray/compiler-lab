@@ -27,7 +27,7 @@ for f in cfgFiles:
     print("Testing file  " + f ); 
     command = "./cfg-test -icode -lra -d " + f + " > expected "
     os.system(command) 
-    command = "./cfglp64 -icode -lra -d "  + f + " > generated  "
+    command = "./cfglp -icode -lra -d "  + f + " > generated  "
     os.system(command)
     os.system("diff expected generated");
 
@@ -41,6 +41,6 @@ for f in error_files:
     print("Testing file  " + f ); 
     command = "./cfg-test -icode -lra -d  " + f + " > expected " 
     os.system(command) 
-    command = "./cfglp64 -icode -lra -d  " + f + " > generated " 
+    command = "./cfglp -icode -lra -d  " + f + " > generated " 
     os.system(command)
     os.system("diff -b expected generated");

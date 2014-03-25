@@ -39,7 +39,7 @@ HEADERS = $(HEADERS_CORE) $(HEADERS_GEN)
 CPP = g++
 BISONCPP = bisonc++
 FLEXCPP = flexc++
-TGT = cfglp64
+TGT = cfglp
 
 CFLAGS = -g 
 
