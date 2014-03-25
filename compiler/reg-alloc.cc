@@ -105,6 +105,10 @@ void Register_Descriptor::update_symbol_information(Symbol_Table_Entry & sym_ent
 		lra_symbol_list.push_back(&sym_entry);
 }
 
+int Register_Descriptor::get_lra_symbol_list_size(){
+	return lra_symbol_list.size();
+}
+
 //////////////////////////////// Lra_Outcome //////////////////////////////////////////
 
 Lra_Outcome::Lra_Outcome(Register_Descriptor * rdp, bool nr, bool sr, bool dr, bool mv, bool ld)
@@ -186,9 +190,17 @@ void Lra_Outcome::optimize_lra(Lra_Scenario lcase, Ast * destination_memory, Ast
 		}
 		else if (destination_register != NULL)
 		{
-			result_register = destination_register;
-			is_same_as_destination = true;
-			load_needed = true;
+			if(destination_register->get_lra_symbol_list_size()>1){
+				// cout<<"hell yeah!\n";
+				result_register = machine_dscr_object.get_new_register();
+				is_a_new_register = true;
+				load_needed = true;
+			}
+			else{
+				result_register = destination_register;
+				is_same_as_destination = true;
+				load_needed = true;
+			}
 		}
 		else 
 		{

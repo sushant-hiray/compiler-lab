@@ -96,6 +96,7 @@ class Register_Descriptor
     bool get_used_for_expr_result();
     void set_used_for_expr_result(bool);
     void reset_use_for_expr_result();
+    int get_lra_symbol_list_size();
 
     bool is_free();
 };
