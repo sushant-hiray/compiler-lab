@@ -71,7 +71,6 @@ void Program::append_global_table(Symbol_Table & new_table, int line){
 		global_symbol_table.push_symbol(*i);
 	}
 	return;
-	//cout<<"local_list appended"<<endl;
 }
 void Program::set_procedure_map(Procedure & proc)
 {
@@ -138,7 +137,6 @@ void Program::print_ast()
 		for(;it!=procedure_map.end();it++){
 			(it->second)->print_ast(ast_buffer);
 		}
-		// main->print_ast(ast_buffer);
 	}
 }
 
@@ -155,7 +153,6 @@ Eval_Result & Program::evaluate()
 		report_error("No main function found in the program", NOLINE);
 
 	global_symbol_table.create(interpreter_global_table);
-	//cout<<"Created global table"<<endl;
 	command_options.create_output_buffer();
 	ostream & file_buffer = command_options.get_output_buffer();
 	file_buffer << "Evaluating Program\n";

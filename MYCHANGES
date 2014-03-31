@@ -1,19 +1,36 @@
 Sushant Hiray: 110050009
 Sanchit Garg : 110050035
 
-The following changes were made for Lab4 and Assignment 3b\a. Submission:
+The following changes were made for Lab5 and Assignment 4b. Submission:
 
-Changes in scanner.ll
-    
-    Added a new token for detecting void
-    Updated the scanner structure to stop detecting `.` in NUM
----------------------------------------------------------------------------------------
+
 
 Changes in parser.yy
-    Added grammar rules to detect function calls. 
-    Grammar rules to detect function calls in assignment statements
-    Detect function declaration
+    Added fuction calls in grammar declaration to execute -ast and -eval operations.
+    Added checks and validation rules for type checking and protoytpe.
     
 ---------------------------------------------------------------------------------------
 
+Changes in procedure.cc, procedure.hh
+	append_local_list(Symbol_Table & new_list,int line);
+	void set_parameter_length(int _a);
+	int get_parameter_length();
+	void set_defined(bool _val);
+	bool is_defined();
+	void check_called_data_type(list<Ast*> params, int line);
+	Modified evaluate so that it now takes function call arguments
 
+---------------------------------------------------------------------------------------
+
+Changes in ast.cc and ast.hh:
+    Created a new Call_Ast to handle function calls.
+    Modified Return_Ast to check for return types of functions.
+
+---------------------------------------------------------------------------------------
+Changes in local-environment.cc
+	Updated print to tackle precision issues
+
+---------------------------------------------------------------------------------------
+Changes in program.cc
+
+	Program::get_procedure(string & _name)
