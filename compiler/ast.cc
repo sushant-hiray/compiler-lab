@@ -554,7 +554,11 @@ Eval_Result & Name_Ast::evaluate(Local_Environment & eval_env, ostream & file_bu
 Code_For_Ast & Name_Ast::compile()
 {
 	Ics_Opd * opd = new Mem_Addr_Opd(*variable_symbol_entry);
-	Register_Descriptor * result_register = machine_dscr_object.get_new_register();
+	
+	Register_Val_Type type = (node_data_type == int_data_type)?
+							Register_Val_Type::int_num:Register_Val_Type::double_num;
+
+	Register_Descriptor * result_register = machine_dscr_object.get_new_register(type);
 	Ics_Opd * register_opd = new Register_Addr_Opd(result_register);
 
 	Icode_Stmt * load_stmt = new Move_IC_Stmt(load, opd, register_opd);
@@ -642,6 +646,20 @@ Data_Type Boolean_Ast::get_data_type()
 	return node_data_type;
 }
 
+bool Boolean_Ast::check_ast()
+{
+	CHECK_INVARIANT((rhs_exp != NULL), "Rhs of Assignment_Ast cannot be null");
+	CHECK_INVARIANT((lhs_exp != NULL), "Lhs of Assignment_Ast cannot be null");
+
+	if (lhs_exp->get_data_type() == rhs_exp->get_data_type())
+	{
+		return true;
+	}
+
+	CHECK_INVARIANT(CONTROL_SHOULD_NOT_REACH, 
+		"Relational Expression data type not compatible");
+}
+
 Eval_Result & Boolean_Ast:: evaluate(Local_Environment & eval_env, ostream & file_buffer){
 		Eval_Result & l_res = lhs_exp->evaluate(eval_env, file_buffer);
 		if (l_res.is_variable_defined() == false){
@@ -706,8 +724,11 @@ Code_For_Ast & Boolean_Ast::compile(){
 	Code_For_Ast & rhs_stmt = rhs_exp->compile();
 	Register_Descriptor * rhs_register = rhs_stmt.get_reg();
 	rhs_register->set_used_for_expr_result(true);
-	//cout<<lhs_register->get_name()<< " "<< rhs_register->get_name()<<endl;
-	Register_Descriptor * result_register = machine_dscr_object.get_new_register();
+	
+	Register_Val_Type type = (node_data_type == int_data_type)?
+							Register_Val_Type::int_num:Register_Val_Type::double_num;
+	
+	Register_Descriptor * result_register = machine_dscr_object.get_new_register(type);
 	result_register->set_used_for_expr_result(true);
 
 	Ics_Opd* lhs_opd = new Register_Addr_Opd(lhs_register);
@@ -718,22 +739,22 @@ Code_For_Ast & Boolean_Ast::compile(){
 
 	switch (op) {
 		case EQ :
-			comp_stmt = new Compare_IC_Stmt(seq, lhs_opd, rhs_opd, res_opd);
+			comp_stmt = new Compute_IC_Stmt(seq, lhs_opd, rhs_opd, res_opd);
 			break;
 		case NE :
-			comp_stmt = new Compare_IC_Stmt(sne, lhs_opd, rhs_opd, res_opd);
+			comp_stmt = new Compute_IC_Stmt(sne, lhs_opd, rhs_opd, res_opd);
 			break;
 		case GT :
-			comp_stmt = new Compare_IC_Stmt(sgt, lhs_opd, rhs_opd, res_opd);
+			comp_stmt = new Compute_IC_Stmt(sgt, lhs_opd, rhs_opd, res_opd);
 			break;
 		case LT :
-			comp_stmt = new Compare_IC_Stmt(slt, lhs_opd, rhs_opd, res_opd);
+			comp_stmt = new Compute_IC_Stmt(slt, lhs_opd, rhs_opd, res_opd);
 			break;
 		case GE :
-			comp_stmt = new Compare_IC_Stmt(sge, lhs_opd, rhs_opd, res_opd);
+			comp_stmt = new Compute_IC_Stmt(sge, lhs_opd, rhs_opd, res_opd);
 			break;
 		case LE :
-			comp_stmt = new Compare_IC_Stmt(sle, lhs_opd, rhs_opd, res_opd);
+			comp_stmt = new Compute_IC_Stmt(sle, lhs_opd, rhs_opd, res_opd);
 			break;
 
 		default:
@@ -792,8 +813,10 @@ Code_For_Ast & Boolean_Ast::compile_and_optimize_ast(Lra_Outcome & lra)
 	Register_Descriptor * rhs_register = rhs_stmt.get_reg();
 	rhs_register->set_used_for_expr_result(true);
 
+	Register_Val_Type type = (node_data_type == int_data_type)?
+							Register_Val_Type::int_num:Register_Val_Type::double_num;
 
-	Register_Descriptor * result_register = machine_dscr_object.get_new_register();
+	Register_Descriptor * result_register = machine_dscr_object.get_new_register(type);
 	result_register->set_used_for_expr_result(true);
 
 	Ics_Opd* lhs_opd = new Register_Addr_Opd(lhs_register);
@@ -804,22 +827,22 @@ Code_For_Ast & Boolean_Ast::compile_and_optimize_ast(Lra_Outcome & lra)
 
 	switch (op) {
 		case EQ :
-			comp_stmt = new Compare_IC_Stmt(seq, lhs_opd, rhs_opd, res_opd);
+			comp_stmt = new Compute_IC_Stmt(seq, lhs_opd, rhs_opd, res_opd);
 			break;
 		case NE :
-			comp_stmt = new Compare_IC_Stmt(sne, lhs_opd, rhs_opd, res_opd);
+			comp_stmt = new Compute_IC_Stmt(sne, lhs_opd, rhs_opd, res_opd);
 			break;
 		case GT :
-			comp_stmt = new Compare_IC_Stmt(sgt, lhs_opd, rhs_opd, res_opd);
+			comp_stmt = new Compute_IC_Stmt(sgt, lhs_opd, rhs_opd, res_opd);
 			break;
 		case LT :
-			comp_stmt = new Compare_IC_Stmt(slt, lhs_opd, rhs_opd, res_opd);
+			comp_stmt = new Compute_IC_Stmt(slt, lhs_opd, rhs_opd, res_opd);
 			break;
 		case GE :
-			comp_stmt = new Compare_IC_Stmt(sge, lhs_opd, rhs_opd, res_opd);
+			comp_stmt = new Compute_IC_Stmt(sge, lhs_opd, rhs_opd, res_opd);
 			break;
 		case LE :
-			comp_stmt = new Compare_IC_Stmt(sle, lhs_opd, rhs_opd, res_opd);
+			comp_stmt = new Compute_IC_Stmt(sle, lhs_opd, rhs_opd, res_opd);
 			break;
 
 		default:
@@ -873,6 +896,20 @@ Data_Type Arithmetic_Ast::get_data_type()
     return node_data_type;
 }
 
+bool Arithmetic_Ast::check_ast()
+{
+	CHECK_INVARIANT((rhs_exp != NULL), "Rhs of Assignment_Ast cannot be null");
+	CHECK_INVARIANT((lhs_exp != NULL), "Lhs of Assignment_Ast cannot be null");
+
+	if (lhs_exp->get_data_type() == rhs_exp->get_data_type())
+	{
+		node_data_type = lhs_exp->get_data_type();
+		return true;
+	}
+
+	CHECK_INVARIANT(CONTROL_SHOULD_NOT_REACH, 
+		"Relational Expression data type not compatible");
+}
 
 void Arithmetic_Ast::print(ostream & file_buffer){
 
@@ -1251,7 +1288,10 @@ Eval_Result & Number_Ast<DATA_TYPE>::evaluate(Local_Environment & eval_env, ostr
 template <class DATA_TYPE>
 Code_For_Ast & Number_Ast<DATA_TYPE>::compile()
 {
-	Register_Descriptor * result_register = machine_dscr_object.get_new_register();
+	Register_Val_Type type = (node_data_type == int_data_type)?
+							Register_Val_Type::int_num:Register_Val_Type::double_num;
+
+	Register_Descriptor * result_register = machine_dscr_object.get_new_register(type);
 	CHECK_INVARIANT((result_register != NULL), "Result register cannot be null");
 	Ics_Opd * load_register = new Register_Addr_Opd(result_register);
 	Ics_Opd * opd = new Const_Opd<int>(constant);

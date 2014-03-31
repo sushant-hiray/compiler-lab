@@ -109,6 +109,10 @@ int Register_Descriptor::get_lra_symbol_list_size(){
 	return lra_symbol_list.size();
 }
 
+Register_Val_Type Register_Descriptor::get_value_type(){
+	return value_type;
+}
+
 //////////////////////////////// Lra_Outcome //////////////////////////////////////////
 
 Lra_Outcome::Lra_Outcome(Register_Descriptor * rdp, bool nr, bool sr, bool dr, bool mv, bool ld)
@@ -155,6 +159,8 @@ void Lra_Outcome::optimize_lra(Lra_Scenario lcase, Ast * destination_memory, Ast
 	register_move_needed = false;
 	load_needed = false;
 
+	Register_Val_Type type;
+
 	switch (lcase)
 	{
 	case mc_2m:
@@ -162,6 +168,9 @@ void Lra_Outcome::optimize_lra(Lra_Scenario lcase, Ast * destination_memory, Ast
 			"Destination ast pointer cannot be NULL for m2m scenario in lra");
 		CHECK_INVARIANT(source_memory, 
 			"Sourse ast pointer cannot be NULL for m2m scenario in lra");
+		
+		type = (source_memory->get_data_type()==int_data_type)?
+			Register_Val_Type::int_num:Register_Val_Type::double_num;
 
 		if (typeid(*destination_memory) == typeid(Number_Ast<int>))
 			destination_register = NULL;
@@ -192,7 +201,7 @@ void Lra_Outcome::optimize_lra(Lra_Scenario lcase, Ast * destination_memory, Ast
 		{
 			if(destination_register->get_lra_symbol_list_size()>1){
 				// cout<<"hell yeah!\n";
-				result_register = machine_dscr_object.get_new_register();
+				result_register = machine_dscr_object.get_new_register(type);
 				is_a_new_register = true;
 				load_needed = true;
 			}
@@ -204,7 +213,7 @@ void Lra_Outcome::optimize_lra(Lra_Scenario lcase, Ast * destination_memory, Ast
 		}
 		else 
 		{
-			result_register = machine_dscr_object.get_new_register();
+			result_register = machine_dscr_object.get_new_register(type);
 			is_a_new_register = true;
 			load_needed = true;
 		}
@@ -220,6 +229,9 @@ void Lra_Outcome::optimize_lra(Lra_Scenario lcase, Ast * destination_memory, Ast
 
 	case mc_2r:
 		CHECK_INVARIANT(source_memory, "Sourse ast pointer cannot be NULL for m2r scenario in lra");
+
+		type = (source_memory->get_data_type()==int_data_type)?
+			Register_Val_Type::int_num:Register_Val_Type::double_num;
 
 		if (typeid(*source_memory) == typeid(Number_Ast<int>))
 			source_register = NULL;
@@ -238,7 +250,7 @@ void Lra_Outcome::optimize_lra(Lra_Scenario lcase, Ast * destination_memory, Ast
 		}
 		else 
 		{
-			result_register = machine_dscr_object.get_new_register();
+			result_register = machine_dscr_object.get_new_register(type);
 			is_a_new_register = true;
 			load_needed = true;
 		}
@@ -302,6 +314,21 @@ void Machine_Description::initialize_register_table()
 	spim_register_table[sp] = new Register_Descriptor(sp, "sp", int_num, pointer);
 	spim_register_table[fp] = new Register_Descriptor(fp, "fp", int_num, pointer);
 	spim_register_table[ra] = new Register_Descriptor(ra, "ra", int_num, ret_address);
+	spim_register_table[f2] = new Register_Descriptor(f2, "f2", double_num, gp_data);
+	spim_register_table[f4] = new Register_Descriptor(f4, "f4", double_num, gp_data);
+	spim_register_table[f6] = new Register_Descriptor(f6, "f6", double_num, gp_data);
+	spim_register_table[f8] = new Register_Descriptor(f8, "f8", double_num, gp_data);
+	spim_register_table[f10] = new Register_Descriptor(f10, "f10", double_num, gp_data);
+	spim_register_table[f12] = new Register_Descriptor(f12, "f12", double_num, gp_data);
+	spim_register_table[f14] = new Register_Descriptor(f14, "f14", double_num, gp_data);
+	spim_register_table[f16] = new Register_Descriptor(f16, "f16", double_num, gp_data);
+	spim_register_table[f18] = new Register_Descriptor(f18, "f18", double_num, gp_data);
+	spim_register_table[f20] = new Register_Descriptor(f20, "f20", double_num, gp_data);
+	spim_register_table[f22] = new Register_Descriptor(f22, "f22", double_num, gp_data);
+	spim_register_table[f24] = new Register_Descriptor(f24, "f24", double_num, gp_data);
+	spim_register_table[f26] = new Register_Descriptor(f26, "f26", double_num, gp_data);
+	spim_register_table[f28] = new Register_Descriptor(f28, "f28", double_num, gp_data);
+	spim_register_table[f30] = new Register_Descriptor(f30, "f30", double_num, gp_data);
 }
 
 void Machine_Description::initialize_instruction_table()
@@ -317,6 +344,17 @@ void Machine_Description::initialize_instruction_table()
 	spim_instruction_table[slt] = new Instruction_Descriptor(slt, "slt", "slt", "", i_r_o1_op_o2, a_op_r_o1_o2);
 	spim_instruction_table[bne] = new Instruction_Descriptor(bne, "bne", "bne", "", i_op_o1_o2_o3, a_op_o1_o2_o3);
 	spim_instruction_table[j] = new Instruction_Descriptor(j, "goto", "j", "", i_op_o1, a_op_o1);
+	spim_instruction_table[j] = new Instruction_Descriptor(add, "add", "add", "", i_r_o1_op_o2, a_op_r_o1_o2);
+	spim_instruction_table[j] = new Instruction_Descriptor(sub, "sub", "sub", "", i_r_o1_op_o2, a_op_r_o1_o2);
+	spim_instruction_table[j] = new Instruction_Descriptor(mul, "mul", "mul", "", i_r_o1_op_o2, a_op_r_o1_o2);
+	spim_instruction_table[j] = new Instruction_Descriptor(idiv, "div", "div", "", i_r_o1_op_o2, a_op_r_o1_o2);
+	spim_instruction_table[j] = new Instruction_Descriptor(fadd, "add.d", "add.d", "", i_r_o1_op_o2, a_op_r_o1_o2);
+	spim_instruction_table[j] = new Instruction_Descriptor(fsub, "sub.d", "sub.d", "", i_r_o1_op_o2, a_op_r_o1_o2);
+	spim_instruction_table[j] = new Instruction_Descriptor(fmul, "mul.d", "mul.d", "", i_r_o1_op_o2, a_op_r_o1_o2);
+	spim_instruction_table[j] = new Instruction_Descriptor(fdiv, "div.d", "div.d", "", i_r_o1_op_o2, a_op_r_o1_o2);
+	spim_instruction_table[store] = new Instruction_Descriptor(fstore, "store.d", "s.d", "", i_r_op_o1, a_op_o1_r);
+	spim_instruction_table[load] = new Instruction_Descriptor(fload, "load.d", "l.d", "", i_r_op_o1, a_op_r_o1);
+	spim_instruction_table[imm_load] = new Instruction_Descriptor(fimm_load, "iLoad.d", "li.d", "", i_r_op_o1, a_op_r_o1);
 }
 
 void Machine_Description::validate_init_local_register_mapping()
@@ -350,7 +388,7 @@ void Machine_Description::clear_local_register_mappings()
 	*/
 }
 
-Register_Descriptor * Machine_Description::get_new_register()
+Register_Descriptor * Machine_Description::get_new_register(Register_Val_Type type)
 {
 	Register_Descriptor * reg_desc;
 
@@ -359,7 +397,7 @@ Register_Descriptor * Machine_Description::get_new_register()
 	{
 		reg_desc = i->second;
 
-		if (reg_desc->is_free()){
+		if (reg_desc->is_free() && (reg_desc->get_value_type()==type)){
 			reg_desc->set_used_for_expr_result(true);
 			return reg_desc;
 		}

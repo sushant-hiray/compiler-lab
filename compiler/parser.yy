@@ -269,7 +269,7 @@ declaration:
 		CHECK_INVARIANT(($2 != NULL), "Name cannot be null");
 
 		string name = *$2;
-		Data_Type type = int_data_type;
+		Data_Type type = $1;
 
 		pair<Data_Type, string> * declar = new pair<Data_Type, string>(type, name);
 
@@ -506,6 +506,7 @@ logical_expression:
     if (NOT_ONLY_PARSE)
 	{
         $$ = new Boolean_Ast($1,$3,Boolean_Ast::BooleanOp::EQ);
+        $$->check_ast();
     }
     }
     |
@@ -514,6 +515,7 @@ logical_expression:
     if (NOT_ONLY_PARSE)
 	{
         $$ = new Boolean_Ast($1,$3,Boolean_Ast::BooleanOp::NE);
+        $$->check_ast();
     }
     }
     |
@@ -522,6 +524,7 @@ logical_expression:
     if (NOT_ONLY_PARSE)
 	{
         $$ = new Boolean_Ast($1,$3,Boolean_Ast::BooleanOp::GT);
+        $$->check_ast();
     }
     }
     |
@@ -530,6 +533,7 @@ logical_expression:
     if (NOT_ONLY_PARSE)
 	{
         $$ = new Boolean_Ast($1,$3,Boolean_Ast::BooleanOp::GE);
+        $$->check_ast();
     }
     }
     |
@@ -538,6 +542,7 @@ logical_expression:
     if (NOT_ONLY_PARSE)
 	{
         $$ = new Boolean_Ast($1,$3,Boolean_Ast::BooleanOp::LT);
+        $$->check_ast();
     }
     }
     |
@@ -546,6 +551,7 @@ logical_expression:
     if (NOT_ONLY_PARSE)
 	{
         $$ = new Boolean_Ast($1,$3,Boolean_Ast::BooleanOp::LE);
+        $$->check_ast();
     }
     }
 ;
@@ -557,7 +563,7 @@ arithmetic_expression:
     if (NOT_ONLY_PARSE)
 	{
         $$ = new Arithmetic_Ast($1,$3,Arithmetic_Ast::ArithOp::MINUS);
-        int line = get_line_number();
+        $$->check_ast();
     }
     }
     |
@@ -566,7 +572,7 @@ arithmetic_expression:
     if (NOT_ONLY_PARSE)
 	{
         $$ = new Arithmetic_Ast($1,$3,Arithmetic_Ast::ArithOp::PLUS);
-        int line = get_line_number();
+        $$->check_ast();
     }
     }
     |
@@ -575,7 +581,7 @@ arithmetic_expression:
     if (NOT_ONLY_PARSE)
 	{
         $$ = new Arithmetic_Ast($1,$3,Arithmetic_Ast::ArithOp::DIVIDE);
-        int line = get_line_number();
+        $$->check_ast();
     }
     }
     |
@@ -584,7 +590,7 @@ arithmetic_expression:
     if (NOT_ONLY_PARSE)
 	{
         $$ = new Arithmetic_Ast($1,$3,Arithmetic_Ast::ArithOp::MULTIPLY);
-        int line = get_line_number();
+        $$->check_ast();
     }
     }
 

@@ -171,6 +171,7 @@ class Boolean_Ast:public Ast
         Boolean_Ast(Ast * lhs_exp , Ast * rhs_exp , BooleanOp op);
         ~Boolean_Ast();
         Data_Type get_data_type();
+        bool check_ast();
         void print(ostream & file_buffer);
         Eval_Result & evaluate(Local_Environment & eval_env, ostream & file_buffer);
         Code_For_Ast & compile();
@@ -202,6 +203,7 @@ class Arithmetic_Ast:public Ast
     public:
         Arithmetic_Ast(Ast* lhs_exp , Ast* rhs_exp , ArithOp op);
         ~Arithmetic_Ast();
+        bool check_ast();
         Data_Type get_data_type();
         void print(ostream & file_buffer);
         Eval_Result & evaluate(Local_Environment & eval_enc , ostream & file_buffer);

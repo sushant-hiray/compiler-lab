@@ -308,9 +308,9 @@ void Move_IC_Stmt::print_assembly(ostream & file_buffer)
 	}
 }
 
-/*************************** Class Compare_IC_Stmt *****************************/
+/*************************** Class Compute_IC_Stmt *****************************/
 
-Compare_IC_Stmt::Compare_IC_Stmt(Tgt_Op op, Ics_Opd * o1, Ics_Opd * o2, Ics_Opd * res)
+Compute_IC_Stmt::Compute_IC_Stmt(Tgt_Op op, Ics_Opd * o1, Ics_Opd * o2, Ics_Opd * res)
 {
 	CHECK_INVARIANT((machine_dscr_object.spim_instruction_table[op] != NULL),
 			"Instruction description in spim table cannot be null");
@@ -321,15 +321,15 @@ Compare_IC_Stmt::Compare_IC_Stmt(Tgt_Op op, Ics_Opd * o1, Ics_Opd * o2, Ics_Opd 
 	result = res; 
 }
 
-Ics_Opd * Compare_IC_Stmt::get_opd1()          { return opd1; }
-Ics_Opd * Compare_IC_Stmt::get_opd2()          { return opd2; }
-Ics_Opd * Compare_IC_Stmt::get_result()        { return result; }
+Ics_Opd * Compute_IC_Stmt::get_opd1()          { return opd1; }
+Ics_Opd * Compute_IC_Stmt::get_opd2()          { return opd2; }
+Ics_Opd * Compute_IC_Stmt::get_result()        { return result; }
 
-void Compare_IC_Stmt::set_opd1(Ics_Opd * io)   { opd1 = io; }
-void Compare_IC_Stmt::set_opd2(Ics_Opd * io)   { opd2 = io; }
-void Compare_IC_Stmt::set_result(Ics_Opd * io) { result = io; }
+void Compute_IC_Stmt::set_opd1(Ics_Opd * io)   { opd1 = io; }
+void Compute_IC_Stmt::set_opd2(Ics_Opd * io)   { opd2 = io; }
+void Compute_IC_Stmt::set_result(Ics_Opd * io) { result = io; }
 
-Compare_IC_Stmt& Compare_IC_Stmt::operator=(const Compare_IC_Stmt& rhs)
+Compute_IC_Stmt& Compute_IC_Stmt::operator=(const Compute_IC_Stmt& rhs)
 {
 	op_desc = rhs.op_desc;
 	opd1 = rhs.opd1;
@@ -339,7 +339,7 @@ Compare_IC_Stmt& Compare_IC_Stmt::operator=(const Compare_IC_Stmt& rhs)
 	return *this;
 }
 
-void Compare_IC_Stmt::print_icode(ostream & file_buffer)
+void Compute_IC_Stmt::print_icode(ostream & file_buffer)
 {
 	CHECK_INVARIANT (opd1, "Opd1 cannot be NULL for a compare IC Stmt");
 	CHECK_INVARIANT (opd2, "Opd2 cannot be NULL for a compare IC Stmt");
@@ -366,7 +366,7 @@ void Compare_IC_Stmt::print_icode(ostream & file_buffer)
 	}
 }
 
-void Compare_IC_Stmt::print_assembly(ostream & file_buffer)
+void Compute_IC_Stmt::print_assembly(ostream & file_buffer)
 {
 	CHECK_INVARIANT (opd1, "Opd1 cannot be NULL for a move IC Stmt");
 	CHECK_INVARIANT (opd2, "Opd2 cannot be NULL for a move IC Stmt");

@@ -78,9 +78,12 @@ typedef enum
 
 typedef enum 
 { 
-	load, 
-	imm_load, 
-	store, 
+	load,
+	fload, 
+	imm_load,
+	fimm_load, 
+	store,
+	fstore, 
 	nop,
 	sne,
 	seq,
@@ -89,7 +92,15 @@ typedef enum
 	sle,
 	slt,
 	bne,
-	j
+	j,
+	add,
+	sub,
+	mul,
+	idiv,
+	fadd,
+	fsub,
+	fdiv,
+	fmul
 } Tgt_Op;
 
 ///////////////////////// Instruction Descriptor ///////////////////////////////////
@@ -258,16 +269,16 @@ public:
 	void print_assembly(ostream & file_buffer);
 };
 
-class Compare_IC_Stmt: public Icode_Stmt
+class Compute_IC_Stmt: public Icode_Stmt
 { 
 	Ics_Opd * opd1;
 	Ics_Opd * opd2;   
 	Ics_Opd * result; 
 
 public:
-	Compare_IC_Stmt(Tgt_Op inst_op, Ics_Opd * opd1, Ics_Opd * opd2, Ics_Opd * result); 
-	~Compare_IC_Stmt() {} 
-	Compare_IC_Stmt & operator=(const Compare_IC_Stmt & rhs);
+	Compute_IC_Stmt(Tgt_Op inst_op, Ics_Opd * opd1, Ics_Opd * opd2, Ics_Opd * result); 
+	~Compute_IC_Stmt() {} 
+	Compute_IC_Stmt & operator=(const Compute_IC_Stmt & rhs);
 
 	Instruction_Descriptor & get_inst_op_of_ics();
 
