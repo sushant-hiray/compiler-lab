@@ -95,6 +95,183 @@ Code_For_Ast & Ast::create_store_stmt(Register_Descriptor * store_register)
 }
 
 ////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////
+
+Type_Expression_Ast::Type_Expression_Ast(Ast* e, Data_Type d){
+    type_exp = e;
+    node_data_type = d;
+}
+
+Type_Expression_Ast::Type_Expression_Ast(Ast* e){
+    type_exp = e;
+    node_data_type = e->get_data_type();
+}
+
+
+Type_Expression_Ast::~Type_Expression_Ast(){
+    delete(type_exp);
+}
+
+void Type_Expression_Ast::print(ostream & file_buffer){
+    type_exp->print(file_buffer);
+}
+
+Data_Type Type_Expression_Ast::get_data_type(){
+    return node_data_type;
+}
+
+Eval_Result & Type_Expression_Ast::evaluate(Local_Environment & eval_env, ostream & file_buffer){
+    Eval_Result & res = type_exp->evaluate(eval_env, file_buffer);
+    Result r;
+    if(node_data_type == int_data_type){
+        r.no=1;
+        r.res = (int) res.get_value().res;
+        Eval_Result & result = *new Eval_Result_Value_Int();
+        result.set_value(r);
+        result.set_result_enum(int_result);
+        return result;
+    }
+    else if(node_data_type == float_data_type){
+        r.no=2;
+        r.res = (float) res.get_value().res;
+        Eval_Result & result = *new Eval_Result_Value_Float();
+        result.set_value(r);
+        result.set_result_enum(float_result);
+        return result;
+    }
+        
+    else if(node_data_type == double_data_type){
+        r.no=3;
+        r.res = (double) res.get_value().res;
+        Eval_Result & result = *new Eval_Result_Value_Double();
+        result.set_value(r);
+        result.set_result_enum(double_result);
+        return result;
+    }
+}
+
+
+Code_For_Ast & Type_Expression_Ast::compile(){
+	CHECK_INVARIANT((type_exp != NULL), "Type cannot be null");
+
+	Code_For_Ast & type_stmt = type_exp->compile();
+	Register_Descriptor * type_register = type_stmt.get_reg();
+	type_register->set_used_for_expr_result(true);
+	
+    return type_stmt;
+}
+
+
+
+Code_For_Ast & Type_Expression_Ast::compile_and_optimize_ast(Lra_Outcome & lra){
+	CHECK_INVARIANT((type_exp != NULL), "Type cannot be null");
+
+	Code_For_Ast & type_stmt = type_exp->compile();
+	Register_Descriptor * type_register = type_stmt.get_reg();
+	type_register->set_used_for_expr_result(true);
+	
+    return type_stmt;
+}
+
+
+/////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////
+
+Unary_Ast::Unary_Ast(Ast* ast,bool m){
+    atomic_exp = ast;
+    node_data_type = ast->get_data_type();
+    minus = m;
+}
+
+Unary_Ast::~Unary_Ast(){
+    delete(atomic_exp);
+}
+
+Data_Type Unary_Ast::get_data_type()
+{
+    return node_data_type;
+}
+
+
+void Unary_Ast::print(ostream & file_buffer){
+    if(minus){
+        file_buffer << "\n"<<AST_NODE_SPACE <<"Arith: UMINUS"<<"\n";
+        file_buffer << COND_NODE_SPACE << "LHS (";
+        atomic_exp->print(file_buffer);
+        file_buffer << ")";
+    }
+    else{
+        atomic_exp->print(file_buffer);
+    }
+}
+
+
+Eval_Result & Unary_Ast::evaluate(Local_Environment & eval_env, ostream & file_buffer){
+    
+    Result r;
+    Eval_Result & res = atomic_exp->evaluate(eval_env,file_buffer);
+
+    int factor = (minus)? -1 : 1;
+    //cout << "factor is: "<<factor << endl;
+    if(node_data_type == int_data_type){
+            Eval_Result& result = *new Eval_Result_Value_Int();
+            r.no = 1;
+            r.res = (int)((res.get_value().res) * factor);
+            result.set_value(r);
+            result.set_result_enum(int_result);
+            return result;
+        }
+        else if(node_data_type == float_data_type){
+            Eval_Result& result = *new Eval_Result_Value_Float();
+            r.no = 2;
+            r.res = (float)((res.get_value().res) * factor);
+            result.set_value(r);
+            result.set_result_enum(float_result);
+            return result;
+        }
+        else if(node_data_type == double_data_type){
+            Eval_Result& result = *new Eval_Result_Value_Double();
+            r.no = 3;
+            r.res = (double)((res.get_value().res) * factor);
+            result.set_value(r);
+            result.set_result_enum(double_result);
+            return result;
+        }
+}
+
+
+
+Code_For_Ast & Unary_Ast::compile(){
+	CHECK_INVARIANT((atomic_exp != NULL), "Type cannot be null");
+
+	Code_For_Ast & unary_stmt = atomic_exp->compile();
+	Register_Descriptor * unary_register = unary_stmt.get_reg();
+	unary_register->set_used_for_expr_result(true);
+	
+    return unary_stmt;
+}
+
+
+
+Code_For_Ast & Unary_Ast::compile_and_optimize_ast(Lra_Outcome & lra){
+	CHECK_INVARIANT((atomic_exp != NULL), "Type cannot be null");
+
+	Code_For_Ast & unary_stmt = atomic_exp->compile();
+	Register_Descriptor * unary_register = unary_stmt.get_reg();
+	unary_register->set_used_for_expr_result(true);
+	
+    return unary_stmt;
+}
+
+/////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////
+
+
+
+///////////////////////////////////////////////////////////////////////////
+
 
 Assignment_Ast::Assignment_Ast(Ast * temp_lhs, Ast * temp_rhs, int line)
 {

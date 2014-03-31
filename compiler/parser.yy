@@ -25,7 +25,6 @@
 %scanner-token-function d_scanner.lex()
 %filenames parser
 %parsefun-source parser.cc
-
 %union 
 {
 	int integer_value;
@@ -51,7 +50,8 @@
 %token ASSIGN 
 %left NE EQ
 %left LT LE GT GE
-
+%left '+' '-'
+%left '*' '/'
 %type <symbol_table> optional_variable_declaration_list
 %type <symbol_table> variable_declaration_list
 %type <symbol_entry> variable_declaration
@@ -67,6 +67,7 @@
 %type <goto_ast> goto_statement
 %type <ast> expression
 %type <ast> logical_expression
+%type <ast> unary_expression
 %type <ast> atomic_expression
 %type <ast> arithmetic_expression
 %type <ast> type_expression
@@ -439,7 +440,7 @@ assignment_statement_list:
 ;
 
 assignment_statement:
-	variable ASSIGN expression ';'
+	variable ASSIGN type_expression ';'
 	{
 	if (NOT_ONLY_PARSE)
 	{
@@ -465,7 +466,7 @@ type_expression:
     {
     if(NOT_ONLY_PARSE)
     {
-        $$=$1;
+        $$=new Type_Expression_Ast($1);
     }
     }
 ;
@@ -489,7 +490,7 @@ expression:
     }
     } 
     |
-    atomic_expression
+    unary_expression
     {
     if (NOT_ONLY_PARSE)
 	{
@@ -500,7 +501,7 @@ expression:
 
 
 logical_expression:
-    expression EQ expression
+    type_expression EQ type_expression
     {
     if (NOT_ONLY_PARSE)
 	{
@@ -508,7 +509,7 @@ logical_expression:
     }
     }
     |
-    expression NE expression
+    type_expression NE type_expression
     {
     if (NOT_ONLY_PARSE)
 	{
@@ -516,7 +517,7 @@ logical_expression:
     }
     }
     |
-    expression GT expression
+    type_expression GT type_expression
     {
     if (NOT_ONLY_PARSE)
 	{
@@ -524,7 +525,7 @@ logical_expression:
     }
     }
     |
-    expression GE expression
+    type_expression GE type_expression
     {
     if (NOT_ONLY_PARSE)
 	{
@@ -532,7 +533,7 @@ logical_expression:
     }
     }
     |
-    expression LT expression
+    type_expression LT type_expression
     {
     if (NOT_ONLY_PARSE)
 	{
@@ -540,7 +541,7 @@ logical_expression:
     }
     }
     |
-    expression LE expression
+    type_expression LE type_expression
     {
     if (NOT_ONLY_PARSE)
 	{
@@ -608,11 +609,40 @@ atomic_expression:
     }
     }
     |
-    '(' expression ')'
+    '(' type_expression ')'
     {
     if (NOT_ONLY_PARSE)
 	{
          $$ = $2;
+    }
+    }
+    |
+    '(' type_specifier ')' atomic_expression
+    {
+    if (NOT_ONLY_PARSE)
+	{
+        $$=$4;
+        $$= new Type_Expression_Ast($4,$2);
+    
+    }
+    }
+;
+
+unary_expression:
+    '-' unary_expression
+    {
+    if (NOT_ONLY_PARSE)
+	{
+        $$ = new Unary_Ast($2,1);
+    
+    }
+    }
+    |
+    atomic_expression
+    {
+    if (NOT_ONLY_PARSE)
+	{
+        $$ = new Unary_Ast($1,0);
     }
     }
 ;

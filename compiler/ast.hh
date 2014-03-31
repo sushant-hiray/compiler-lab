@@ -120,11 +120,35 @@ public:
 
 
 
+class Type_Expression_Ast:public Ast{
+    private:
+        Ast* type_exp;
 
+    public:
+        Type_Expression_Ast(Ast*, Data_Type);
+        Type_Expression_Ast(Ast*);
+        ~Type_Expression_Ast();
+        Data_Type get_data_type();
+        void print(ostream & file_buffer);
+        Eval_Result & evaluate(Local_Environment & eval_env, ostream & file_buffer);
+        Code_For_Ast & compile();
+        Code_For_Ast & compile_and_optimize_ast(Lra_Outcome & lra);
+};
 
+class Unary_Ast:public Ast{
+    private:
+        Ast* atomic_exp;
+        bool minus;
 
-
-
+    public:
+        Unary_Ast(Ast*, bool);
+        ~Unary_Ast();
+        Data_Type get_data_type();
+        void print(ostream & file_buffer);
+        Eval_Result & evaluate(Local_Environment & eval_enc , ostream & file_buffer);
+        Code_For_Ast & compile();
+        Code_For_Ast & compile_and_optimize_ast(Lra_Outcome & lra);
+};
 
 class Boolean_Ast:public Ast
 {
