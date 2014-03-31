@@ -29,6 +29,7 @@
 %union 
 {
 	int integer_value;
+    float float_value;
 	std::string * string_value;
 	pair<Data_Type, string> * decl;
 	list<Ast *> * ast_list;
@@ -40,11 +41,13 @@
 	Procedure * procedure;
 	Goto_Ast * goto_ast;
     Conditional_Ast * cond_ast;
+    Data_Type dt;
 };
 
 %token <integer_value> INTEGER_NUMBER BBNUM
+%token <float_value> FLOAT_NUMBER
 %token <string_value> NAME
-%token RETURN INTEGER IF ELSE GOTO 
+%token RETURN INTEGER FLOAT DOUBLE IF ELSE GOTO 
 %token ASSIGN 
 %left NE EQ
 %left LT LE GT GE
@@ -65,6 +68,9 @@
 %type <ast> expression
 %type <ast> logical_expression
 %type <ast> atomic_expression
+%type <ast> arithmetic_expression
+%type <ast> type_expression
+%type <dt> type_specifier
 
 %start program
 
@@ -255,7 +261,7 @@ variable_declaration:
 ;
 
 declaration:
-	INTEGER NAME
+	type_specifier NAME
 	{
 	if (NOT_ONLY_PARSE)
 	{
@@ -454,7 +460,15 @@ assignment_statement:
 
 
 
-
+type_expression:
+    expression
+    {
+    if(NOT_ONLY_PARSE)
+    {
+        $$=$1;
+    }
+    }
+;
 
 
 
@@ -464,6 +478,22 @@ expression:
     if (NOT_ONLY_PARSE)
 	{
         $$=$1;
+    }
+    }
+    |
+    arithmetic_expression
+    {
+    if (NOT_ONLY_PARSE)
+    {
+        $$=$1;
+    }
+    } 
+    |
+    atomic_expression
+    {
+    if (NOT_ONLY_PARSE)
+	{
+         $$ = $1;
     }
     }
 ;
@@ -515,14 +545,6 @@ logical_expression:
     if (NOT_ONLY_PARSE)
 	{
         $$ = new Boolean_Ast($1,$3,Boolean_Ast::BooleanOp::LE);
-    }
-    }
-    |
-    atomic_expression
-    {
-    if (NOT_ONLY_PARSE)
-	{
-         $$ = $1;
     }
     }
 ;
@@ -621,4 +643,43 @@ constant:
 		$$ = num_ast;
 	}
 	}
+    |
+
+	FLOAT_NUMBER
+	{
+	if (NOT_ONLY_PARSE)
+	{
+		float num = $1;
+
+		Ast * num_ast = new Number_Ast<int>(num, float_data_type, get_line_number());
+
+		$$ = num_ast;
+	}
+	}
+;
+
+type_specifier:
+    INTEGER
+	{
+    if (NOT_ONLY_PARSE)
+	{
+        $$=Data_Type::int_data_type;
+    } 
+    }
+    |
+    FLOAT
+	{
+    if (NOT_ONLY_PARSE)
+    {
+        $$=Data_Type::float_data_type;
+    }
+    }
+    |
+    DOUBLE
+    {
+	if (NOT_ONLY_PARSE)
+    {
+        $$=Data_Type::double_data_type;
+    }
+    }
 ;
