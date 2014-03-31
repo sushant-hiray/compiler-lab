@@ -340,8 +340,27 @@ void Name_Ast::set_value_of_evaluation(Local_Environment & eval_env, Eval_Result
 		CHECK_INPUT_AND_ABORT(CONTROL_SHOULD_NOT_REACH, "Type of a name can be int/float only", lineno);
 
 	if (result.get_result_enum() == int_result)
-	 	i->set_value(result.get_int_value());
-	else
+    {
+        
+        i = new Eval_Result_Value_Int();
+        i->set_result_enum(int_result);
+        i->set_value(result.get_value());
+        //cout<<i->get_value().no<<endl;
+    }
+    else if (result.get_result_enum() == float_result)
+    {
+        i = new Eval_Result_Value_Float();
+        i->set_result_enum(float_result);
+        i->set_value(result.get_value());
+    }
+
+    else if (result.get_result_enum() == double_result)
+    {
+        i = new Eval_Result_Value_Double();
+        i->set_result_enum(double_result);
+        i->set_value(result.get_value());
+    }
+    else
 		CHECK_INPUT_AND_ABORT(CONTROL_SHOULD_NOT_REACH, "Type of a name can be int/float only", lineno);
 
 	if (eval_env.does_variable_exist(variable_name))
@@ -491,7 +510,10 @@ Eval_Result & Boolean_Ast:: evaluate(Local_Environment & eval_env, ostream & fil
 				}
 				break;
 		}
-		result.set_value(temp);
+        Result r1;
+        r1.no = 1;   //boolean EXP IS OF INT
+        r1.res = temp;
+        result.set_value(r1);
 		result.set_result_enum(int_result);
         return result;
 }
@@ -656,7 +678,140 @@ Code_For_Ast & Boolean_Ast::compile_and_optimize_ast(Lra_Outcome & lra)
 
 ///////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////
+Arithmetic_Ast::Arithmetic_Ast(Ast* _lhs, Ast* _rhs, ArithOp _op){
+    lhs_exp = _lhs;
+    rhs_exp = _rhs;
+    op = _op;
+}
 
+Arithmetic_Ast::~Arithmetic_Ast(){
+    delete(lhs_exp);
+    delete(rhs_exp);
+}
+
+
+
+Data_Type Arithmetic_Ast::get_data_type()
+{
+    return node_data_type;
+}
+
+
+void Arithmetic_Ast::print(ostream & file_buffer){
+
+    file_buffer << "\n"<<AST_NODE_SPACE <<"Arith: "<<arithOp[op]<<"\n";
+    file_buffer << COND_NODE_SPACE << "LHS (";
+    lhs_exp->print(file_buffer);
+    file_buffer << ")\n";
+    file_buffer  << COND_NODE_SPACE << "RHS (";
+    rhs_exp->print(file_buffer);
+    file_buffer << ")";
+}
+
+
+Eval_Result & Arithmetic_Ast::evaluate(Local_Environment & eval_env, ostream & file_buffer){
+       
+        Eval_Result & l_res = lhs_exp->evaluate(eval_env, file_buffer);
+        if (l_res.is_variable_defined() == false){
+            report_error("Variable should be defined to be on lhs of condition", NOLINE);
+        }
+        Eval_Result & r_res = rhs_exp->evaluate(eval_env, file_buffer);
+        if (r_res.is_variable_defined() == false){
+            report_error("Variable should be defined to be on rhs of condition", NOLINE);
+        }
+
+        Result r;
+        r.no = l_res.get_value().no;
+
+        switch (op) {
+            case MINUS :
+                r.res = l_res.get_value().res - r_res.get_value().res;
+                break;
+            case PLUS :
+                r.res = l_res.get_value().res + r_res.get_value().res;
+                break;
+            case DIVIDE :
+                if(r_res.get_value().res == 0){
+                    report_error("Divide by 0",NOLINE);
+                }
+                r.res = l_res.get_value().res / r_res.get_value().res;
+                // if(l_res.get_data_type()==float_data_type){
+                //  resullt.set_value(l_res.get_value() / (float)r_res.get_value());
+                // }
+                // else if(l_res.get_data_type()==double_data_type){
+                //  resullt.set_value(l_res.get_value() / (double)r_res.get_value());
+                // }
+                // else if(l_res.get_data_type()==itn_data_type){
+                //  resullt.set_value(l_res.get_value() / r_res.get_value());
+                // }
+                break;
+            case MULTIPLY :
+                r.res = l_res.get_value().res * r_res.get_value().res;
+                break;
+        }
+        
+        if(l_res.get_result_enum() == int_result){
+            Eval_Result& result = *new Eval_Result_Value_Int();
+            result.set_value(r);
+            result.set_result_enum(l_res.get_result_enum());
+            return result;
+        }
+        else if(l_res.get_result_enum() == double_result){
+            Eval_Result& result = *new Eval_Result_Value_Double();
+            result.set_value(r);
+            result.set_result_enum(l_res.get_result_enum());
+            return result;
+        }
+        else if(l_res.get_result_enum() == float_result){
+            Eval_Result& result = *new Eval_Result_Value_Float();
+            result.set_value(r);
+            result.set_result_enum(l_res.get_result_enum());
+            return result;
+        }
+        
+}
+
+
+
+Code_For_Ast & Arithmetic_Ast::compile(){
+	CHECK_INVARIANT((lhs_exp != NULL), "Lhs cannot be null");
+	CHECK_INVARIANT((rhs_exp != NULL), "Rhs cannot be null");
+
+	Code_For_Ast & lhs_stmt = lhs_exp->compile();
+	Register_Descriptor * lhs_register = lhs_stmt.get_reg();
+	lhs_register->set_used_for_expr_result(true);
+	
+	Code_For_Ast & rhs_stmt = rhs_exp->compile();
+	Register_Descriptor * rhs_register = rhs_stmt.get_reg();
+	rhs_register->set_used_for_expr_result(true);
+    
+    return lhs_stmt;
+}
+
+
+
+Code_For_Ast & Arithmetic_Ast::compile_and_optimize_ast(Lra_Outcome & lra){
+	CHECK_INVARIANT((lhs_exp != NULL), "Lhs cannot be null");
+	CHECK_INVARIANT((rhs_exp != NULL), "Rhs cannot be null");
+
+	Code_For_Ast & lhs_stmt = lhs_exp->compile();
+	Register_Descriptor * lhs_register = lhs_stmt.get_reg();
+	lhs_register->set_used_for_expr_result(true);
+	
+	Code_For_Ast & rhs_stmt = rhs_exp->compile();
+	Register_Descriptor * rhs_register = rhs_stmt.get_reg();
+	rhs_register->set_used_for_expr_result(true);
+
+    return lhs_stmt;
+}
+
+
+
+
+
+
+///////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////
 Conditional_Ast::Conditional_Ast(Ast* _condition, Goto_Ast*  trueGoto, Goto_Ast* falseGoto){
 	condition = _condition;
 	true_goto = trueGoto;
@@ -689,14 +844,20 @@ Eval_Result & Conditional_Ast:: evaluate(Local_Environment & eval_env, ostream &
 		if(cond_result.get_int_value()==1){
             file_buffer <<AST_SPACE<< "Condition True : Goto (BB " << true_goto->getBlockNo()<<")\n";
             Eval_Result & result = *new Eval_Result_Value_Goto();
-            result.set_value(true_goto->getBlockNo());
+            Result r;
+            r.no=4;
+            r.res = true_goto->getBlockNo();
+            result.set_value(r);
 			return result;
 		}
         else{
 
             file_buffer <<AST_SPACE<< "Condition False : Goto (BB " << false_goto->getBlockNo()<<")\n";
             Eval_Result & result = *new Eval_Result_Value_Goto();
-            result.set_value(false_goto->getBlockNo());
+            Result r;
+            r.no=4;
+            r.res = false_goto->getBlockNo();
+            result.set_value(r);
 			return result;
         }
 }
@@ -803,7 +964,11 @@ Eval_Result & Goto_Ast::evaluate(Local_Environment & eval_env, ostream & file_bu
         file_buffer<<"\n"<<AST_SPACE<< "Goto statement:\n"<<AST_NODE_SPACE <<"Successor: "<< block_no;
         file_buffer<< "\n" <<AST_SPACE<< "GOTO (BB "<< block_no <<")\n";
 		Eval_Result & result = *new Eval_Result_Value_Goto();
-		result.set_value(block_no);
+		
+        Result r;
+        r.no=4;
+        r.res = block_no;
+        result.set_value(r); 
         return result;
 }
 
@@ -878,13 +1043,32 @@ void Number_Ast<DATA_TYPE>::print(ostream & file_buffer)
 template <class DATA_TYPE>
 Eval_Result & Number_Ast<DATA_TYPE>::evaluate(Local_Environment & eval_env, ostream & file_buffer)
 {
-	if (node_data_type == int_data_type)
-	{
-		Eval_Result & result = *new Eval_Result_Value_Int();
-		result.set_value(constant);
-
-		return result;
-	}
+    Result r;
+    r.res = constant;
+    if (node_data_type == int_data_type)
+    {
+        Eval_Result & result = *new Eval_Result_Value_Int();
+        r.no=1;
+        result.set_value(r);
+        result.set_result_enum(int_result);
+        return result;
+    }
+    else if (node_data_type == float_data_type)
+    {
+        Eval_Result & result = *new Eval_Result_Value_Float();
+        r.no=2;
+        result.set_value(r);
+        result.set_result_enum(float_result);
+        return result;
+    }
+    else if (node_data_type == double_data_type)
+    {
+        Eval_Result & result = *new Eval_Result_Value_Double();
+        r.no=3;
+        result.set_value(r);
+        result.set_result_enum(double_result);
+        return result;
+    }
 }
 
 template <class DATA_TYPE>

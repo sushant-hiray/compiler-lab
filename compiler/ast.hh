@@ -39,6 +39,8 @@ using namespace std;
 
 class Ast;
 static const char* opNames[] = {"EQ","NE","GT","LT","GE","LE" };  
+static const char* arithOp[] = {"MINUS","PLUS","MULT","DIV"};  
+
 class Ast
 {
 protected:
@@ -155,6 +157,33 @@ class Boolean_Ast:public Ast
 
 
 
+
+
+
+class Arithmetic_Ast:public Ast
+{
+    public:
+        enum ArithOp{
+            MINUS,
+            PLUS,
+            MULTIPLY,
+            DIVIDE
+        };
+
+    private:
+        Ast* lhs_exp;
+        Ast* rhs_exp;
+        ArithOp op;
+
+    public:
+        Arithmetic_Ast(Ast* lhs_exp , Ast* rhs_exp , ArithOp op);
+        ~Arithmetic_Ast();
+        Data_Type get_data_type();
+        void print(ostream & file_buffer);
+        Eval_Result & evaluate(Local_Environment & eval_enc , ostream & file_buffer);
+        Code_For_Ast & compile();
+		Code_For_Ast & compile_and_optimize_ast(Lra_Outcome & lra);
+};
 
 
 

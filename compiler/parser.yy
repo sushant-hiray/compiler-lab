@@ -549,6 +549,48 @@ logical_expression:
     }
 ;
 
+
+arithmetic_expression:
+    type_expression '-' type_expression
+    {
+    if (NOT_ONLY_PARSE)
+	{
+        $$ = new Arithmetic_Ast($1,$3,Arithmetic_Ast::ArithOp::MINUS);
+        int line = get_line_number();
+    }
+    }
+    |
+    type_expression '+' type_expression
+    {
+    if (NOT_ONLY_PARSE)
+	{
+        $$ = new Arithmetic_Ast($1,$3,Arithmetic_Ast::ArithOp::PLUS);
+        int line = get_line_number();
+    }
+    }
+    |
+    type_expression '/' type_expression
+    {
+    if (NOT_ONLY_PARSE)
+	{
+        $$ = new Arithmetic_Ast($1,$3,Arithmetic_Ast::ArithOp::DIVIDE);
+        int line = get_line_number();
+    }
+    }
+    |
+    type_expression '*' type_expression
+    {
+    if (NOT_ONLY_PARSE)
+	{
+        $$ = new Arithmetic_Ast($1,$3,Arithmetic_Ast::ArithOp::MULTIPLY);
+        int line = get_line_number();
+    }
+    }
+
+;
+
+
+
 atomic_expression:
     variable
     {
