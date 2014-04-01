@@ -11,7 +11,7 @@ for f in files:
         correct_files.append(f)
 
 
-which="ast"
+which="compile"
 cfgFiles=[]
 for f in correct_files:
     command = "make -f Makefile.cfg FILE=" + f+ " >/dev/null";
@@ -25,9 +25,9 @@ print("Done generating cfg files\n");
 
 for f in cfgFiles:
     print("Testing file  " + f ); 
-    command = "./cfg-test -tokens -d " + f + " > expected "
+    command = "./cfg-test -icode -d " + f + " > expected "
     os.system(command) 
-    command = "./cfglp -tokens -d "  + f + " > generated  "
+    command = "./cfglp -icode -d "  + f + " > generated  "
     os.system(command)
     os.system("diff expected generated");
 
@@ -39,8 +39,8 @@ for f in files:
 
 for f in error_files:
     print("Testing file  " + f ); 
-    command = "./cfg-test -tokens -d  " + f + " > expected " 
+    command = "./cfg-test -icode -d  " + f + " > expected " 
     os.system(command) 
-    command = "./cfglp -tokens -d  " + f + " > generated " 
+    command = "./cfglp -icode -d  " + f + " > generated " 
     os.system(command)
-    #os.system("diff -b expected generated");
+    os.system("diff expected generated");

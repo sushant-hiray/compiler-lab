@@ -264,7 +264,7 @@ void Move_IC_Stmt::print_icode(ostream & file_buffer)
 	switch (ic_format)
 	{
 	case i_r_op_o1: 
-			file_buffer << "\t" << operation_name << ":\t";
+			file_buffer << "\t" << operation_name << ":    \t";
 			result->print_ics_opd(file_buffer);
 			file_buffer << " <- ";
 			opd1->print_ics_opd(file_buffer);
@@ -350,7 +350,7 @@ void Compute_IC_Stmt::print_icode(ostream & file_buffer){
 	switch (ic_format){
 		case i_r_o1_op_o2:
 			CHECK_INVARIANT (opd2, "Opd2 cannot be NULL for a compare IC Stmt");
-			file_buffer << " " << operation_name << ": ";
+			file_buffer << "\t" << operation_name << ":    \t";
 			result->print_ics_opd(file_buffer);
 			file_buffer << " <- ";
 			opd1->print_ics_opd(file_buffer);
@@ -360,7 +360,7 @@ void Compute_IC_Stmt::print_icode(ostream & file_buffer){
 			break; 
 
 		case i_r_op_o1:
-			file_buffer << " " << operation_name << ": ";
+			file_buffer << "\t" << operation_name << ":    \t";
 			result->print_ics_opd(file_buffer);
 			file_buffer << " <- ";
 			opd1->print_ics_opd(file_buffer);
@@ -449,7 +449,7 @@ void Branch_IC_Stmt::print_icode(ostream & file_buffer)
 			CHECK_INVARIANT (opd2, "Opd2 cannot be NULL for a Branch IC Stmt");
 			CHECK_INVARIANT (opd3, "Opd3 cannot be NULL for a Branch IC Stmt");
 
-			file_buffer << " " << operation_name << ": ";
+			file_buffer << "\t" << operation_name << ":    \t";
 			opd1->print_ics_opd(file_buffer);
 			file_buffer << " , ";
 			opd2->print_ics_opd(file_buffer);
@@ -461,7 +461,7 @@ void Branch_IC_Stmt::print_icode(ostream & file_buffer)
 		case i_op_o1:
 			CHECK_INVARIANT (opd1, "Opd1 cannot be NULL for a Branch IC Stmt");
 
-			file_buffer << " " << operation_name << " ";
+			file_buffer << "\t" << operation_name << " ";
 			opd1->print_ics_opd(file_buffer);
 			file_buffer << "\n";
 			break;

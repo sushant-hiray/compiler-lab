@@ -155,10 +155,53 @@ Code_For_Ast & Type_Expression_Ast::compile(){
 	CHECK_INVARIANT((type_exp != NULL), "Type cannot be null");
 
 	Code_For_Ast & type_stmt = type_exp->compile();
+	if(node_data_type == type_exp->get_data_type()){
+		return type_stmt;
+	}
+	else if((type_exp->get_data_type()==float_data_type || type_exp->get_data_type()==double_data_type)
+			&&((node_data_type==float_data_type || node_data_type==double_data_type))){
+		return type_stmt;
+	}
 	Register_Descriptor * type_register = type_stmt.get_reg();
 	type_register->set_used_for_expr_result(true);
 	
-    return type_stmt;
+
+    Register_Val_Type type = (node_data_type == int_data_type)?
+    						Register_Val_Type::int_num:Register_Val_Type::double_num;
+    
+    Register_Descriptor * result_register = machine_dscr_object.get_new_register(type);
+    result_register->set_used_for_expr_result(true);
+
+    Ics_Opd* type_opd = new Register_Addr_Opd(type_register);
+    Ics_Opd* res_opd = new Register_Addr_Opd(result_register);
+
+
+    Icode_Stmt* type_stmts;
+
+	if(type==int_num){
+		type_stmts = new Compute_IC_Stmt(mfc1,type_opd,NULL,res_opd);
+	}
+	else{
+		type_stmts = new Compute_IC_Stmt(mtc1,type_opd,NULL,res_opd);
+	}
+
+
+    list<Icode_Stmt *> ic_list;
+	
+	if (type_stmt.get_icode_list().empty() == false)
+		ic_list = type_stmt.get_icode_list();
+
+		ic_list.push_back(type_stmts);
+
+	Code_For_Ast * u_stmts;
+	
+	if (ic_list.empty() == false)
+		u_stmts = new Code_For_Ast(ic_list, result_register);
+
+	type_register->reset_use_for_expr_result();
+	Code_For_Ast & comp_code = *new Code_For_Ast(ic_list, result_register);
+	return comp_code;
+
 }
 
 
@@ -269,7 +312,7 @@ Code_For_Ast & Unary_Ast::compile(){
 		unary_stmts = new Compute_IC_Stmt(neg,unary_opd,NULL,res_opd);
 	}
 	else{
-		unary_stmts = new Compute_IC_Stmt(neg,unary_opd,NULL,res_opd);
+		unary_stmts = new Compute_IC_Stmt(fneg,unary_opd,NULL,res_opd);
 	}
 
 
@@ -344,6 +387,11 @@ bool Assignment_Ast::check_ast()
 
 	if (lhs->get_data_type() == rhs->get_data_type())
 	{
+		node_data_type = lhs->get_data_type();
+		return true;
+	}
+	else if((lhs->get_data_type()==float_data_type || lhs->get_data_type()==double_data_type)
+			&&((rhs->get_data_type()==float_data_type || rhs->get_data_type()==double_data_type))){
 		node_data_type = lhs->get_data_type();
 		return true;
 	}
@@ -715,6 +763,10 @@ bool Boolean_Ast::check_ast()
 	{
 		return true;
 	}
+	else if((lhs_exp->get_data_type()==float_data_type || lhs_exp->get_data_type()==double_data_type)
+			&&((rhs_exp->get_data_type()==float_data_type || rhs_exp->get_data_type()==double_data_type))){
+		return true;
+	}
 
 	CHECK_INVARIANT(CONTROL_SHOULD_NOT_REACH, 
 		"Relational Expression data type not compatible");
@@ -865,7 +917,6 @@ Code_For_Ast & Boolean_Ast::compile_and_optimize_ast(Lra_Outcome & lra)
 	lhs_register->set_used_for_expr_result(true);
 	
 	if(typeid(*rhs_exp) != typeid(Boolean_Ast)){
-		//rhs_exp->print(cout);
 		lra_rhs->optimize_lra(mc_2r,NULL,rhs_exp);
 	}
 
@@ -965,6 +1016,13 @@ bool Arithmetic_Ast::check_ast()
 	{
 		node_data_type = lhs_exp->get_data_type();
 		return true;
+	}
+	else{
+		if((lhs_exp->get_data_type()==float_data_type || lhs_exp->get_data_type()==double_data_type)
+			&&((rhs_exp->get_data_type()==float_data_type || rhs_exp->get_data_type()==double_data_type))){
+			node_data_type = double_data_type;
+			return true;
+		}
 	}
 
 	CHECK_INVARIANT(CONTROL_SHOULD_NOT_REACH, 

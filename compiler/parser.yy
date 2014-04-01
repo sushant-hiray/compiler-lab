@@ -70,7 +70,6 @@
 %type <ast> unary_expression
 %type <ast> atomic_expression
 %type <ast> arithmetic_expression
-%type <ast> type_expression
 %type <dt> type_specifier
 
 %start program
@@ -440,7 +439,7 @@ assignment_statement_list:
 ;
 
 assignment_statement:
-	variable ASSIGN type_expression ';'
+	variable ASSIGN expression ';'
 	{
 	if (NOT_ONLY_PARSE)
 	{
@@ -457,21 +456,6 @@ assignment_statement:
 	}
 	}
 ;
-
-
-
-
-type_expression:
-    expression
-    {
-    if(NOT_ONLY_PARSE)
-    {
-        $$=new Type_Expression_Ast($1);
-    }
-    }
-;
-
-
 
 expression:
     logical_expression
@@ -501,7 +485,7 @@ expression:
 
 
 logical_expression:
-    type_expression EQ type_expression
+    expression EQ expression
     {
     if (NOT_ONLY_PARSE)
 	{
@@ -510,7 +494,7 @@ logical_expression:
     }
     }
     |
-    type_expression NE type_expression
+    expression NE expression
     {
     if (NOT_ONLY_PARSE)
 	{
@@ -519,7 +503,7 @@ logical_expression:
     }
     }
     |
-    type_expression GT type_expression
+    expression GT expression
     {
     if (NOT_ONLY_PARSE)
 	{
@@ -528,7 +512,7 @@ logical_expression:
     }
     }
     |
-    type_expression GE type_expression
+    expression GE expression
     {
     if (NOT_ONLY_PARSE)
 	{
@@ -537,7 +521,7 @@ logical_expression:
     }
     }
     |
-    type_expression LT type_expression
+    expression LT expression
     {
     if (NOT_ONLY_PARSE)
 	{
@@ -546,7 +530,7 @@ logical_expression:
     }
     }
     |
-    type_expression LE type_expression
+    expression LE expression
     {
     if (NOT_ONLY_PARSE)
 	{
@@ -558,7 +542,7 @@ logical_expression:
 
 
 arithmetic_expression:
-    type_expression '-' type_expression
+    expression '-' expression
     {
     if (NOT_ONLY_PARSE)
 	{
@@ -567,7 +551,7 @@ arithmetic_expression:
     }
     }
     |
-    type_expression '+' type_expression
+    expression '+' expression
     {
     if (NOT_ONLY_PARSE)
 	{
@@ -576,7 +560,7 @@ arithmetic_expression:
     }
     }
     |
-    type_expression '/' type_expression
+    expression '/' expression
     {
     if (NOT_ONLY_PARSE)
 	{
@@ -585,7 +569,7 @@ arithmetic_expression:
     }
     }
     |
-    type_expression '*' type_expression
+    expression '*' expression
     {
     if (NOT_ONLY_PARSE)
 	{
@@ -615,7 +599,7 @@ atomic_expression:
     }
     }
     |
-    '(' type_expression ')'
+    '(' expression ')'
     {
     if (NOT_ONLY_PARSE)
 	{
@@ -675,12 +659,6 @@ goto_statement:
     }
 
 ;
-
-
-
-
-
-
 
 variable:
 	NAME

@@ -357,6 +357,8 @@ void Machine_Description::initialize_instruction_table()
 	spim_instruction_table[fimm_load] = new Instruction_Descriptor(fimm_load, "iLoad.d", "li.d", "", i_r_op_o1, a_op_r_o1);
 	spim_instruction_table[neg] = new Instruction_Descriptor(neg, "uminus", "neg", "", i_r_op_o1, a_op_r_o1);
 	spim_instruction_table[fneg] = new Instruction_Descriptor(fneg, "uminus.d", "neg.d", "", i_r_op_o1, a_op_r_o1);
+	spim_instruction_table[mtc1] = new Instruction_Descriptor(mtc1, "mtc1", "mtc1", "", i_r_op_o1, a_op_r_o1);
+	spim_instruction_table[mfc1] = new Instruction_Descriptor(mfc1, "mfc1", "mfc1", "", i_r_op_o1, a_op_r_o1);
 }
 
 void Machine_Description::validate_init_local_register_mapping()
