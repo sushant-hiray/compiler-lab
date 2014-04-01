@@ -100,7 +100,9 @@ typedef enum
 	fadd,
 	fsub,
 	fdiv,
-	fmul
+	fmul,
+	neg,
+	fneg
 } Tgt_Op;
 
 ///////////////////////// Instruction Descriptor ///////////////////////////////////

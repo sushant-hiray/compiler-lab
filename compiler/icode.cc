@@ -341,24 +341,29 @@ Compute_IC_Stmt& Compute_IC_Stmt::operator=(const Compute_IC_Stmt& rhs)
 	return *this;
 }
 
-void Compute_IC_Stmt::print_icode(ostream & file_buffer)
-{
-	CHECK_INVARIANT (opd1, "Opd1 cannot be NULL for a compare IC Stmt");
-	CHECK_INVARIANT (opd2, "Opd2 cannot be NULL for a compare IC Stmt");
-	CHECK_INVARIANT (result, "Result cannot be NULL for a compare IC Stmt");
-
+void Compute_IC_Stmt::print_icode(ostream & file_buffer){
 	string operation_name = op_desc.get_name();
-
+	CHECK_INVARIANT (opd1, "Opd1 cannot be NULL for a compare IC Stmt");
+	CHECK_INVARIANT (result, "Result cannot be NULL for a compare IC Stmt");
 	Icode_Format ic_format = op_desc.get_ic_format();
 
 	switch (ic_format){
 		case i_r_o1_op_o2:
+			CHECK_INVARIANT (opd2, "Opd2 cannot be NULL for a compare IC Stmt");
 			file_buffer << " " << operation_name << ": ";
 			result->print_ics_opd(file_buffer);
 			file_buffer << " <- ";
 			opd1->print_ics_opd(file_buffer);
 			file_buffer << " , ";
 			opd2->print_ics_opd(file_buffer);
+			file_buffer << "\n";
+			break; 
+
+		case i_r_op_o1:
+			file_buffer << " " << operation_name << ": ";
+			result->print_ics_opd(file_buffer);
+			file_buffer << " <- ";
+			opd1->print_ics_opd(file_buffer);
 			file_buffer << "\n";
 			break; 
 
@@ -370,21 +375,29 @@ void Compute_IC_Stmt::print_icode(ostream & file_buffer)
 
 void Compute_IC_Stmt::print_assembly(ostream & file_buffer)
 {
-	CHECK_INVARIANT (opd1, "Opd1 cannot be NULL for a move IC Stmt");
-	CHECK_INVARIANT (opd2, "Opd2 cannot be NULL for a move IC Stmt");
-	CHECK_INVARIANT (result, "Result cannot be NULL for a move IC Stmt");
+	CHECK_INVARIANT (opd1, "Opd1 cannot be NULL for a Compute_IC_Stmt");
+	CHECK_INVARIANT (result, "Result cannot be NULL for a Compute_IC_Stmt");
 	string op_name = op_desc.get_mnemonic();
 
 	Assembly_Format assem_format = op_desc.get_assembly_format();
 	switch (assem_format){ 
 
 		case a_op_r_o1_o2:
+			CHECK_INVARIANT (opd2, "Opd2 cannot be NULL for a Compute_IC_Stmt");
 			file_buffer << "\t" << op_name << " ";
 			result->print_asm_opd(file_buffer);
 			file_buffer << ", ";
 			opd1->print_asm_opd(file_buffer);
 			file_buffer << ", ";
 			opd2->print_asm_opd(file_buffer);
+			file_buffer << "\n";
+			break;
+
+		case a_op_r_o1:
+			file_buffer << "\t" << op_name << " ";
+			result->print_asm_opd(file_buffer);
+			file_buffer << ", ";
+			opd1->print_asm_opd(file_buffer);
 			file_buffer << "\n";
 			break;
 
