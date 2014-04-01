@@ -183,6 +183,10 @@ void Lra_Outcome::optimize_lra(Lra_Scenario lcase, Ast * destination_memory, Ast
 
 		if (typeid(*source_memory) == typeid(Number_Ast<int>))
 			source_register = NULL;
+
+		else if (typeid(*source_memory) == typeid(Number_Ast<float>))
+			source_register = NULL;
+
 		else
 		{
 			//cout<<"23"<<endl;
@@ -197,19 +201,11 @@ void Lra_Outcome::optimize_lra(Lra_Scenario lcase, Ast * destination_memory, Ast
 			is_same_as_source = true;
 			load_needed = false;
 		}
-		else if (destination_register != NULL)
+		else if ((destination_register != NULL) && !(destination_register->get_lra_symbol_list_size()>1) )
 		{
-			if(destination_register->get_lra_symbol_list_size()>1){
-				// cout<<"hell yeah!\n";
-				result_register = machine_dscr_object.get_new_register(type);
-				is_a_new_register = true;
-				load_needed = true;
-			}
-			else{
-				result_register = destination_register;
-				is_same_as_destination = true;
-				load_needed = true;
-			}
+			result_register = destination_register;
+			is_same_as_destination = true;
+			load_needed = true;
 		}
 		else 
 		{
@@ -235,6 +231,10 @@ void Lra_Outcome::optimize_lra(Lra_Scenario lcase, Ast * destination_memory, Ast
 
 		if (typeid(*source_memory) == typeid(Number_Ast<int>))
 			source_register = NULL;
+
+		else if (typeid(*source_memory) == typeid(Number_Ast<float>))
+			source_register = NULL;
+
 		else
 		{
 			//cout<<"56"<<endl;

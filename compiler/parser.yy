@@ -479,6 +479,8 @@ expression:
     if (NOT_ONLY_PARSE)
 	{
          $$ = $1;
+         // cout<<"5\n";
+         // F<<(typeid(*$1)==typeid(Number_Ast<float>))<<endl;
     }
     }
 ;
@@ -596,6 +598,7 @@ atomic_expression:
     if (NOT_ONLY_PARSE)
 	{
          $$ = $1;
+         // cout<<"3\n";
     }
     }
     |
@@ -633,6 +636,7 @@ unary_expression:
     if (NOT_ONLY_PARSE)
 	{
         $$ = $1;
+        // cout<<"4\n";
     }
     }
 ;
@@ -670,19 +674,26 @@ variable:
 		CHECK_INVARIANT(($1 != NULL), "Variable name cannot be null");
 
 		string var_name = *$1;
+		// cout<<"variable: "<<var_name<<endl;
+		// cout<<current_procedure->get_proc_name()<<endl;
+		if (current_procedure->variable_in_symbol_list_check(var_name) == true){
+			// cout<<"hi111\n";
+			var_table_entry = &(current_procedure->get_symbol_table_entry(var_name));
+		}
 
-		if (current_procedure->variable_in_symbol_list_check(var_name) == true)
-			 var_table_entry = &(current_procedure->get_symbol_table_entry(var_name));
-
-		else if (program_object.variable_in_symbol_list_check(var_name) == true)
+		else if (program_object.variable_in_symbol_list_check(var_name) == true){
 			var_table_entry = &(program_object.get_symbol_table_entry(var_name));
-
-		else
+			// cout<<"hi1vdew11\n";
+		}
+			
+		else{
 			CHECK_INVARIANT(CONTROL_SHOULD_NOT_REACH, "Variable has not been declared");
+		}
 
 		Ast * name_ast = new Name_Ast(var_name, *var_table_entry, get_line_number());
 
 		$$ = name_ast;
+		// cout<<"variable1: "<<var_name<<endl;
 	}
 	}
 ;
@@ -705,8 +716,9 @@ constant:
 	{
 	if (NOT_ONLY_PARSE)
 	{
+		// cout<<"2\n";
 		float num = $1;
-
+		// cout<<"dfnfkwnfknreknferrevgregvtr\n";
 		Ast * num_ast = new Number_Ast<float>(num, float_data_type, get_line_number());
 
 		$$ = num_ast;

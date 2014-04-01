@@ -39,6 +39,10 @@ using namespace std;
 #include"procedure.hh"
 #include"program.hh"
 
+
+#define mycheck(X) ((typeid(X)==typeid(Name_Ast))||(typeid(X)==typeid(Number_Ast<int>))||(typeid(X)==typeid(Number_Ast<float>)))
+
+
 Ast::Ast()
 {}
 
@@ -165,7 +169,6 @@ Code_For_Ast & Type_Expression_Ast::compile(){
 	Register_Descriptor * type_register = type_stmt.get_reg();
 	type_register->set_used_for_expr_result(true);
 	
-
     Register_Val_Type type = (node_data_type == int_data_type)?
     						Register_Val_Type::int_num:Register_Val_Type::double_num;
     
@@ -191,7 +194,7 @@ Code_For_Ast & Type_Expression_Ast::compile(){
 	if (type_stmt.get_icode_list().empty() == false)
 		ic_list = type_stmt.get_icode_list();
 
-		ic_list.push_back(type_stmts);
+	ic_list.push_back(type_stmts);
 
 	Code_For_Ast * u_stmts;
 	
@@ -204,16 +207,63 @@ Code_For_Ast & Type_Expression_Ast::compile(){
 
 }
 
-
+/*
+ * 1)compile and optimize the expression.
+ * 2)if node_data_type and type_exp->get_data_type are compatible then return the statement in step 1).
+ * 3)else: add the typecast instruction and set free the is_used_for_exp field of register to false.
+ */
 
 Code_For_Ast & Type_Expression_Ast::compile_and_optimize_ast(Lra_Outcome & lra){
 	CHECK_INVARIANT((type_exp != NULL), "Type cannot be null");
+	if mycheck(*type_exp){
+		lra.optimize_lra(mc_2r, NULL, type_exp);
+	}
+	Code_For_Ast & type_stmt = type_exp->compile_and_optimize_ast(lra);
+	if(node_data_type == type_exp->get_data_type()){
+		return type_stmt;
+	}
+	else if((type_exp->get_data_type()==float_data_type || type_exp->get_data_type()==double_data_type)
+			&&((node_data_type==float_data_type || node_data_type==double_data_type))){
+		return type_stmt;
+	}
 
-	Code_For_Ast & type_stmt = type_exp->compile();
+	Register_Val_Type type = (node_data_type == int_data_type)?
+    						Register_Val_Type::int_num:Register_Val_Type::double_num;
+
 	Register_Descriptor * type_register = type_stmt.get_reg();
 	type_register->set_used_for_expr_result(true);
+
+	Register_Descriptor * result_register = machine_dscr_object.get_new_register(type);
+    result_register->set_used_for_expr_result(true);
+
+    Ics_Opd* type_opd = new Register_Addr_Opd(type_register);
+    Ics_Opd* res_opd = new Register_Addr_Opd(result_register);
 	
-    return type_stmt;
+
+    Icode_Stmt* type_stmts;
+	if(type==int_num){
+		type_stmts = new Compute_IC_Stmt(mfc1,type_opd,NULL,res_opd);
+	}
+	else{
+		type_stmts = new Compute_IC_Stmt(mtc1,type_opd,NULL,res_opd);
+	}
+	list<Icode_Stmt *> ic_list;
+	
+	if (type_stmt.get_icode_list().empty() == false){
+		ic_list = type_stmt.get_icode_list();
+	}
+		
+	ic_list.push_back(type_stmts);
+	Code_For_Ast * u_stmts;
+	
+	if (ic_list.empty() == false)
+		u_stmts = new Code_For_Ast(ic_list, result_register);
+
+	type_register->reset_use_for_expr_result();
+	
+	Code_For_Ast & comp_code = *new Code_For_Ast(ic_list, result_register);
+
+    return comp_code;
 }
 
 
@@ -333,13 +383,6 @@ Code_For_Ast & Unary_Ast::compile(){
 	unary_register->reset_use_for_expr_result();
 	Code_For_Ast & comp_code = *new Code_For_Ast(ic_list, result_register);
 	return comp_code;
-
-
-
-
-
-
-
 }
 
 
@@ -347,11 +390,53 @@ Code_For_Ast & Unary_Ast::compile(){
 Code_For_Ast & Unary_Ast::compile_and_optimize_ast(Lra_Outcome & lra){
 	CHECK_INVARIANT((atomic_exp != NULL), "Type cannot be null");
 
-	Code_For_Ast & unary_stmt = atomic_exp->compile();
+	if mycheck(*atomic_exp){
+		lra.optimize_lra(mc_2r, NULL, atomic_exp);
+	}
+
+	Code_For_Ast & unary_stmt = atomic_exp->compile_and_optimize_ast(lra);
+	if(!minus){
+		return unary_stmt;
+	}
+	
 	Register_Descriptor * unary_register = unary_stmt.get_reg();
 	unary_register->set_used_for_expr_result(true);
+    
+    Register_Val_Type type = (node_data_type == int_data_type)?
+    						Register_Val_Type::int_num:Register_Val_Type::double_num;
+    
+    Register_Descriptor * result_register = machine_dscr_object.get_new_register(type);
+    result_register->set_used_for_expr_result(true);
+
+    Ics_Opd* unary_opd = new Register_Addr_Opd(unary_register);
+    Ics_Opd* res_opd = new Register_Addr_Opd(result_register);
+
+
+    Icode_Stmt* unary_stmts;
+
+	if(type==int_num){
+		unary_stmts = new Compute_IC_Stmt(neg,unary_opd,NULL,res_opd);
+	}
+	else{
+		unary_stmts = new Compute_IC_Stmt(fneg,unary_opd,NULL,res_opd);
+	}
+
+
+    list<Icode_Stmt *> ic_list;
 	
-    return unary_stmt;
+	if (unary_stmt.get_icode_list().empty() == false)
+		ic_list = unary_stmt.get_icode_list();
+
+	ic_list.push_back(unary_stmts);
+
+	Code_For_Ast * u_stmts;
+	
+	if (ic_list.empty() == false)
+		u_stmts = new Code_For_Ast(ic_list, result_register);
+
+	unary_register->reset_use_for_expr_result();
+	Code_For_Ast & comp_code = *new Code_For_Ast(ic_list, result_register);
+	return comp_code;
 }
 
 /////////////////////////////////////////////////////////////////////////
@@ -477,11 +562,10 @@ Code_For_Ast & Assignment_Ast::compile()
 
 Code_For_Ast & Assignment_Ast::compile_and_optimize_ast(Lra_Outcome & lra)
 {
-	//cout<<"Assign"<<endl;
 	CHECK_INVARIANT((lhs != NULL), "Lhs cannot be null");
 	CHECK_INVARIANT((rhs != NULL), "Rhs cannot be null");
-
-	if(typeid(*rhs)!=typeid(Boolean_Ast)){
+	
+	if mycheck(*rhs){
 		lra.optimize_lra(mc_2m, lhs, rhs);
 	}
 
@@ -490,7 +574,7 @@ Code_For_Ast & Assignment_Ast::compile_and_optimize_ast(Lra_Outcome & lra)
 	Code_For_Ast store_stmt = lhs->create_store_stmt(result_register);
 
 	// lra.optimize_lra(mc_2m, lhs, rhs);
-	if(typeid(*rhs)==typeid(Boolean_Ast)){
+	if(!mycheck(*rhs)){
 
 		Symbol_Table_Entry* destination_symbol_entry = &(lhs->get_symbol_entry());
 		Register_Descriptor* destination_register = destination_symbol_entry->get_register(); 
@@ -712,9 +796,17 @@ Code_For_Ast & Name_Ast::compile_and_optimize_ast(Lra_Outcome & lra)
 	Icode_Stmt * load_stmt = NULL;
 	if (load_needed)
 	{
+		Register_Val_Type type = (node_data_type == int_data_type)?
+							Register_Val_Type::int_num:Register_Val_Type::double_num;
+							
 		Ics_Opd * opd = new Mem_Addr_Opd(*variable_symbol_entry);
 
-		load_stmt = new Move_IC_Stmt(load, opd, register_opd);
+		if(type == int_num){
+			load_stmt = new Move_IC_Stmt(load, opd, register_opd);
+		}
+		else{
+			load_stmt = new Move_IC_Stmt(fload, opd, register_opd);
+		}
 			
 		ic_list.push_back(load_stmt);
 	}
@@ -906,8 +998,7 @@ Code_For_Ast & Boolean_Ast::compile_and_optimize_ast(Lra_Outcome & lra)
 	Lra_Outcome* lra_lhs = new Lra_Outcome();
 	Lra_Outcome* lra_rhs = new Lra_Outcome();
 
-	if(typeid(*lhs_exp) != typeid(Boolean_Ast)){
-		//lhs_exp->print(cout);
+	if(mycheck(*lhs_exp)){
 		lra_lhs->optimize_lra(mc_2r,NULL,lhs_exp);
 	}
 
@@ -916,7 +1007,7 @@ Code_For_Ast & Boolean_Ast::compile_and_optimize_ast(Lra_Outcome & lra)
 	Register_Descriptor * lhs_register = lhs_stmt.get_reg();
 	lhs_register->set_used_for_expr_result(true);
 	
-	if(typeid(*rhs_exp) != typeid(Boolean_Ast)){
+	if mycheck(*rhs_exp){
 		lra_rhs->optimize_lra(mc_2r,NULL,rhs_exp);
 	}
 
@@ -1187,15 +1278,98 @@ Code_For_Ast & Arithmetic_Ast::compile_and_optimize_ast(Lra_Outcome & lra){
 	CHECK_INVARIANT((lhs_exp != NULL), "Lhs cannot be null");
 	CHECK_INVARIANT((rhs_exp != NULL), "Rhs cannot be null");
 
-	Code_For_Ast & lhs_stmt = lhs_exp->compile();
+	Lra_Outcome* lra_lhs = new Lra_Outcome();
+	Lra_Outcome* lra_rhs = new Lra_Outcome();
+
+	if(mycheck(*lhs_exp)){
+		lra_lhs->optimize_lra(mc_2r,NULL,lhs_exp);
+	}
+
+
+	Code_For_Ast & lhs_stmt = lhs_exp->compile_and_optimize_ast(*lra_lhs);
 	Register_Descriptor * lhs_register = lhs_stmt.get_reg();
 	lhs_register->set_used_for_expr_result(true);
 	
-	Code_For_Ast & rhs_stmt = rhs_exp->compile();
+	if mycheck(*rhs_exp){
+		lra_rhs->optimize_lra(mc_2r,NULL,rhs_exp);
+	}
+
+	Code_For_Ast & rhs_stmt = rhs_exp->compile_and_optimize_ast(*lra_rhs);
 	Register_Descriptor * rhs_register = rhs_stmt.get_reg();
 	rhs_register->set_used_for_expr_result(true);
 
-    return lhs_stmt;
+	Register_Val_Type type = (node_data_type == int_data_type)?
+							Register_Val_Type::int_num:Register_Val_Type::double_num;
+
+	Register_Descriptor * result_register = machine_dscr_object.get_new_register(type);
+	result_register->set_used_for_expr_result(true);
+
+    Ics_Opd* lhs_opd = new Register_Addr_Opd(lhs_register);
+	Ics_Opd* rhs_opd = new Register_Addr_Opd(rhs_register);
+	Ics_Opd* res_opd = new Register_Addr_Opd(result_register);
+
+	Icode_Stmt * comp_stmt;
+	switch (op) {
+		case PLUS :
+			if(type == int_num){
+				comp_stmt = new Compute_IC_Stmt(add, lhs_opd, rhs_opd, res_opd);
+			}
+			else{
+				comp_stmt = new Compute_IC_Stmt(fadd, lhs_opd, rhs_opd, res_opd);
+			}
+			break;
+		case MINUS :
+			if(type == int_num){
+				comp_stmt = new Compute_IC_Stmt(sub, lhs_opd, rhs_opd, res_opd);
+			}
+			else{
+				comp_stmt = new Compute_IC_Stmt(fsub, lhs_opd, rhs_opd, res_opd);
+			}
+			break;
+		case DIVIDE :
+			if(type == int_num){
+				comp_stmt = new Compute_IC_Stmt(idiv, lhs_opd, rhs_opd, res_opd);
+			}
+			else{
+				comp_stmt = new Compute_IC_Stmt(fdiv, lhs_opd, rhs_opd, res_opd);
+			}
+			break;
+		case MULTIPLY :
+			if(type == int_num){
+				comp_stmt = new Compute_IC_Stmt(mul, lhs_opd, rhs_opd, res_opd);
+			}
+			else{
+				comp_stmt = new Compute_IC_Stmt(fmul, lhs_opd, rhs_opd, res_opd);
+			}
+			break;
+
+		default:
+			CHECK_INVARIANT(CONTROL_SHOULD_NOT_REACH, "Intermediate code format not supported");
+			break;
+	}
+
+
+	list<Icode_Stmt *> ic_list;
+	
+	if (lhs_stmt.get_icode_list().empty() == false)
+		ic_list = lhs_stmt.get_icode_list();
+
+	if (rhs_stmt.get_icode_list().empty() == false)
+		ic_list.splice(ic_list.end(), rhs_stmt.get_icode_list());
+
+	ic_list.push_back(comp_stmt);
+	Code_For_Ast * assign_stmt;
+	
+	if (ic_list.empty() == false)
+		assign_stmt = new Code_For_Ast(ic_list, result_register);
+
+
+
+	lhs_register->reset_use_for_expr_result();
+	rhs_register->reset_use_for_expr_result();
+
+	Code_For_Ast & comp_code = *new Code_For_Ast(ic_list, result_register);
+	return comp_code;
 }
 
 
@@ -1494,13 +1668,29 @@ Code_For_Ast & Number_Ast<DATA_TYPE>::compile()
 template <class DATA_TYPE>
 Code_For_Ast & Number_Ast<DATA_TYPE>::compile_and_optimize_ast(Lra_Outcome & lra)
 {
+	// Register_Val_Type type = (node_data_type == int_data_type)?
+	// 						Register_Val_Type::int_num:Register_Val_Type::double_num;
+
+ //    Register_Descriptor * result_register = machine_dscr_object.get_new_register(type);
+
+ //    cout<<"fwfwerfwef\n";
 	CHECK_INVARIANT((lra.get_register() != NULL), "Register assigned through optimize_lra cannot be null");
 	Ics_Opd * load_register = new Register_Addr_Opd(lra.get_register());
 	Ics_Opd * opd = new Const_Opd<int>(constant);
 
-	Icode_Stmt * load_stmt = new Move_IC_Stmt(imm_load, opd, load_register);
+	Icode_Stmt * load_stmt;
 
-	list<Icode_Stmt *> ic_list;
+	if(node_data_type == int_data_type){
+       opd = new Const_Opd<int>(constant);
+       load_stmt = new Move_IC_Stmt(imm_load, opd, load_register);
+    }
+    else if(node_data_type == float_data_type || node_data_type == double_data_type){
+       opd = new Const_Opd<float>(constant);
+       load_stmt = new Move_IC_Stmt(fimm_load, opd, load_register);
+    }
+	 
+
+	list<Icode_Stmt *> & ic_list = *new list<Icode_Stmt *>;
 	ic_list.push_back(load_stmt);
 
 	Code_For_Ast & num_code = *new Code_For_Ast(ic_list, lra.get_register());

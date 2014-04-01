@@ -116,9 +116,8 @@ void Basic_Block::compile()
 			}
 		}
 	}
-
 	machine_dscr_object.clear_local_register_mappings();
-	//out<<"bb end "<<get_bb_number()<<endl;
+	// cout<<"bb end "<<get_bb_number()<<endl;
 }
 
 void Basic_Block::print_assembly(ostream & file_buffer)
@@ -133,6 +132,7 @@ void Basic_Block::print_icode(ostream & file_buffer)
 {
 	file_buffer<<"\n" << "label" << id_number << ":    \t\n";
 	list<Icode_Stmt *>::iterator i;
-	for (i = bb_icode_list.begin(); i != bb_icode_list.end(); i++)
+	for (i = bb_icode_list.begin(); i != bb_icode_list.end(); i++){
 		(*i)->print_icode(file_buffer);
+	}
 }

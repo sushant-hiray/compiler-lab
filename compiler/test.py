@@ -25,9 +25,9 @@ print("Done generating cfg files\n");
 
 for f in cfgFiles:
     print("Testing file  " + f ); 
-    command = "./cfg-test -icode -d " + f + " > expected "
+    command = "./cfg-test -icode -lra -d " + f + " > expected "
     os.system(command) 
-    command = "./cfglp -icode -d "  + f + " > generated  "
+    command = "./cfglp -icode -lra -d "  + f + " > generated  "
     os.system(command)
     os.system("diff expected generated");
 
