@@ -632,7 +632,7 @@ unary_expression:
     {
     if (NOT_ONLY_PARSE)
 	{
-        $$ = new Unary_Ast($1,0);
+        $$ = $1;
     }
     }
 ;
