@@ -729,7 +729,7 @@ constant:
 	{
 		float num = $1;
 
-		Ast * num_ast = new Number_Ast<int>(num, float_data_type, get_line_number());
+		Ast * num_ast = new Number_Ast<float>(num, float_data_type, get_line_number());
 
 		$$ = num_ast;
 	}

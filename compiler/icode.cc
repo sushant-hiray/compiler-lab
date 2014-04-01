@@ -177,12 +177,14 @@ Const_Opd<DATA_TYPE> & Const_Opd<DATA_TYPE>::operator=(const Const_Opd<DATA_TYPE
 template <class DATA_TYPE>
 void Const_Opd<DATA_TYPE>::print_ics_opd(ostream & file_buffer) 
 {
-	file_buffer << num;
+	file_buffer << std::fixed << std::setprecision(2);
+    file_buffer << num;
 }
 
 template <class DATA_TYPE>
 void Const_Opd<DATA_TYPE>::print_asm_opd(ostream & file_buffer) 
-{
+{ 
+    file_buffer << std::fixed << std::setprecision(2);
 	file_buffer << num;
 }
 
@@ -262,9 +264,9 @@ void Move_IC_Stmt::print_icode(ostream & file_buffer)
 	switch (ic_format)
 	{
 	case i_r_op_o1: 
-			file_buffer << " " << operation_name << ":\t";
+			file_buffer << "\t" << operation_name << ":\t";
 			result->print_ics_opd(file_buffer);
-			file_buffer << " <- ";
+			file_buffer << "<- ";
 			opd1->print_ics_opd(file_buffer);
 			file_buffer << "\n";
 
@@ -560,3 +562,4 @@ Instruction_Descriptor::Instruction_Descriptor()
 }
 
 template class Const_Opd<int>;
+template class Const_Opd<float>;

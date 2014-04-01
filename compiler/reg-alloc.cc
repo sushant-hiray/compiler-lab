@@ -344,17 +344,17 @@ void Machine_Description::initialize_instruction_table()
 	spim_instruction_table[slt] = new Instruction_Descriptor(slt, "slt", "slt", "", i_r_o1_op_o2, a_op_r_o1_o2);
 	spim_instruction_table[bne] = new Instruction_Descriptor(bne, "bne", "bne", "", i_op_o1_o2_o3, a_op_o1_o2_o3);
 	spim_instruction_table[j] = new Instruction_Descriptor(j, "goto", "j", "", i_op_o1, a_op_o1);
-	spim_instruction_table[j] = new Instruction_Descriptor(add, "add", "add", "", i_r_o1_op_o2, a_op_r_o1_o2);
-	spim_instruction_table[j] = new Instruction_Descriptor(sub, "sub", "sub", "", i_r_o1_op_o2, a_op_r_o1_o2);
-	spim_instruction_table[j] = new Instruction_Descriptor(mul, "mul", "mul", "", i_r_o1_op_o2, a_op_r_o1_o2);
-	spim_instruction_table[j] = new Instruction_Descriptor(idiv, "div", "div", "", i_r_o1_op_o2, a_op_r_o1_o2);
-	spim_instruction_table[j] = new Instruction_Descriptor(fadd, "add.d", "add.d", "", i_r_o1_op_o2, a_op_r_o1_o2);
-	spim_instruction_table[j] = new Instruction_Descriptor(fsub, "sub.d", "sub.d", "", i_r_o1_op_o2, a_op_r_o1_o2);
-	spim_instruction_table[j] = new Instruction_Descriptor(fmul, "mul.d", "mul.d", "", i_r_o1_op_o2, a_op_r_o1_o2);
-	spim_instruction_table[j] = new Instruction_Descriptor(fdiv, "div.d", "div.d", "", i_r_o1_op_o2, a_op_r_o1_o2);
-	spim_instruction_table[store] = new Instruction_Descriptor(fstore, "store.d", "s.d", "", i_r_op_o1, a_op_o1_r);
-	spim_instruction_table[load] = new Instruction_Descriptor(fload, "load.d", "l.d", "", i_r_op_o1, a_op_r_o1);
-	spim_instruction_table[imm_load] = new Instruction_Descriptor(fimm_load, "iLoad.d", "li.d", "", i_r_op_o1, a_op_r_o1);
+	spim_instruction_table[add] = new Instruction_Descriptor(add, "add", "add", "", i_r_o1_op_o2, a_op_r_o1_o2);
+	spim_instruction_table[sub] = new Instruction_Descriptor(sub, "sub", "sub", "", i_r_o1_op_o2, a_op_r_o1_o2);
+	spim_instruction_table[mul] = new Instruction_Descriptor(mul, "mul", "mul", "", i_r_o1_op_o2, a_op_r_o1_o2);
+	spim_instruction_table[idiv] = new Instruction_Descriptor(idiv, "div", "div", "", i_r_o1_op_o2, a_op_r_o1_o2);
+	spim_instruction_table[fadd] = new Instruction_Descriptor(fadd, "add.d", "add.d", "", i_r_o1_op_o2, a_op_r_o1_o2);
+	spim_instruction_table[fsub] = new Instruction_Descriptor(fsub, "sub.d", "sub.d", "", i_r_o1_op_o2, a_op_r_o1_o2);
+	spim_instruction_table[fmul] = new Instruction_Descriptor(fmul, "mul.d", "mul.d", "", i_r_o1_op_o2, a_op_r_o1_o2);
+	spim_instruction_table[fdiv] = new Instruction_Descriptor(fdiv, "div.d", "div.d", "", i_r_o1_op_o2, a_op_r_o1_o2);
+	spim_instruction_table[fstore] = new Instruction_Descriptor(fstore, "store.d", "s.d", "", i_r_op_o1, a_op_o1_r);
+	spim_instruction_table[fload] = new Instruction_Descriptor(fload, "load.d", "l.d", "", i_r_op_o1, a_op_r_o1);
+	spim_instruction_table[fimm_load] = new Instruction_Descriptor(fimm_load, "iLoad.d", "li.d", "", i_r_op_o1, a_op_r_o1);
 }
 
 void Machine_Description::validate_init_local_register_mapping()

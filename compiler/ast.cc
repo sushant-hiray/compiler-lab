@@ -558,7 +558,7 @@ Code_For_Ast & Name_Ast::compile()
 	Register_Val_Type type = (node_data_type == int_data_type)?
 							Register_Val_Type::int_num:Register_Val_Type::double_num;
 
-	Register_Descriptor * result_register = machine_dscr_object.get_new_register(type);
+    Register_Descriptor * result_register = machine_dscr_object.get_new_register(type);
 	Ics_Opd * register_opd = new Register_Addr_Opd(result_register);
 
 	Icode_Stmt * load_stmt = new Move_IC_Stmt(load, opd, register_opd);
@@ -578,7 +578,14 @@ Code_For_Ast & Name_Ast::create_store_stmt(Register_Descriptor * store_register)
 	Ics_Opd * register_opd = new Register_Addr_Opd(store_register);
 	Ics_Opd * opd = new Mem_Addr_Opd(*variable_symbol_entry);
 
-	Icode_Stmt * store_stmt = new Move_IC_Stmt(store, register_opd, opd);
+	Icode_Stmt * store_stmt;
+    if(node_data_type==int_data_type){
+        store_stmt = new Move_IC_Stmt(store, register_opd, opd);
+    }
+    else if(node_data_type==float_data_type || node_data_type == double_data_type){
+
+        store_stmt = new Move_IC_Stmt(fstore, register_opd, opd);
+    }
 
 	if (command_options.is_do_lra_selected() == false)
 		variable_symbol_entry->free_register(store_register);
@@ -1231,7 +1238,6 @@ Number_Ast<DATA_TYPE>::Number_Ast(DATA_TYPE number, Data_Type constant_data_type
 	node_data_type = constant_data_type;
 
 	ast_num_child = zero_arity;
-
 	lineno = line;
 }
 
@@ -1288,16 +1294,24 @@ Eval_Result & Number_Ast<DATA_TYPE>::evaluate(Local_Environment & eval_env, ostr
 template <class DATA_TYPE>
 Code_For_Ast & Number_Ast<DATA_TYPE>::compile()
 {
-	Register_Val_Type type = (node_data_type == int_data_type)?
+   
+    Register_Val_Type type = (node_data_type == int_data_type)?
 							Register_Val_Type::int_num:Register_Val_Type::double_num;
 
-	Register_Descriptor * result_register = machine_dscr_object.get_new_register(type);
+    Register_Descriptor * result_register = machine_dscr_object.get_new_register(type);
 	CHECK_INVARIANT((result_register != NULL), "Result register cannot be null");
 	Ics_Opd * load_register = new Register_Addr_Opd(result_register);
-	Ics_Opd * opd = new Const_Opd<int>(constant);
+	Ics_Opd * opd;
 
-	Icode_Stmt * load_stmt = new Move_IC_Stmt(imm_load, opd, load_register);
-
+	Icode_Stmt * load_stmt;
+    if(node_data_type == int_data_type){
+       opd = new Const_Opd<int>(constant);
+       load_stmt = new Move_IC_Stmt(imm_load, opd, load_register);
+    }
+    else if(node_data_type == float_data_type || node_data_type == double_data_type){
+       opd = new Const_Opd<float>(constant);
+       load_stmt = new Move_IC_Stmt(fimm_load, opd, load_register);
+    }
 	list<Icode_Stmt *> & ic_list = *new list<Icode_Stmt *>;
 	ic_list.push_back(load_stmt);
 
@@ -1358,3 +1372,4 @@ Code_For_Ast & Return_Ast::compile_and_optimize_ast(Lra_Outcome & lra)
 }
 
 template class Number_Ast<int>;
+template class Number_Ast<float>;
