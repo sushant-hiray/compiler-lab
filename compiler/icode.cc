@@ -266,7 +266,7 @@ void Move_IC_Stmt::print_icode(ostream & file_buffer)
 	case i_r_op_o1: 
 			file_buffer << "\t" << operation_name << ":\t";
 			result->print_ics_opd(file_buffer);
-			file_buffer << "<- ";
+			file_buffer << " <- ";
 			opd1->print_ics_opd(file_buffer);
 			file_buffer << "\n";
 
