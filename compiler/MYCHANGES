@@ -17,23 +17,15 @@ Changes in ast.cc and ast.hh
         Type_Expression
         Unary_Ast
 
-    Write the code for the method <x::compile> where x is either:
+    Write the code for the method <x::compile_and_optimize_lra> where x is either:
         Arithmetic_Ast
         Type_Expression
         Unary_Ast
 
----------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------
 
-Changes in reg-alloc.cc reg-alloc.hh
+Changes in reg-alloc.cc
 
-    Added registers for floating numbers
-    Added new Register_Val_Type i.e. double_num
-    Added new instructions for floating numbers and typecasting.
-    Changed <Machine_Description::get_new_register> method a bit.
+    Modified the method Lra_Outcome::optimize_lra so it is working for Float
 
- ---------------------------------------------------------------------------------------
-
-Changes in icode.cc and icode.hh
-
-	Changed print_icode and print_assembly methods.
---------------------------------------------------------------------------------------- 
+------------------------------------------------------------------------------------------
